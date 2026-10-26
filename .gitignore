@@ -1,0 +1,8 @@
+.env
+.relay/
+__pycache__/
+*.pyc
+.DS_Store
+._*
+workspace/outputs/*
+!workspace/outputs/.gitkeep

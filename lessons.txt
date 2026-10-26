@@ -1,0 +1,2468 @@
+✉
+You're missing out!
+Sign up for our weekly newsletter to learn about hackathons, community updates, and awesome projects.
+
+Sign me up×
+Devpost
+Join a hackathon 
+Host a hackathon 
+Resources 
+5 
+mohammed1916
+Notifications
+Loading...
+
+JupyterLite WebMCP
+Your notebook is already in the browser. Now your agent can be too.
+
+ Like  Comment
+Story
+Updates
+Submission history
+
+
+
+
+
+
+
+Live demo: https://jupyterlite-web-mcp.vercel.app/lab/index.html Repository: https://github.com/alliecatowo/jupyterlite-web-mcp
+
+The problem
+A data scientist's working notebook lives in a browser tab, and almost none of what matters about it exists on disk. The cell you just typed and haven't saved. The eleven characters you highlighted with your mouse because they look wrong. The kernel holding your DataFrame in memory. The chart that only rendered because you ran cells in that order.
+
+Getting an AI to help with that means one of two bad deals today. Copy-paste into a chat window: the model sees a dead snapshot, hands back text, and you re-key it — it cannot see your selection, cannot run anything, cannot know what already ran. Or bolt in a server-side MCP integration: it reads .ipynb bytes off disk, which is to say it reads a file that does not match your screen, and it needs a Jupyter server, credentials, and infrastructure. On JupyterLite there is no server to talk to at all.
+
+Why this is a WebMCP use case specifically
+The state that matters exists only inside the browser tab. There is no backend holding it, so there is nothing for a conventional MCP server to connect to. WebMCP is not the convenient option here — it is the only one.
+
+All 22 registered tools operate on tab-local state: the live NotebookPanel model including edits never saved to disk; the human's current cell, cursor, and exact text selection; the in-browser Pyodide/WebAssembly kernel that is shared with the human; the IndexedDB-backed contents manager; and threaded review conversations stored in the notebook's own metadata. None of this is proxied through or duplicated into an external service.
+
+Why this creates a better UX
+Every existing AI-notebook workflow bolts a second surface onto the first: a chat panel, a separate window, a copy-pasted cell you re-key by hand. WebMCP lets the agent act inside the tab the human is already looking at, so the notebook itself becomes the interface instead of a chat transcript describing one. The targeted cell gets a calm ring, an inline badge tracks state (Reading → Applying → Running → Done, or Failed with a structured error), a diff button opens the exact before/after, and any output the agent produced is labelled with a timestamp, in place. The human never has to ask "what did you just do?" — the document answers that live.
+
+What people and agents can do together that was hard before
+Pointing is bidirectional: highlight text with your mouse and say "fix just what I selected" — the agent reads that exact substring. One kernel, one document: the agent runs cells on the kernel that already has your data loaded, with no shadow copy anywhere. The human always wins a conflict: every mutating tool requires a source hash from a prior read, and a stale write is refused with a structured error, never silently overwritten. The notebook stays the record: the agent cannot execute arbitrary code, only cells that already visibly exist. And the owner decides what the agent may touch, per cell and per notebook — write, read, or fully hidden. The page injects no permission prompts of its own; permission UX stays with the WebMCP client.
+
+Review before it sticks. Flip the Agent panel from Direct to Propose mode and jupyter_update_cell stops applying on call: the change is staged as a reviewable before/after diff inline, under the cell it targets, with Accept and Deny controls — and the agent's tool call does not resolve until you decide. Accept applies the edit through the same code path Direct mode uses, so there is still only one place a cell's source is ever written. Deny sends back a reason you typed, as a normal result coded PROPOSAL_DENIED rather than an error, so the agent's next turn knows why, not just that it was told no. Aborting the call cancels the pending proposal, and a cell holds at most one proposal at a time. Propose mode covers cell edits today; insert, delete and run apply directly in either mode.
+
+How WebMCP was implemented
+A JupyterLab 4.6 prebuilt frontend extension, built with jupyter-builder and hatchling — no server extension, no backend, no API key, no embedded LLM, no chat panel. Tools are registered once at plugin activation through document.modelContext.registerTool(), and every tool reads live state when invoked rather than caching anything. Seven small plugins (tools, review, access, activity, propose, panel, output-selection) keep the notebook features decoupled from the tool surface — review threads, access control, the activity badges, proposals and output-selection capture all work with no agent connected at all.
+
+Try it
+Open the live demo, wait for the status bar to read "WebMCP ready", open customer-analysis.ipynb, and ask your agent to find and fix a wrong denominator in the conversion-rate calculation, then leave a review comment explaining why. Then highlight text with your mouse and ask the agent what you just selected. Then switch the Agent panel to Propose, ask for another edit, and watch it arrive as an inline diff you can Accept — or Deny with a reason the agent reads back.
+
+MIT licensed.
+
+How we built it
+Two packages in one repo: a TypeScript JupyterLab extension (packages/jupyterlite-webmcp) built with @jupyter/builder, and a hatchling-packaged Python distribution so the same build installs with one pip install into JupyterLab, Notebook 7, or a JupyterLite site. The Vercel deployment is a stock JupyterLite build with the extension added and COOP/COEP headers set so Pyodide runs on a SharedArrayBuffer worker. WebMCP only adds a tool surface on top of the notebook plugins; it never gates existing functionality.
+
+Challenges we ran into
+Making sure a mutating tool call could never silently clobber a human's in-flight edit required threading a content hash through every read/write pair and rejecting stale writes with a structured, recoverable error rather than a generic failure. Getting Pyodide running on a true SharedArrayBuffer worker (rather than the slower service-worker fallback) required serving the deployment cross-origin isolated, which meant hosting on a platform that would let us set COOP/COEP headers.
+
+Accomplishments that we're proud of
+All 22 tools operate purely on live, tab-local browser state — nothing is proxied through or duplicated into an external service, which is the only way this integration could work at all given JupyterLite has no server. The same extension ports unchanged to a JupyterLab server and a Notebook 7 server, so the abstraction is portable rather than JupyterLite-specific.
+
+What we learned
+Applying one test to every feature — "would this still make sense if the second participant were a human instead of an agent?" — turned out to be a remarkably reliable design filter. It's why the agent writes to the live shared model instead of a private copy, why writes carry a hash, why there's no arbitrary-code-execution tool, and why review threads live in the notebook file itself instead of a chat log that dies with the tab.
+
+What's next for JupyterLite WebMCP
+Extending Propose/Deny from cell updates to inserts, deletes and runs, which need their own diff representation; extending the review-thread and presence system to support multiple simultaneous human collaborators alongside an agent; and per-notebook policy templates so a team can standardize access-control defaults across a shared workspace.
+
+Built With
+jest
+jupyterlab
+jupyterlite
+playwright
+pyodide
+python
+typescript
+vercel
+webassembly
+webmcp
+Try it out
+ jupyterlite-web-mcp.vercel.app
+ GitHub Repo
+Submitted to
+image
+The WebMCP Challenge
+
+Winner WebMCP Challenge Winners
+Created by
+Allison Coleman
+Allison Coleman 
+Juan Mendoza
+Juan Mendoza 
+ Report inappropriate content
+ Like 
+Updates
+ Turn on notifications
+Allison Coleman
+Allison Coleman started this project — 26 days ago
+
+Leave feedback in the comments!
+
+Mohammed Abdullah
+Write a comment
+
+Submission history
+Devpost
+About
+Careers
+Contact
+Help
+Hackathons
+Browse hackathons
+Explore projects
+Host a hackathon
+Hackathon guides
+Portfolio
+Your projects
+Your hackathons
+Settings
+Connect
+ Twitter
+ Discord
+ Facebook
+ LinkedIn
+© 2026 Devpost, Inc. All rights reserved.
+Community guidelines
+Security
+CA notice
+Privacy policy
+Terms of service
+…
+This is the most useful comparison yet because JupyterLite WebMCP is very close to your project technically. Both involve Python running in-browser, Pyodide, live execution state, code editing, human review, and WebMCP.
+
+So here we can isolate the differences much better.
+
+Your project vs JupyterLite WebMCP
+Capability	JupyterLite WebMCP	Your Algorithm Visualizer
+Python in browser	✅ Pyodide	✅ Pyodide
+WebMCP	✅	✅
+Live code state	✅	✅
+Execute Python	✅	✅
+Web Worker	✅ SharedArrayBuffer worker	✅ Web Worker
+Agent reads current state	✅	✅
+Agent modifies code	✅	✅ proposed changes
+Human-reviewed diff	✅	✅ red/green diff
+Agent receives rejection reason	✅	Not mentioned
+Stale-write protection	✅ source hash	Not mentioned
+Agent/human conflict handling	✅ explicit	Not mentioned
+Exact human text selection	✅	Not mentioned
+Per-cell permissions	✅ read/write/hidden	No equivalent described
+Agent arbitrary-code execution	Deliberately prohibited	Agent runs current visualization/code
+Agent activity visible in UI	✅ Reading → Applying → Running → Done	Less explicit
+Agent-created output provenance	✅ timestamp/label	Not mentioned
+Review comments	✅ persisted in notebook	No
+Browser-local state	Central argument	Yes, but barely emphasized
+Generic visualization engine	No	✅ major advantage
+Execution tracing	Ordinary notebook execution	✅ major advantage
+Data-structure inference	No	✅
+Execution frames	No	✅
+Visual playback	No	✅
+22 tools	22	6
+No backend required	✅	Essentially yes for execution
+Existing major application integration	JupyterLab/JupyterLite	Custom application
+And there are three particularly important differences.
+
+1. They absolutely nail "Why WebMCP?"
+Their best sentence may be:
+
+“WebMCP is not the convenient option here — it is the only one.”
+
+Then they prove it.
+
+The important state is:
+
+unsaved notebook edits
+currently selected cell
+cursor
+exact selected text
+in-memory DataFrame
+already-running Pyodide kernel
+execution history
+notebook metadata
+A server-side MCP integration can't fully reproduce that because the authoritative state exists in the browser tab.
+
+That's an exceptionally strong WebMCP argument.
+
+And your project had almost the same opportunity.
+
+Your authoritative state includes:
+
+currently loaded Python
+current input
+live execution trace
+active frame
+playback position
+inferred visual structures
+visual mappings
+possibly worker/runtime state
+You could have made essentially the same argument:
+
+The state an agent needs to understand a running algorithm exists inside the browser—not in the source file.
+
+A GitHub/MCP integration can read:
+
+def dijkstra(...):
+
+But it cannot inherently know:
+
+“At frame 37, dist[4] changed from 12 to 9, node 4 became the active node, and this is what the user is currently looking at.”
+
+That's your equivalent of Jupyter's unsaved cell/kernel state.
+
+That's a very strong WebMCP justification that your submission barely exploited.
+
+2. Their human-agent conflict model is much stronger
+This is probably the biggest concrete technical difference.
+
+Before modifying a cell, the agent first reads it and gets something effectively like:
+
+source
+source_hash = ABC123
+When updating:
+
+update_cell(
+    new_source=...,
+    expected_hash="ABC123"
+)
+Suppose the human edits the cell meanwhile.
+
+Current hash becomes:
+
+XYZ789
+Then:
+
+ABC123 != XYZ789
+so the agent's modification is rejected.
+
+That's excellent.
+
+They summarize the design beautifully:
+
+“The human always wins a conflict.”
+
+This same problem absolutely exists in your visualizer.
+
+Imagine:
+
+Agent inspects code.
+Agent reasons for five seconds.
+User modifies code.
+Agent proposes a change based on the previous version.
+Your diff may now be stale.
+
+A revision/hash mechanism would solve it:
+
+inspectWorkspace()
+→ codeRevision: 143
+
+proposeCodeChange(
+    baseRevision: 143,
+    ...
+)
+But current revision is:
+
+144
+Therefore:
+
+STALE_WORKSPACE
+Agent reinspects and retries.
+
+Notice the pattern again:
+
+Observatory: revisions
+Faraday: epochs
+JupyterLite: source hashes
+
+Three winners independently solve essentially the same stale-agent-state problem.
+
+That's now a very strong signal.
+
+3. Their Propose mode goes further than your diff
+This is especially relevant because you already implemented something similar.
+
+Your submission says:
+
+“propose Python code/input changes through a human-reviewed red/green diff.”
+
+That's good.
+
+JupyterLite says:
+
+Agent calls update.
+
+Instead of immediately returning:
+
+success
+the tool call itself remains pending.
+
+Human sees:
+
+Before | After
+
+[Accept] [Deny]
+If accepted:
+
+tool result → accepted
+If denied:
+
+the human can type:
+
+Don't replace pandas; fix the denominator instead.
+
+And the tool returns something like:
+
+PROPOSAL_DENIED
+reason:
+"Don't replace pandas; fix the denominator instead."
+Now the agent receives the human's rejection reason as part of its tool interaction and can adapt on its next turn.
+
+That's an excellent human-agent feedback loop.
+
+Your red/green diff handles:
+
+Agent → Human
+
+JupyterLite adds:
+
+Agent → Human → Agent
+
+That closes the loop.
+
+Something else they did extremely well: no arbitrary execute tool
+This sounds counterintuitive.
+
+An AI coding integration where the agent cannot execute arbitrary code sounds less powerful.
+
+But they deliberately restrict it:
+
+Agent can execute only cells visibly present in the notebook.
+
+So instead of:
+
+execute_arbitrary_code("...")
+the agent must:
+
+propose/update cell
+↓
+visible notebook state
+↓
+run cell
+Therefore the human-visible document remains the source of truth.
+
+That's a very strong product principle:
+
+The notebook stays the record.
+
+Your equivalent could have been:
+
+The visible program stays the record.
+
+Agent shouldn't secretly execute some separate Python program invisible to the user.
+
+It should propose a change → human sees it → accepted code becomes visible → execute that.
+
+You already seem relatively close to this philosophy.
+
+And their UI shows agent activity
+Another subtle but excellent feature:
+
+Reading → Applying → Running → Done
+
+The human can see exactly what the agent is doing.
+
+And agent-generated outputs are timestamped/labeled.
+
+That addresses an important human-agent problem:
+
+“What did the AI just change?”
+
+Your visualization itself provides some transparency, but explicit agent-action provenance would strengthen it.
+
+For example:
+
+Agent activity
+
+✓ Inspected workspace
+✓ Ran visualization
+✓ Read frame 17
+✓ Changed playback → frame 22
+● Proposed code change
+  Waiting for your review
+That would make the collaboration much more legible.
+
+But your project beats JupyterLite in one substantial area
+Jupyter already has semantic structure.
+
+It has:
+
+Notebook
+ ├── Cell
+ ├── Cell
+ └── Cell
+and Pyodide executes those cells.
+
+Your project attempts something harder:
+
+arbitrary Python
+      ↓
+execution instrumentation
+      ↓
+runtime variables
+      ↓
+structure interpretation
+      ↓
+visual scene generation
+You're turning runtime state into visual semantics:
+
+[2, 7, 4]
+     ↓
+array visualization
+
+heap state
+     ↓
+tree representation
+
+adjacency structure
+     ↓
+graph visualization
+
+2D values
+     ↓
+DP table
+JupyterLite doesn't appear to do anything equivalent.
+
+So again, your technical core isn't trivial compared with this winner.
+
+The problem is that their submission spends paragraphs exposing the subtle engineering decisions, while yours compresses your most interesting pipeline into:
+
+“traces execution state, compiles variables into visual scenes.”
+
+We now have SIX winners
+And this creates a remarkably consistent picture.
+
+Winner	Particularly strong design property
+Observatory	revision-safe semantic mutations
+Bouquet	inspect/edit/refine visual feedback loop
+Faraday	local semantic extraction + privacy
+MASIL	quantitative WebMCP evaluation
+Mandate	authority/security + adversarial testing
+JupyterLite	live browser state + conflict-safe human/agent editing
+And now look at the recurring concepts:
+
+Shared authoritative state
+All of them treat the website/application—not the agent's conversation—as authoritative.
+
+Semantic tools
+Agent operates on:
+
+map objects / flowers / medical regions / game state / permissions / notebook cells.
+
+Not coordinates.
+
+Stale-state protection
+This keeps appearing:
+
+Observatory: revisions
+Faraday: epochs
+JupyterLite: hashes
+
+Human control
+Observatory: destructive approval
+Bouquet: undo/history
+Faraday: export approval
+MASIL: human remains participant
+Mandate: mandate + staging
+JupyterLite: Accept/Deny
+
+Your red/green diff absolutely belongs here.
+
+End-to-end agent loop
+Not merely:
+
+tool()
+→ result
+but:
+
+human
+→ agent
+→ WebMCP
+→ application
+→ changed application state
+→ human
+→ agent
+→ ...
+And one thing changes my assessment
+Earlier, one possible explanation was that your project simply wasn't sufficiently sophisticated.
+
+After seeing JupyterLite, I don't think that's a particularly convincing explanation.
+
+The two projects overlap enough technically that your implementation clearly has material that could support a strong WebMCP submission.
+
+The much clearer differences are:
+
+JupyterLite deeply articulates the browser-state problem, establishes WebMCP as necessary, handles stale-state conflicts explicitly, makes human/agent ownership visible, and explains the design philosophy behind each restriction.
+
+Your page mostly tells judges what your application can do.
+
+Their page tells judges:
+
+what problem exists → why existing MCP/AI approaches cannot solve it → why WebMCP uniquely solves it → what new problems agent access creates → how their architecture solves those → exactly how a judge can verify everything.
+
+That's a fundamentally stronger hackathon submission narrative.
+
+And because JupyterLite is so close to your technical domain, this is probably the winner I would study most carefully if you're trying to understand what your entry could have done differently, rather than simply looking for extra features you should have built.
+
+✉
+You're missing out!
+Sign up for our weekly newsletter to learn about hackathons, community updates, and awesome projects.
+
+Sign me up×
+Devpost
+Join a hackathon 
+Host a hackathon 
+Resources 
+5 
+mohammed1916
+Notifications
+Loading...
+
+Roque Nights
+Plan the night sky with your agent. One instrument, two operators.
+
+ Like  Comment
+Story
+Updates
+Submission history
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Roque Nights is an observing planner where a person and an AI agent share the same instrument. It computes a night from scratch in the browser: sunset and twilight, the true astronomical darkness window, Moon rise, set and illumination, and the altitude of every one of the 110 Messier objects, the planets and the Moon over a 5,044-star dome. Then it hands that instrument to your agent through fifteen WebMCP tools registered on the page itself.
+
+I am an AI engineer at the Gran Telescopio Canarias on La Palma, next to one of the darkest skies on Earth. Planning a good night is still tedious: which night has no Moon, what is high when it is dark, how long each target stays above thirty degrees, what to do when the weather sends you to another mountain. Every existing tool answers one of those questions with a table. None of them lets an agent work the sky with you.
+
+What happens in a session. You open the page in ChatGPT's browser (Site tools) or in Chrome with the WebMCP flag, and paste one prompt: "Plan me a three-hour night, best night in the next two weeks, avoiding the Moon." The agent calls rank_nights and picks September 13 (a thin Moon, nine hours of darkness). It calls find_observable_targets and gets candidates with observing windows, and the rejects with reasons. It calls point_sky_map and the dome swings to each target with an easing animation while you watch; the row lights up in the Agent tools panel. You double-click Andromeda and the Pleiades on the map to mark them as favorites; the agent reads that gesture through describe_current_view and answers with propose_plan: a dotted ghost plan on the night timeline that you accept or reject item by item before anything is committed. Move the site to Mauna Kea and the plan is flagged as built for a different sky; one click revalidates every block into Hawaii's own darkness. Export it as JSON in the open observing-plan.v1 schema, as a calendar, or as a share link that carries the whole plan, so a friend's agent can revalidate it for their latitude.
+
+What is real today. Fifteen imperative tools plus one declarative form, contextual registration (plan tools appear when a plan exists, commit_proposal when a proposal is pending, and the tool that causes the change reports tools_added and tools_removed), a human-in-the-loop primitive (propose, review, commit) that never blocks the agent's turn, explicit polar-night and unknown-time-zone handling, structured errors that an agent can recover from, a fuzz test of 14 tools times 12 malformed inputs, 1,035 tests, and a browser-level audit that drives all sixteen calls through document.modelContext.executeTool in a real Chromium. Live at roque-nights.netlify.app, MIT licensed.
+
+What it is not yet. Weather is only in the site comparison tool (Open-Meteo, one request for 28 dark-sky sites), not in the per-target windows. No custom targets beyond the catalog. No session log. Those are the roadmap, not the demo.
+
+Why WebMCP
+How the project fits WebMCP. There is no Roque Nights API. Every number on the page is computed locally with astronomy-engine, on the visitor's machine, from a vendored star catalog. A classic MCP server has nothing to wrap here: there is no endpoint behind the page, and inventing one would mean recomputing the same ephemeris on someone else's machine. What an agent actually needs is the running page: the night the person selected, the object they are looking at, the plan they are halfway through. WebMCP is the only way an agent can reach that, so this is not a website that also has an API. It is one instrument with two operators, and WebMCP is the second seat.
+
+How it improves the user experience. Planning stops being a conversation about a table and becomes a shared session over the sky. The person keeps every gesture they already know (drag the dome, tap an object, drag the time slider) and gains an operator who can rank sixty nights in a second and point the map for them. The agent's proposals arrive as a ghost plan on the timeline, so review is visual and item by item; a rejected item goes back to the agent with the person's reason. The Agent tools panel shows, in plain words, what the agent can do on this page and lights up the tool it is calling, so the person never wonders what just happened. Every tool returns a quotable summary plus the numbers behind it, so the agent can explain instead of assert.
+
+What human and agent can do together that was not possible before. Point at the same sky. The person marks a favorite with a double-click and the agent reads that gesture, with its timestamp, through describe_current_view; the agent swings the dome to Saturn and the person sees it move. Neither could do the other's part: the agent has no hands on the map and the person has no patience for sixty ephemeris calls. And the plan they build together is portable: exported in an open schema with the site and the night it was built for, a share link re-imports it on another sky as a new proposal, revalidated target by target, with the reasons for what no longer works. Two agents, two skies, one plan negotiated between them.
+
+How it is implemented. Vite, React 19 and TypeScript. A vanilla Zustand store is the single source of truth; every action carries source: 'human' | 'agent', and the fifteen tools are thin wrappers over the same store actions the buttons call, so bidirectionality is a property of the architecture rather than a feature. Tools are registered at module level, outside React, because StrictMode's double mount silently unregisters tools created in an effect. The sky is a canvas 2D stereographic projection fed by a pure scene builder, with one J2000-to-horizontal rotation per frame (about 1 ms for the whole dome). Contextual tools register and unregister through AbortControllers as the plan changes, with deactivation deferred until no tool call is in flight. The declarative API is used for the site form (toolname plus agentInvoked and respondWith), sharing one validation function with the imperative twin. Data: d3-celestial catalogs (BSD-3), astronomy-engine (MIT), Open-Meteo (CC BY 4.0). Everything is open source under MIT.
+
+Credits
+Music: "Cosmic Pulse", original instrumental generated with Google Lyria 3 Pro via Magnific; no third-party rights.
+
+Built With
+astronomy-engine
+canvas
+d3-celestial
+netlify
+open-meteo
+playwright
+react
+remotion
+tailwindcss
+typescript
+vite
+vitest
+webmcp
+zustand
+Try it out
+ roque-nights.netlify.app
+ GitHub Repo
+Submitted to
+image
+The WebMCP Challenge
+
+Winner WebMCP Challenge Winners
+Created by
+Sebastián  Fernández García
+Sebastián Fernández García 
+ Report inappropriate content
+ Like 
+Updates
+ Turn on notifications
+Sebastián  Fernández García
+Sebastián Fernández García started this project — 26 days ago
+
+Leave feedback in the comments!
+
+Mohammed Abdullah
+Write a comment
+
+Submission history
+Devpost
+About
+Careers
+Contact
+Help
+Hackathons
+Browse hackathons
+Explore projects
+Host a hackathon
+Hackathon guides
+Portfolio
+Your projects
+Your hackathons
+Settings
+Connect
+ Twitter
+ Discord
+ Facebook
+ LinkedIn
+© 2026 Devpost, Inc. All rights reserved.
+Community guidelines
+Security
+CA notice
+Privacy policy
+Terms of service
+…
+This one is especially revealing. Roque Nights has many of the same building blocks as your visualizer, but its implementation is much more deliberately designed around human-agent co-ownership.
+
+And unlike MASIL, it doesn't rely mainly on a social-impact story. There is a lot of hard engineering here.
+
+Roque Nights vs your Algorithm Visualizer
+Area	Roque Nights	Your Visualizer
+Browser-local computation	✅ Astronomy	✅ Python/Pyodide
+Canvas/visual workspace	✅ Sky	✅ Algorithm structures
+Semantic WebMCP access	✅	✅
+Human + agent manipulate same UI	Explicit architectural invariant	Yes, but less developed/explained
+Single source of truth	Zustand store	Not stated
+Action provenance	human | agent on every action	Not stated
+Context-dependent tools	Tools dynamically appear/disappear	Apparently static
+Proposal workflow	propose → review → commit	propose code/input → diff review
+Reject with reason	Yes	Not stated
+Stale-context detection	Yes—plan/site changes	Not stated
+Structured recoverable errors	Yes	Not stated
+Agent activity UI	Current tool lights up	Not stated
+Human gesture → agent context	Yes	Limited/unclear
+Agent action → visible UI	Yes	Yes
+Tests	1,035	Not mentioned
+Malformed-input fuzz testing	14 tools × 12 inputs	Not mentioned
+Real-browser WebMCP audit	All 16 calls	Not mentioned
+Open interchange format	observing-plan.v1	No equivalent
+Tool count	15 + declarative form	6
+Generic runtime tracing	No	✅
+Automatic visualization	No	✅
+Multi-data-structure support	No	✅
+One line explains a lot
+This is one of the strongest technical statements among all the winners you've shown:
+
+“the fifteen tools are thin wrappers over the same store actions the buttons call, so bidirectionality is a property of the architecture rather than a feature.”
+
+That's excellent.
+
+Their architecture is essentially:
+
+                 ┌── Human UI ─────┐
+                 │                 ↓
+              Zustand ← actions ← state
+                 ↑                 ↑
+                 │                 │
+                 └── WebMCP/Agent ─┘
+There aren't separate:
+
+humanUpdatePlan()
+agentUpdatePlan()
+paths.
+
+Both ultimately invoke the same domain action.
+
+And every action carries:
+
+source: "human" | "agent"
+So the application can always answer:
+
+Who caused this state transition?
+
+That is much stronger than simply attaching WebMCP methods to an existing application.
+
+Contextual tools are another sophisticated feature
+This is something none of your pasted description suggests your visualizer does.
+
+Roque Nights changes the agent's available capabilities depending on application state.
+
+No plan exists:
+
+propose_plan
+Plan exists:
+
+plan-related tools become available
+Proposal pending:
+
+commit_proposal
+And the calling tool reports:
+
+tools_added
+tools_removed
+That's very agent-friendly.
+
+The agent doesn't have to reason about 15 permanently available operations that may or may not currently make sense.
+
+The tool surface itself reflects application state.
+
+For your project, the analogous design could have been:
+
+No program loaded:
+    inspect_workspace
+    set_code
+
+Code ready:
+    run_visualization
+
+Execution available:
+    read_frame
+    control_playback
+    configure_visual
+
+Proposal pending:
+    inspect_proposal
+    cancel_proposal
+You don't necessarily need that exact design, but Roque treats tool availability as part of the state machine.
+
+That's advanced WebMCP usage.
+
+Their human→agent direction is unusually strong
+Most projects demonstrate:
+
+Agent → website
+
+Roque emphasizes:
+
+Website → agent, too.
+
+Human double-clicks Andromeda.
+
+The application records:
+
+favorite:
+  object: Andromeda
+  source: human
+  timestamp: ...
+Then the agent calls describe_current_view and discovers what the human just did.
+
+So:
+
+Human gesture
+     ↓
+Shared state
+     ↓
+WebMCP
+     ↓
+Agent understands gesture
+Then:
+
+Agent action
+     ↓
+WebMCP
+     ↓
+Shared state
+     ↓
+Sky physically moves
+     ↓
+Human sees it
+That's true bidirectionality.
+
+Your visualizer could have exploited this extremely well.
+
+Imagine:
+
+Human scrubs execution to frame 47
+
+then asks:
+
+Why does it go wrong here?
+
+Agent reads:
+
+activeFrame: 47
+selectedVariable: dist
+selectedNode: 5
+No need to say:
+
+“Look at frame 47 and node 5.”
+
+Or human clicks a DP cell.
+
+Agent automatically knows:
+
+selected:
+  structure: dp
+  row: 4
+  column: 7
+Then explains exactly that cell.
+
+That would have been a very compelling WebMCP interaction.
+
+Their testing is also substantially stronger
+Roque claims:
+
+1,035 tests
+
+plus:
+
+14 tools × 12 malformed inputs fuzzed
+
+plus:
+
+browser-level audit of all 16 WebMCP calls through actual document.modelContext.executeTool.
+
+Notice again that winners aren't merely testing their React functions.
+
+They're specifically testing the agent boundary.
+
+That's becoming a major recurring theme across everything you've pasted.
+
+MASIL:
+real end-to-end evaluation.
+
+Mandate:
+production verifier + adversarial ChatGPT test.
+
+Roque:
+fuzz + browser WebMCP audit.
+
+JupyterLite:
+conflict semantics.
+
+Observatory:
+lint/type/unit/browser/security gates.
+
+Roque also handles something subtle: tools disappearing during execution
+They say:
+
+contextual tools register and unregister through AbortControllers as the plan changes, with deactivation deferred until no tool call is in flight.
+
+That's careful concurrency engineering.
+
+Suppose:
+
+Agent calls tool A
+        ↓
+tool A running
+        ↓
+human changes plan
+        ↓
+tool A would normally disappear
+They don't yank the capability out halfway through execution.
+
+Again, they're designing for asynchronous human-agent interaction rather than treating tool calls as isolated RPCs.
+
+And again: they have a killer WebMCP justification
+This line echoes JupyterLite:
+
+“There is no Roque Nights API.”
+
+All astronomical state is calculated locally.
+
+A conventional MCP server would need to recreate the application somewhere else.
+
+But what matters is:
+
+currently selected night
+current observing site
+object human is viewing
+partially constructed plan
+human favorites
+current proposal
+All of that is live browser state.
+
+Therefore WebMCP operates on the actual instrument the human is using.
+
+Their metaphor:
+
+“One instrument, two operators.”
+
+is excellent because it communicates the architecture in five words.
+
+After SEVEN winners, something is extremely clear
+We're past the point where this looks coincidental.
+
+Across the winners you've provided:
+
+Observatory
+→ shared map state
+
+Bouquet
+→ shared bouquet state
+
+Faraday
+→ shared medical viewer state
+
+MASIL
+→ shared activity state
+
+Mandate
+→ shared application authority
+
+JupyterLite
+→ shared notebook/kernel state
+
+Roque Nights
+→ shared astronomy instrument state
+
+They all treat WebMCP fundamentally as:
+
+Agent becomes another participant in an existing stateful application.
+
+Not:
+
+Website exposes some functions to AI.
+
+That's a subtle but extremely important distinction.
+
+And your visualizer was very close
+Your architecture naturally lends itself to:
+
+One debugger/visualizer, two operators.
+
+Human can:
+
+write code
+change input
+scrub timeline
+select structures
+inspect visualization
+manipulate playback
+Agent can:
+
+inspect
+execute
+read frames
+manipulate playback
+configure visualization
+propose modifications
+That's exactly the shared-instrument model.
+
+But your Devpost page frames it as:
+
+“We added six WebMCP tools…”
+
+rather than:
+
+The human and agent operate the same live Python execution.
+
+That difference matters.
+
+I now see four concrete technical things that would have strengthened your implementation most
+Not 20 more visualizers.
+
+1. Explicit shared-state revisions
+Every relevant state snapshot gets something like:
+
+workspaceRevision: 142
+executionRevision: 31
+Agent mutations must reference the revision they inspected.
+
+This gives you the Observatory/JupyterLite/Faraday-style stale-state protection.
+
+2. Human-selection context
+Expose what the human is currently focused on:
+
+activeFrame
+selectedVariable
+selectedNode
+selectedCell
+selectedSourceRange
+playbackPosition
+That gives you Roque/JupyterLite-style bidirectionality.
+
+Then:
+
+“Why is this wrong?”
+
+actually works.
+
+3. Closed proposal feedback
+You already have the red/green diff.
+
+Extend:
+
+Agent proposes
+      ↓
+Human accepts
+      ↓
+agent receives ACCEPTED
+or:
+
+Human denies
+reason: "Don't change the algorithm,
+         change the input."
+      ↓
+agent receives PROPOSAL_DENIED + reason
+That's much stronger collaboration.
+
+4. WebMCP-specific evaluation
+Freeze perhaps 15–30 tasks.
+
+Test:
+
+ordinary browser agent
+vs
+WebMCP agent
+Measure:
+
+task success
+correct frame identification
+correct variable identification
+successful debugging
+stale-write protection
+invalid-call recovery
+token use
+completion time
+And fuzz your six tools with malformed/boundary payloads.
+
+The important conclusion hasn't changed
+I would not look at Roque Nights and conclude:
+
+“I should have built more visualizers/features.”
+
+Roque has lots of polish, but its standout engineering isn't the star catalog.
+
+It's:
+
+shared authoritative state + provenance + bidirectionality + contextual capabilities + proposal lifecycle + structured errors + concurrency handling + aggressive WebMCP testing.
+
+Your visualizer already had a technically interesting core.
+
+What these seven winners repeatedly demonstrate is that the competition appears to have rewarded teams that went extremely deep on the human ↔ application ↔ WebMCP ↔ agent boundary.
+
+Your project went extremely deep on the Python ↔ tracing ↔ visualization side.
+
+That's probably the single clearest architectural distinction I can draw from everything you've shown me so far.
+
+✉
+You're missing out!
+Sign up for our weekly newsletter to learn about hackathons, community updates, and awesome projects.
+
+Sign me up×
+Devpost
+Join a hackathon 
+Host a hackathon 
+Resources 
+5 
+mohammed1916
+Notifications
+Loading...
+
+Aisle - AI Wedding Seating
+Aisle is a live wedding seating canvas where people and AI plan together. Using WebMCP, agents arrange guests, honor constraints, spot conflicts, and repair changes in real time.
+
+ Like 1  Comment
+Story
+Updates
+Submission history
+
+
+
+
+
+
+
+
+
+Inspiration
+Wedding seating is a two-brain problem. Software is good at tracking capacity, relationships, and dozens of constraints, while people understand the family history, personalities, and compromises behind those rules.
+
+Traditional seating tools leave all that reasoning to the couple. General AI can offer suggestions, but it usually works in a separate chat and cannot see or change the actual floor plan. Aisle was inspired by the idea that the person and the agent should work together on the same visual artifact. Making changes in real time.
+
+What it does
+Aisle is an interactive wedding seating planner built for human–AI collaboration.
+
+People can design the venue, add or import guests, create seating rules, drag guests between tables, pin important placements, and undo any change. Through WebMCP, an AI agent can work directly with that same seating chart.
+
+The agent can:
+
+Arrange an entire wedding while respecting guest relationships and venue zones
+Repair conflicts while moving as few guests as possible
+Explain why someone was assigned to a particular table
+Ask the user questions and wait for their decision
+Propose a new arrangement that the user can keep or revert
+React to manual changes instead of overwriting them
+Prepare a printable seating document
+Basically every action that a human can take...
+
+Aisle currently exposes 41 WebMCP tools. Some tools register dynamically based on the chart’s state. For example, seating tools appear once tables exist, while finalize_chart only becomes available when every attending guest is seated and no rules are broken.
+
+How I built it
+Aisle is built with React, TypeScript, Vite, Tailwind CSS, and shadcn components. It runs entirely in the browser, requires no account or backend, and stores the chart locally.
+
+The WebMCP integration uses document.modelContext.registerTool() to expose the application’s capabilities to compatible agents. Every tool includes a description, JSON Schema, and an execution function connected to the same application actions used by the human interface.
+
+Both people and agents therefore operate on one shared state and one undo/redo history. Agent actions are visualized on the canvas through an animated cursor, highlighted objects, speech bubbles, and a shared activity feed that is on the left sidebar.
+
+The seating solver groups guests who must sit together, evaluates separation and venue-zone rules, and searches for a good arrangement.The agent is able to fix a problem without unnecessarily rearranging the entire wedding.
+
+Some WebMCP calls deliberately wait for human input. When the agent proposes an arrangement or asks a question, the tool call remains open until the user responds on the page.
+
+Codex and, when running out of usage limits, other AI tools helped me design, implement, debug, and test the project. I tested the WebMCP experience using ChatGPT’s in-app browser.
+
+Challenges I ran into
+The biggest challenge was making the collaboration feel shared rather than allowing the agent to silently rewrite the whole application. Initially, when asking to seat people, it was a bulk seating operation which moved dozens of guests at once, so I built cursor choreography, movement animations, explanations, and an activity feed to keep the agent’s work understandable. Now we can see the Agent moving each person, with the cursor moving around the screen, explaining its reasoning and actions.
+
+Human decisions also introduced asynchronous challenges. Proposal and question tools must wait for a response while handling timeouts, undo operations, competing actions, and additional tool calls safely.
+
+Another challenge was keeping the agent’s capabilities aligned with the application’s current state. Aisle continuously recalculates which tools should be registered as tables, guests, constraints, and violations change.
+
+Finally, seating itself is a difficult optimization problem. We had to balance hard relationship constraints, group cohesion, venue geometry, pinned seats, and the goal of minimizing disruption during repairs.
+
+What I learned
+I learned that WebMCP is most powerful when the web page becomes a shared workspace instead of simply exposing a collection of commands.
+
+Good agent tools need more than correct execution. They need clear descriptions, useful errors, visible feedback, reversible actions, and certain handoff points where the human still remains in control.
+
+I also learned that dynamic tool registration can explain what the application state is naturally. The tools available to the agent can tell it what is currently possible without requiring a separate workflow system.
+
+Testing was especially important for delayed human decisions, dynamic registration, pinned seats, solver behavior, geometry (a LOT of geometry issues), importing, and export pagination. The project now includes 122 automated tests across 14 test files.
+
+Accomplishments that I'm proud of
+I am proud that Aisle works as a complete visual seating planner even without an agent, while WebMCP turns it into a genuinely collaborative experience. The same chart can be edited by hand or through an agent, every action remains visible and undoable, and the final result becomes a practical document that could be used at a real event.
+
+What's next for Aisle
+Next, I'd like to add secure sharing between couples and planners, reusable venue templates, richer accessibility preferences, and additional optimization controls.
+
+I also want to explore collaborative sessions where several people and an agent can work on the same chart while preserving authorship, explanations, and a complete decision history.
+
+Additionally, Aisle can become more than just a wedding planner, and can be used for parties, dinners, restaurant seating, etc.
+
+Built With
+codex
+motion
+react
+shadcn
+tailwind
+typescript
+vercel
+vite
+webmcp
+zustand
+Try it out
+ aisle-three.vercel.app
+ GitHub Repo
+Submitted to
+image
+The WebMCP Challenge
+
+Winner WebMCP Challenge Winners
+Created by
+eri alipaj
+eri alipaj 
+ Report inappropriate content
+ Like 1 1 person likes this: 
+Diana Aliya
+Updates
+ Turn on notifications
+eri alipaj
+eri alipaj started this project — 26 days ago
+
+Leave feedback in the comments!
+
+Mohammed Abdullah
+Write a comment
+
+Submission history
+Devpost
+About
+Careers
+Contact
+Help
+Hackathons
+Browse hackathons
+Explore projects
+Host a hackathon
+Hackathon guides
+Portfolio
+Your projects
+Your hackathons
+Settings
+Connect
+ Twitter
+ Discord
+ Facebook
+ LinkedIn
+© 2026 Devpost, Inc. All rights reserved.
+Community guidelines
+Security
+CA notice
+Privacy policy
+Terms of service
+…
+Aisle reinforces the same pattern, but it adds one thing the previous examples make less explicit: the agent's work is made physically legible to the human while it happens.
+
+And importantly, Aisle having 41 tools does not mean "more tools = winner." Faraday won with five. The interesting part is what those tools represent.
+
+Aisle vs your Algorithm Visualizer
+Capability	Aisle	Your Visualizer
+Shared human/agent state	Explicit	Yes, but less emphasized
+Same actions for human + agent	Yes	Partially
+Shared undo/redo	Yes	Not highlighted
+Dynamic tools	Yes	Apparently no
+Human input during tool call	Yes	Diff review, but lifecycle unclear
+Agent asks user questions	Yes, tool waits	Not mentioned
+Human rejection/reversion	Yes	Diff rejection likely, but not explained
+Agent activity visualization	Very strong	Limited
+Agent cursor	Yes	No
+Highlight current affected object	Yes	Not described
+Agent explanations	Speech bubbles	No equivalent described
+Activity feed	Yes	No
+Reacts to manual changes	Explicit	Not highlighted
+Domain optimization	Seating solver	Runtime/visualization engine
+Minimal-change repair	Explicit goal	No direct equivalent
+Automated tests	122 / 14 files	Not mentioned
+Tested with ChatGPT browser	Explicit	Demo exists
+Runtime Python	No	Yes
+Execution tracing	No	Yes
+Generic structure visualization	No	Yes
+Aisle solves the "what the hell is the agent doing?" problem
+This is one of its strongest differentiators.
+
+Initially, the developer says the agent would simply perform bulk seating operations.
+
+Technically:
+
+“Seat everyone.”
+
+→ solver executes
+→ 70 people suddenly move.
+
+Correct result perhaps, but horrible collaboration.
+
+So they added:
+
+agent cursor → movement animation → highlighted objects → explanation bubbles → activity feed
+
+Now when the agent changes:
+
+Alice: Table 3 → Table 7
+the human actually watches it happen.
+
+That makes the agent feel like another operator of the application rather than an invisible function calling APIs.
+
+This matters particularly for YOUR visualizer
+You already have the perfect application for this.
+
+Suppose the user asks:
+
+Find where this algorithm goes wrong.
+
+Instead of the agent silently doing:
+
+run
+read frame 1
+read frame 8
+read frame 14
+read frame 22
+read frame 37
+your UI could visibly show:
+
+Agent inspecting execution…
+
+Frame 14
+Checking: visited[]
+
+Frame 22
+Checking: dist[4]
+
+Frame 37
+⚠ Potential incorrect update
+dist[4]: 12 → 9
+Then the visualization automatically moves with the agent.
+
+Human sees the graph/tree/array changing while the agent investigates.
+
+That would be an extremely compelling demonstration.
+
+Aisle also has true human handoff inside a tool call
+This keeps appearing among winners.
+
+Agent:
+
+I have two reasonable arrangements. Do you want the bride's college group closer to the stage or closer to the dance floor?
+
+The WebMCP call waits.
+
+Human responds in the UI.
+
+Then the tool completes and the agent continues.
+
+That's very different from:
+
+Agent → API → result
+It's:
+
+Agent
+  ↓
+WebMCP call
+  ↓
+Application
+  ↓
+Human decision
+  ↓
+WebMCP result
+  ↓
+Agent continues
+JupyterLite does essentially the same thing with Propose mode.
+
+Aisle does it for both proposals and questions.
+
+Your diff could have followed exactly this model.
+
+Another strong idea: minimal-disruption repair
+Aisle doesn't merely solve seating.
+
+Suppose the human manually moves Uncle Bob.
+
+A naive solver could recompute everything:
+
+80 guests → completely new seating
+Instead Aisle tries to:
+
+repair conflicts while moving as few guests as possible.
+
+That's a very good collaborative property.
+
+The human's actions are treated as intent worth preserving.
+
+This principle generalizes to your project.
+
+If a human manually changes:
+
+playback position
+visualization mapping
+selected variable
+input
+code
+structure configuration
+the agent shouldn't unnecessarily reset everything.
+
+It should preserve human state unless changing it is necessary.
+
+That's another meaning of:
+
+human and agent share the workspace.
+
+Dynamic tools appear again
+Roque Nights:
+
+tools appear/disappear according to application state.
+
+Aisle:
+
+seating tools appear once tables exist; finalize_chart appears only when everyone is seated and constraints are satisfied.
+
+So the tool surface itself becomes a state machine.
+
+Instead of telling the agent:
+
+finalize_chart()
+
+ERROR:
+You can't finalize because...
+the capability simply doesn't exist until the state makes it valid.
+
+That's an elegant pattern.
+
+Now we've seen it in at least two winners.
+
+But don't focus on Aisle's 41 tools
+This is important.
+
+If we looked only at Aisle:
+
+They had 41; you had 6; therefore you needed more tools.
+
+But:
+
+Faraday — 5 tools → winner.
+
+So that's clearly not the lesson.
+
+Aisle needs many operations because wedding planning has lots of semantic actions.
+
+Your six could be sufficient if those six enable a compelling closed workflow.
+
+We're now at EIGHT winners
+And at this point I can make a much firmer comparison.
+
+Across the winners you've pasted, I see seven recurring properties.
+
+1. The app is useful without an agent
+Observatory explicitly says it.
+
+Aisle explicitly says it.
+
+Jupyter obviously is.
+
+Roque is.
+
+Your visualizer passes this strongly.
+
+2. Human and agent operate the same authoritative state
+This is nearly universal.
+
+Your project appears to do this, but your submission doesn't make it an architectural centerpiece.
+
+3. WebMCP exposes domain semantics, not UI mechanics
+Winner examples:
+
+move flower
+focus region
+move guest
+rank nights
+update notebook cell
+place map object
+Yours:
+
+inspect workspace
+run visualization
+read frame
+control playback
+configure visualization
+propose modification
+You pass this too.
+
+4. Human activity becomes agent context
+Roque is particularly good at this.
+
+JupyterLite's selection is another excellent example.
+
+This is relatively weak/unclear in your project.
+
+5. Agent activity becomes human-visible
+Aisle is probably the strongest example.
+
+Roque also lights up tool activity.
+
+JupyterLite has activity badges.
+
+Your visualizer naturally could have been excellent here, but it doesn't appear developed as a distinct feature.
+
+6. Conflicts/failures are first-class
+This has become extremely consistent:
+
+Observatory: revisions/idempotency
+Faraday: epochs/concurrency
+Mandate: server authorization
+JupyterLite: hashes
+Roque: structured errors/in-flight lifecycle
+Aisle: timeout/undo/competing actions
+
+Your submission says essentially nothing about this layer.
+
+This is probably the clearest technical gap.
+
+7. They validate the agent interface, not just the application
+MASIL → controlled evaluation
+Mandate → adversarial live-agent testing
+Roque → fuzz + browser audit
+Aisle → 122 tests + ChatGPT browser testing
+Observatory → extensive automated gates
+
+Again, your page doesn't establish this.
+
+If I had to score where your project was comparatively strong/weak
+Not judging the competition result—just comparing the engineering characteristics visible in these pages:
+
+Dimension	Your relative position
+Core application complexity	Very strong
+Web/browser engineering	Strong
+Novel visualization	Very strong
+Local execution	Strong
+Semantic WebMCP tools	Strong
+Human approval	Strong
+WebMCP-specific problem framing	Weak/moderate
+Bidirectional collaboration	Moderate
+Agent action visibility	Moderate/weak
+State/revision safety	Weak/undocumented
+Agent failure recovery	Weak/undocumented
+WebMCP-specific testing	Weak/undocumented
+Quantitative evaluation	Absent from submission
+End-to-end judge scenario	Moderate
+And that's why I keep coming back to the same conclusion:
+
+I wouldn't have told you to build another algorithm visualization or add another dozen WebMCP tools.
+
+I would have told you to stop feature development earlier and spend the remaining time turning the existing visualizer into a rigorously engineered shared human-agent debugging instrument:
+
+shared revisions + human focus/selection exposed to agent + visible agent investigation + pending proposal/rejection loop + stale-action protection + structured failures + WebMCP fuzz/end-to-end tests + one measured browser-only-vs-WebMCP debugging benchmark.
+
+Based on the eight winners you've pasted, that direction aligns much more closely with what repeatedly distinguishes their submissions.
+
+✉
+You're missing out!
+Sign up for our weekly newsletter to learn about hackathons, community updates, and awesome projects.
+
+Sign me up×
+Devpost
+Join a hackathon 
+Host a hackathon 
+Resources 
+ 
+mohammed1916
+Notifications
+Loading...
+
+ArchMorph
+Browser-based architecture studio where a human and an AI agent design a building together on the same live canvas.
+
+ Like 5  Comment 1
+Story
+Updates
+Submission history
+
+
+
+
+
+
+
+
+
+
+
+
+
+Inspiration
+I have a dream of building a house for my family and being involved in designing it myself.
+
+For almost a year, I tried turning that dream into a floor plan using pen and paper and later Figma. I could imagine the house in my mind, but I was rarely satisfied with the result. Without architectural training, it was difficult to understand room relationships, circulation, dimensions, setbacks, and whether the design would actually feel comfortable.
+
+The biggest limitation was that a flat drawing could not show me what the finished house would feel like. I wanted to see it from the outside, walk through it from the inside, find problems, and keep improving it without needing years of training just to explore an idea.
+
+When I discovered the WebMCP Challenge, I realized I could build the tool I had been wishing for: an architecture studio where a person and an AI agent work on the same live building. That idea became ArchMorph.
+
+ArchMorph is intended for people who want to explore their future home visually before taking the design to a professional architect. It does not replace architects or engineers; it makes the early stage of imagining, testing, and communicating a home much more accessible.
+
+What it does
+ArchMorph is a Human + Agent Architecture Studio for designing residential buildings in the browser.
+
+A user can configure a plot, define its orientation and setbacks, and create a house using rooms, walls, doors, windows, stairs, floors, balconies, terraces, boundary walls, gates, and façade features.
+
+The design can be experienced through three connected views:
+
+Floor Plan for precise 2D planning and editing
+3D Orbit for inspecting the building from different exterior angles
+Walk Mode for exploring the house from the inside
+ArchMorph also calculates architectural measurements in real time, including room areas, gross covered area, open-site area, plot coverage, and floor-area ratio.
+
+For example:
+
+ 
+
+The application can inspect circulation and identify early layout problems such as disconnected rooms, missing exterior access, invalid openings, overlapping geometry, and incorrect stair connections. These checks are meant to support early design decisions, not provide final building-code or structural certification.
+
+What makes ArchMorph WebMCP-native is that an AI agent can directly understand and operate the same project through 57 typed architectural tools. The agent can inspect the plot and existing design, create or modify elements, calculate measurements, validate the layout, control the 3D view, enter Walk Mode, capture snapshots, and export the project.
+
+The human and the agent are not working on separate versions. They share one live model, and every change made by either side appears immediately on the same canvas.
+
+How we built it
+I built ArchMorph using Codex as my main development partner. I used it to help shape the product, research architectural workflows, plan the system, implement the interface, debug geometry, design the WebMCP tools, test interactions, and refine the final experience.
+
+The foundation of ArchMorph is one canonical project model. The plot, floors, rooms, walls, openings, stairs, exterior elements, measurements, and validation results all come from the same structured state.
+
+The 2D plan and 3D building are different representations of that state. When a room is moved or resized, its walls, hosted doors and windows, measurements, validation results, floor-plan geometry, and 3D model update together.
+
+Each architectural element has a stable ID. This allows the agent to inspect a particular room, wall, door, window, or staircase and make precise changes to the correct object.
+
+The WebMCP layer is organized around clear architectural operations:
+
+Inspect the project, plot, floors, rooms, walls, openings, circulation, and exterior
+Design rooms, walls, doors, windows, stairs, floors, and façade elements
+Measure and validate areas, distances, coverage, access, and layout quality
+Present and export the design through 2D, 3D, Walk Mode, snapshots, SVG, and structured JSON
+Human edits and agent actions pass through the same operation system. This keeps the model synchronized and makes changes visible and understandable. Projects are also autosaved locally in the browser so users can continue working without creating an account.
+
+Challenges we ran into
+The hardest challenge was maintaining one reliable source of truth across the visual editor, WebMCP tools, calculations, layout checks, 2D plan, and 3D model.
+
+Architectural elements are strongly connected. Moving one room can affect several walls, openings, measurements, circulation paths, and both visual views. Doors and windows must remain attached to valid host walls, while staircases must connect the correct floors and respond to changes in storey height.
+
+Another challenge was making the WebMCP tools precise enough for an agent to use safely. The tools needed typed inputs, real measurement units, stable element IDs, useful inspection results, and clear errors. Invalid geometry had to be rejected without leaving the rest of the project in a broken state.
+
+I also wanted agent actions to remain visible. ArchMorph is designed around collaboration, so the agent should not silently modify a hidden data model. When it changes something, the result must appear on the human’s canvas, update the measurements, and remain available in the project history.
+
+Finally, balancing capability with simplicity was difficult. Architecture software can quickly become overwhelming, so I had to decide which controls should remain visible, which operations belonged in the inspector, and which details the agent could manage more efficiently.
+
+Accomplishments that we're proud of
+I am proud that ArchMorph became more than a visual prototype. It is a working architecture environment where a user can create a measured floor plan, generate the corresponding 3D building, walk through it, inspect layout problems, and continue editing the same design.
+
+I am especially proud of the WebMCP integration. The agent can inspect the existing project before acting, reason about individual architectural elements, perform precise operations, and show the outcome directly in the live interface.
+
+Building 57 connected WebMCP tools during the hackathon was a major accomplishment. Together, they allow an agent to participate across the complete early design workflow rather than performing a single isolated demo action.
+
+Most personally, I am proud that I can now use ArchMorph to explore ideas for my own family home—the same need that originally inspired the project.
+
+What we learned
+The most important thing I learned is that WebMCP can turn a website from a human-only interface into a shared working environment for humans and agents.
+
+I also learned that useful agent integration is not simply about exposing many tools. An agent needs to inspect before acting, identify objects reliably, understand exact units, receive structured results, and make changes that the human can immediately see and verify.
+
+Building ArchMorph also gave me a much deeper appreciation for the complexity of architecture software. A simple-looking floor plan contains many connected systems: geometry, circulation, openings, measurements, floors, stairs, exterior features, and human experience.
+
+Codex helped me move much faster across product thinking, design, implementation, debugging, and testing. However, I also learned that the human still provides the purpose, judgment, creativity, and final decisions. That became the central idea behind ArchMorph: the best result comes from a human and an agent contributing different strengths to the same project.
+
+What's next for ArchMorph
+The next step is to make the collaboration more conversational. A user should be able to describe their family size, plot, lifestyle, privacy needs, climate, and budget, then ask an agent to create a thoughtful starting design through ArchMorph’s existing tools.
+
+I also plan to add deeper analysis for daylight, ventilation, accessibility, privacy, climate, and energy use. Location-aware planning guidance could help users make better early decisions while clearly distinguishing guidance from professional certification.
+
+Other improvements will include richer interiors, furniture layouts, more realistic materials and lighting, stronger multi-floor navigation, real-time family collaboration, and professional CAD or BIM export options.
+
+The long-term goal is for ArchMorph to become a bridge between homeowners and architects. People should be able to explore their ideas, understand what they truly need, and bring a clear, visual, and measurable starting point to a professional.
+
+Designing a future home should begin with imagination, not confusion. ArchMorph is my attempt to make that imagination something people can see, experience, and improve together with an AI agent.
+
+Built With
+2d
+3d
+agent
+architecture
+codex
+design
+maths
+nextjs
+node.js
+openai
+react
+svg
+tailwind
+three.js
+tool
+typescript
+vinext
+vite
+webmcp
+Try it out
+ archmorph-studio.musfk.chatgpt.site
+ GitHub Repo
+Submitted to
+image
+The WebMCP Challenge
+
+Winner WebMCP Challenge Winners
+Created by
+Designed and built the entire project end-to-end as a solo creator. Architected the canonical data model, built the synchronized 2D floor-plan editor and 3D/Walk-mode viewers with Three.js, and implemented all 57 typed WebMCP architectural tools to enable seamless real-time human-agent co-design.
+
+Yousuf Khan
+Yousuf Khan 
+Creative Builder
+ Report inappropriate content
+ Like 5 5 people like this: 
+Arif ali koyani
+Robert Schwentker
+Diana Ali
+…
+ArchMorph is useful because it doesn't have some of the sophisticated mechanisms we saw in MASIL, Mandate, JupyterLite, or Roque Nights. Yet it still won.
+
+That helps separate what was probably essential from what was merely a bonus.
+
+ArchMorph vs your Algorithm Visualizer
+Dimension	ArchMorph	Your Visualizer
+Useful without AI	✅ Full architecture editor	✅ Full algorithm visualizer
+Shared canonical model	Explicitly central	Exists, but not explained this way
+Human + agent same state	Explicit	Yes
+Same operation path	Explicit	Partly/unclear
+Stable semantic IDs	Explicit	Not highlighted
+Agent inspects before modifying	Explicit	inspect_workspace supports this
+Visible agent changes	Explicit	Yes, but less emphasized
+Multiple synchronized representations	2D + 3D + Walk	code + runtime trace + visual structures
+Derived state recalculation	measurements, geometry, validation	runtime frames/visual scenes
+Invalid mutation rejection	Explicit	Not described
+Undo/history	Mentioned	Code diff/review; general history unclear
+Local persistence	✅	Not highlighted
+Dynamic tools	No mention	No
+Revision/hash/epoch protection	No mention	No
+Quantitative WebMCP benchmark	No	No
+WebMCP tool count	57	6
+Generic Python execution	No	✅
+Runtime tracing	No	✅
+Automatic structure visualization	No	✅
+So ArchMorph is evidence against one conclusion from our earlier comparisons:
+
+You did not necessarily need MASIL-level benchmarking or Mandate-level security research to win.
+
+Those clearly strengthen a submission, but ArchMorph won without presenting either.
+
+What ArchMorph does exceptionally well
+Its strongest architectural idea is extremely easy to understand:
+
+One building model → human editor + agent + 2D + 3D + measurements + validation.
+
+Everything comes from one canonical state:
+
+                    Canonical building
+                          model
+                            │
+        ┌───────────────────┼───────────────────┐
+        ↓                   ↓                   ↓
+    Floor plan             3D               Walk mode
+        │                   │
+        └─────────┬─────────┘
+                  ↓
+        measurements/validation
+
+Human ─────────→ operations ←───────── Agent/WebMCP
+                     │
+                     ↓
+              canonical model
+That is immediately comprehensible.
+
+Move one room and:
+
+walls update
+doors/windows remain attached
+measurements update
+validation updates
+2D updates
+3D updates
+That's a strong demonstration of shared semantic state.
+
+Your project actually has a very similar architecture
+This is where I think your Devpost write-up missed a major opportunity.
+
+Your conceptual architecture is something like:
+
+                    Python program
+                         +
+                       input
+                         │
+                         ↓
+                 Pyodide execution
+                         │
+                         ↓
+                  runtime trace
+                         │
+                         ↓
+                canonical frames
+                         │
+          ┌──────────────┼───────────────┐
+          ↓              ↓               ↓
+        Arrays         Graphs          Trees
+        Heaps          Maps            DP
+        Sets           Scalars         ...
+And:
+
+Human ─────────→ visualizer state ←──────── WebMCP agent
+That's comparable in spirit to ArchMorph.
+
+But ArchMorph spends a significant part of the submission explaining the canonical model and synchronization.
+
+Your submission gives this sophisticated pipeline essentially one sentence:
+
+“The app runs Python in an isolated worker, traces execution state, compiles variables into visual scenes…”
+
+That should probably have been one of your headline architectural accomplishments.
+
+Stable IDs matter too
+ArchMorph explicitly says:
+
+“Each architectural element has a stable ID.”
+
+Therefore an agent can say:
+
+inspect room_17
+move room_17
+resize room_17
+add door to wall_42
+rather than:
+
+the bedroom-looking rectangle near the upper-right.
+
+We saw the same idea in Observatory and Bouquet.
+
+For your visualizer, semantic/stable identity could apply to:
+
+variable: "dist"
+structure: "graph"
+node: "vertex_5"
+frame: 37
+sourceLine: 18
+Then agent reasoning can remain grounded across operations.
+
+If your implementation already has stable identities internally, that should have been advertised.
+
+But there's a significant difference: 57 tools vs 6
+Unlike Faraday, ArchMorph does genuinely expose a huge semantic surface.
+
+But look at why.
+
+An architecture application naturally contains:
+
+inspect_room
+create_room
+move_room
+resize_room
+
+inspect_wall
+create_wall
+modify_wall
+
+add_door
+move_door
+remove_door
+
+add_window
+modify_window
+
+create_floor
+add_staircase
+
+calculate_area
+validate_circulation
+
+enter_walk_mode
+capture_snapshot
+export_project
+...
+The agent can participate in almost the entire product.
+
+Your six tools are much broader:
+
+inspect workspace
+run visualization
+read frame
+control playback
+configure visualization
+propose code/input changes
+That's not inherently bad. A well-designed broad tool can cover many operations.
+
+But ArchMorph can credibly say:
+
+The agent can participate across the complete early design workflow.
+
+Your agent's workflow is somewhat narrower relative to everything your visualizer itself can presumably do.
+
+That could matter.
+
+Another difference: ArchMorph gives the agent a domain to reason about
+The agent doesn't merely manipulate UI state.
+
+It reasons about:
+
+room relationships
+circulation
+dimensions
+setbacks
+exterior access
+overlapping geometry
+stairs
+plot coverage
+floor-area ratio
+So WebMCP exposes enough domain information for the agent to make architectural decisions.
+
+Your visualizer exposes runtime information, but the submission doesn't show enough examples of the agent performing algorithmic reasoning using that state.
+
+For example:
+
+“At frame 27, node C is marked visited before its shortest distance is finalized. Show me why.”
+
+or:
+
+“Compare frames 18 and 19 and explain why this heap property is violated.”
+
+or:
+
+“Find the first DP cell whose value diverges from the recurrence.”
+
+Those demonstrate that the structured execution model isn't merely inspectable—it enables reasoning that would be difficult from screenshots.
+
+ArchMorph's tagline is also much stronger
+ArchMorph:
+
+“Browser-based architecture studio where a human and an AI agent design a building together on the same live canvas.”
+
+Immediately I understand:
+
+Human + agent + same artifact + collaboration.
+
+Yours:
+
+“A WebMCP-powered code playground where AI agents inspect, run, and dynamically visualize Python algorithms…”
+
+That's more feature-oriented.
+
+Something closer to:
+
+“A live algorithm debugger where you and an AI agent inspect the same execution, step through the same state, and fix code together.”
+
+would communicate the WebMCP idea much faster.
+
+Now we have NINE winners
+ArchMorph helps me divide the recurring winner characteristics into two groups.
+
+Nearly fundamental
+Across almost everything you've shown:
+
+Shared live application state.
+Human and agent operate the same artifact.
+
+Semantic operations.
+Agent understands rooms, flowers, cells, stars, map objects, guests—not pixels/click coordinates.
+
+Visible effects.
+Agent changes appear in the actual application.
+
+Strong WebMCP-specific use case.
+There's a reason for the agent to operate the live page rather than receive copied data in chat.
+
+End-to-end workflow.
+The agent participates in a meaningful task, rather than merely demonstrating isolated tool calls.
+
+Your project meets several of these, although your write-up didn't communicate them strongly enough.
+
+Differentiators rather than absolute requirements
+These appear in some winners but not all:
+
+dynamic tool registration
+revision/hash/epoch concurrency
+quantitative evaluation
+fuzz testing
+permission systems
+extensive approval workflows
+dozens of tools
+explicit provenance
+adversarial testing
+They make projects stronger, but ArchMorph shows you don't need every one of them.
+
+Which winner is closest to yours?
+After all nine you've shown, I'd group them roughly like this:
+
+Closest technically: JupyterLite WebMCP
+
+Because of:
+
+Pyodide + live code + browser state + execution + editing + review.
+
+Closest interaction concept: Roque Nights
+
+Because of:
+
+one interactive visual instrument operated by both human and agent.
+
+Closest visualization concept: ArchMorph
+
+Because of:
+
+one canonical semantic model driving multiple synchronized visual representations.
+
+And that combination tells me what the strongest version of your project could have been:
+
+JupyterLite's live-state rigor + Roque's two-operator collaboration + ArchMorph's canonical-model story, applied to your existing runtime-tracing/visualization engine.
+
+You didn't need to replace your project. The underlying idea was well aligned with the winners.
+
+The missing piece visible from these submissions was mostly making “human and agent debugging the exact same live execution” the product itself, rather than presenting “algorithm visualizer + six WebMCP tools” as the product.
+
+✉
+You're missing out!
+Sign up for our weekly newsletter to learn about hackathons, community updates, and awesome projects.
+
+Sign me up×
+Devpost
+Join a hackathon 
+Host a hackathon 
+Resources 
+ 
+mohammed1916
+Notifications
+Loading...
+
+Alza
+A floor plan is coordinates, not buttons. Alza publishes its geometry as 31 typed tools, so your agent draws the plan, checks its own work, buys from another origin, and raises it to walkable 3D.
+
+ Like 9  Comment
+Story
+Updates
+Submission history
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Inspiration
+I had a floor plan as a photo and wanted to see it in 3D. That should be a solved problem, but every tool I found wanted me to redraw it by hand, wall by wall, in an editor built for a mouse.
+
+So I tried handing it to an AI agent instead. That was worse. An agent can read a screenshot and it can talk about a floor plan, but it cannot use one. There is no button that means "make this wall four point six metres". There is no DOM worth scraping. A drawing is coordinates, joints and constraints, and none of that is reachable from the outside.
+
+WebMCP looked like the missing half. Not a way to describe the page to an agent — a way to hand it the actual geometry.
+
+What it does
+Alza is a floor-plan editor that publishes its own tools. You draw walls, rooms, doors, windows and furniture in a metric 2D canvas, then raise it to a 3D model you can walk through. An agent joins the same live page and works with the same tools you do.
+
+The demo is the honest test: I gave the agent a photo of a plan it had never seen. The drawing carries no scale, so it asked for one real dimension, set everything from that, and traced it — 12 walls, 14 openings, 10 rooms, 34 pieces of furniture.
+
+Alza's geometry laid over the drawing it was traced from
+
+The drawing underneath is the source photo. The dark geometry on top is what the agent built from it.
+
+When the catalogue had no honest match for a symbol, it modelled the piece itself: an L-shaped sofa, a corner shower, a compact bath, a fitted L wardrobe, a washing machine
+
+The pieces the agent modelled itself
+
+Then it checked itself. The constraint engine reports in metres — this wardrobe crosses that wall, this basin blocks that door's swing — and the agent reads the complaint and fixes it. And where it could not be sure, it said so instead of guessing: it left a note that one symbol was ambiguous and explained how it had read it.
+
+How I built it
+Vite, React, TypeScript, Three.js. No backend at all — it is a static site, and plans never leave the browser.
+
+The 31 tools are typed and registered on document.modelContext at load:
+
+document.modelContext.registerTool(descriptor, { signal, exposedTo })
+There is a 32nd that only exists when it is relevant: select a wall in the UI and extend_selected_wall appears; deselect and it is gone, unregistered by aborting the AbortSignal its descriptor was registered with.
+
+The constraint engine is oriented-rectangle SAT: furniture against walls, door swing paths, whether an opening fits the wall it sits on, whether a room has a door at all.
+
+The part I am most pleased with is the partner. Nordika is a genuinely separate website on its own origin, deployed to a different host. It registers its own tools with exposedTo, and the studio discovers them with getTools({ fromOrigins }) and calls them with executeTool(). One instruction crosses that boundary and a real product lands in the plan at its real size — with no server anywhere in the path.
+
+Challenges I ran into
+The plan I first traced turned out to be copyrighted. I had pulled it off Google without thinking, and by the time I noticed, it was committed to a public repo — and the whole demo model was traced from it, so the layout was derived too, not just the image. Deleting the file did nothing: git keeps history. I deleted the repo, generated my own plan, and re-traced everything from scratch. That cost a full rebuild of the model, the film and the screenshots.
+
+The video fought me for a long time. The 3D looked juddery no matter what I did, and it took a while to find out why: the tool I was recording with caps at 25 fps and renders in software. Continuous camera motion at 25 fps with no motion blur reads as stepping, and no amount of conforming fixes it. I switched to real GPU screen capture at 60 fps and it went away.
+
+The worst bug was silent. The production build was shipping without its cross-origin headers, so the partner iframe was never allowed to publish its tools — the flagship feature, quietly dead on the live URL. The cause: Vite loads .env into import.meta.env but not into process.env, and the plugin that writes the headers was reading process.env. It failed by emitting a header that looked plausible.
+
+And building the demo found real bugs in my own app: the walk camera passed straight through walls and furniture, looking around orbited instead of turning your head, and the 2D auto-fit anchored the plan to a corner instead of centring it.
+
+Accomplishments that I'm proud of
+The agent recovered from its own mistake without help. Running in Codex, it invented a wall id, the tool answered Wall "wall_10" not found, and its next call used the real one — then get_issues came back "0 issues — the plan is clean". I did not script that. It is what happens when tool errors are sentences instead of failure codes.
+
+The constraint engine caught something about the drawing itself. It rejected the catalogue's standard 1.70 m bath — "Bathtub crosses wall" — because that alcove is 1.68 m wall to wall, 1.58 m clear. The drawing sizes its own bath shorter, at 1.53 m, so that is what got modelled instead. A geometry checker noticing that a drawing is tight is exactly the point.
+
+And the second origin is real. A different site on a different host, not a folder pretending to be one.
+
+What I learned
+That "the agent can see the page" and "the agent can use the page" are completely different problems, and only the second one matters.
+
+That an error message is an interface. Half of what makes the agent look competent is that when it gets something wrong, the tool tells it what is wrong in words it can act on.
+
+That degrading matters more than I expected. Cross-origin discovery is not in every runtime yet — ChatGPT and Codex register the page's own tools fine but fall back to postMessage for the partner. Because the same protocol runs over both, the feature gets quieter instead of disappearing.
+
+And that a build can fail silently and look fine. I now check the artefact, not the exit code.
+
+What's next for Alza
+Multi-floor plans, and stairs between them
+Export to IFC, so the model can leave for real CAD
+Cost and materials as tools, so an agent can answer "what does this room cost to finish" from the same geometry
+A shared session, so a person and an agent can work the same plan at the same time and see each other move
+Why this generalizes
+None of this is really about architecture. The pattern underneath is that a page already holds a rigorous model — geometry, a cart, a spreadsheet, a timeline, an audio track — and right now the only way an agent can reach it is by pretending to be a mouse. WebMCP lets the page hand over the model itself, with its validation still attached, so the agent works on meaning instead of pixels.
+
+I picked the hardest case I could think of to make that argument. A canvas has no DOM to scrape, and 5 cm of error is a wall through a sofa — which is exactly why the app can prove whether the agent got it right. If the pattern holds here, it holds for the easier ones.
+
+What building this taught me about the spec
+I ran into four of the explainer's open questions as actual problems, not as reading material. Here is what I did about each, in case any of it is useful to the people writing the standard.
+
+User prompting and elicitation (#165, #50). I needed this on day one. A tool that wipes someone's floor plan cannot just run because a model decided to call it. My answer lives entirely in the page: a tool marked destructive does not execute when it is called — it parks as a request bar in the UI, and the promise stays pending until a person presses Approve or Reject. Reject hands the agent an actionable failure ("the human declined; ask them what to do instead") rather than an error, so it recovers instead of retrying. The registration AbortSignal releases the request if the agent gives up first. It works, but every site has to build its own, and the confirmation UI is only as trustworthy as the page drawing it — which is the argument for the browser mediating it instead.
+
+One thing I hit there and want to flag: destructiveHint is in MCP's ToolAnnotations but not in WebMCP's, which right now defines only readOnlyHint and untrustedContentHint. I keep it on my own descriptors and enforce it page-side, so nothing depends on the browser passing it through. But if the browser is ever going to mediate confirmation itself, it needs some way to know which tools are destructive — so aligning the two sets looks worth doing.
+
+Multimodal input and output (#41, #86, #81). This is the gap I felt hardest. Tracing a plan means the agent has to see a drawing, and a tool result is text — so a page holding an image has no way to hand it over. It is worse than that: the copy the page holds is not the copy the agent has, because my uploader re-encodes to 1600 px or less. So get_underlay returns no pixels at all. It tells the agent the image has to arrive through both channels — uploaded on the page so the app knows the scale, pasted into the conversation so the model can actually read it — and it returns a mapping that only works in fractions: u = x_px / image_width, then world_x = rect.x + u * rect.w. Fractions survive a resize. Pixel coordinates do not. It is a workable protocol, but it is a workaround for a channel that is not there, and it only holds together because I could explain it inside the tool description.
+
+Skills integration (#161). I wrote one of these before I knew the issue existed. Tracing a plan is a procedure, not a tool call: establish the scale, read the drawing, lay the walls, cut the ope
+…
+Alza is one of the strongest comparisons you've sent because it exposes another distinction very clearly: the agent doesn't just manipulate the application—it can inspect the result, discover its own mistake, and repair it using application-native validation.
+
+And unlike ArchMorph, Alza spends a lot of its submission discussing WebMCP itself, including limitations of the current spec/runtime.
+
+Alza vs your Algorithm Visualizer
+Capability	Alza	Your Visualizer
+Browser-local application	✅	✅
+Semantic WebMCP operations	31 + 1 contextual	6
+Shared human/agent workspace	✅	✅
+Canvas difficult for agent to understand normally	Central argument	Applicable, but barely argued
+Stable domain objects	Walls/rooms/openings/furniture	Runtime structures/frames
+Agent can inspect its result	Yes	Yes — read_frame
+Application validates agent result	Constraint engine	Execution/runtime errors, but not positioned this way
+Agent can self-correct	Explicitly demonstrated	Possible, not demonstrated strongly
+Actionable errors	Central design principle	Not highlighted
+Human approval for destructive actions	Pending tool call	Human-reviewed code/input changes
+Dynamic tool registration	Yes	No/unclear
+Cross-origin WebMCP	Yes	No
+Graceful fallback	Yes	Not discussed
+Real WebMCP E2E testing	56 checks mentioned	Not highlighted
+Discussion of WebMCP spec gaps	Extensive	No
+Runtime execution tracing	No	Major strength
+Generic visualization inference	No	Major strength
+Alza's strongest line
+This is probably the cleanest description of WebMCP among everything you've shown:
+
+“A drawing is coordinates, joints and constraints, and none of that is reachable from the outside.”
+
+Then:
+
+“Not a way to describe the page to an agent — a way to hand it the actual geometry.”
+
+That's excellent.
+
+And your project has an almost perfect equivalent:
+
+An algorithm visualization is runtime state, transitions and relationships—not buttons.
+
+An agent looking at the rendered application may see an array, graph, tree or animation, but what it actually needs is:
+
+frame
+source line
+variables
+values
+relationships
+execution transition
+visual mapping
+WebMCP lets the page hand over the execution model itself.
+
+Again, that is much stronger than your current:
+
+“real structured tools instead of screen guessing.”
+
+The biggest Alza lesson for your project: self-correction
+This workflow is excellent:
+
+Agent creates geometry
+       ↓
+Constraint engine
+       ↓
+"Wardrobe crosses wall"
+       ↓
+Agent reads error
+       ↓
+Agent adjusts wardrobe
+       ↓
+Constraint engine
+       ↓
+0 issues
+They even give a real failure:
+
+Agent invented:
+
+wall_10
+Tool responded:
+
+Wall "wall_10" not found
+Agent recovered by finding/using the real ID.
+
+That's a closed verification loop.
+
+And your project is unusually well suited to exactly this.
+
+Imagine:
+
+Agent proposes fix
+       ↓
+Human accepts
+       ↓
+Run Python
+       ↓
+Runtime trace
+       ↓
+Agent reads frames
+       ↓
+Output still incorrect
+       ↓
+Agent finds first bad transition
+       ↓
+Proposes second fix
+       ↓
+Run again
+       ↓
+Correct output + trace
+That's potentially even more compelling than Alza because program execution itself is your validator.
+
+You already have the raw ingredients.
+
+Error messages as an agent interface
+Alza explicitly says:
+
+“an error message is an interface.”
+
+That's an important insight.
+
+Bad agent-facing API:
+
+ERROR 400
+Good:
+
+Opening cannot be created:
+wall_7 is 2.4 m long, but the requested opening
+from 1.8 m to 2.6 m exceeds its endpoint by 0.2 m.
+Now the agent can fix its own call.
+
+For your application:
+
+Bad:
+
+Execution failed
+Better:
+
+PYTHON_EXECUTION_ERROR
+
+line: 17
+exception: IndexError
+message: list index out of range
+active_frame: 26
+last_successful_line: 16
+available_variables:
+  i: 7
+  nums.length: 7
+or:
+
+FRAME_NOT_FOUND
+
+requested: 87
+available_range: 0–63
+current_frame: 42
+or:
+
+STALE_PROPOSAL
+
+The Python source changed after this proposal was created.
+Expected revision: 18
+Current revision: 19
+Reinspect the workspace before proposing another change.
+Those aren't merely error messages.
+
+They're agent recovery instructions.
+
+Alza also makes its validator part of WebMCP
+This is subtle but important.
+
+Agent doesn't just modify geometry.
+
+It can call something like:
+
+get_issues
+and receive semantic problems.
+
+That's effectively:
+
+act → inspect → validate → repair
+
+Your visualizer already has:
+
+run_visualization
+read_active_frame
+but you could have added a semantic verification layer:
+
+inspect_execution
+find_runtime_anomalies
+compare_output
+find_first_divergence
+Not necessarily those exact tools.
+
+The important concept is that the agent should be able to ask:
+
+Did my change actually solve the problem?
+
+rather than assuming success because the code executed.
+
+Alza's cross-origin experiment is genuinely novel
+This is something your project doesn't have, and unlike some differences, it's not merely presentation.
+
+Alza has another actual website:
+
+Nordika
+
+on another origin.
+
+Nordika exposes its own WebMCP tools.
+
+Alza discovers those capabilities and invokes them so:
+
+Architecture studio
+       ↓
+discover Nordika tools
+       ↓
+search/select product
+       ↓
+real dimensions
+       ↓
+place furniture into floor plan
+That demonstrates an interesting future WebMCP ecosystem:
+
+Web applications acting as semantic capabilities for other web applications/agents.
+
+And they didn't fake it with two routes in the same app—they specifically deployed separate origins.
+
+That's technically ambitious.
+
+But perhaps the most impressive section is the last one
+They don't merely say:
+
+“WebMCP was difficult.”
+
+They identify actual issues encountered while implementing against the emerging API:
+
+human elicitation/approval
+missing destructiveHint
+multimodal tool results
+procedural/skills support
+testing APIs
+unregister-via-AbortSignal behavior
+cross-origin discovery runtime support
+This makes the submission look like they stress-tested WebMCP as a technology, not merely consumed it.
+
+Mandate did something similar.
+
+That's especially relevant in a challenge centered around a new technology.
+
+Alza also gives us another counterexample about tool count
+We've now seen:
+
+Faraday: 5
+Your visualizer: 6
+Roque: 15
+JupyterLite: 22
+Alza: 31/32
+Aisle: 41
+ArchMorph: 57
+
+All can represent legitimate designs.
+
+So there clearly isn't a magic number.
+
+What matters is whether the tool surface corresponds naturally to the application's semantic model.
+
+We're now at TEN winners
+And Alza makes the common winner architecture almost ridiculously clear:
+
+                    DOMAIN MODEL
+                         │
+             ┌───────────┴───────────┐
+             │                       │
+           HUMAN                   AGENT
+             │                       │
+             │                    WebMCP
+             │                       │
+             └───────────┬───────────┘
+                         ↓
+                  SAME APPLICATION
+                         ↓
+              VALIDATION / FEEDBACK
+                         ↓
+                   DOMAIN MODEL
+The critical last part is:
+
+validation → feedback → correction.
+
+That's what Alza emphasizes particularly well.
+
+Your architecture could naturally be:
+                    PYTHON PROGRAM
+                         +
+                       INPUT
+                         │
+             ┌───────────┴───────────┐
+             │                       │
+           HUMAN                   AGENT
+             │                       │
+             │                    WebMCP
+             │                       │
+             └───────────┬───────────┘
+                         ↓
+                  PYODIDE RUNTIME
+                         ↓
+                  EXECUTION TRACE
+                         ↓
+              VISUAL + SEMANTIC STATE
+                         ↓
+                  VERIFY / EXPLAIN
+                         ↓
+                    MODIFY AGAIN
+That's an excellent WebMCP-native architecture.
+
+And you had most of it.
+
+After ten winners, I'd slightly change the diagnosis again
+At first I thought your biggest problem might have been submission/write-up quality.
+
+Then the later winners showed some genuine engineering gaps: revisions, shared-state semantics, error recovery, agent feedback loops, etc.
+
+Now I'd characterize it as approximately:
+
+Your core technology was competitive.
+Pyodide + worker isolation + runtime tracing + generic visual compilation + WebMCP is substantial.
+
+Your WebMCP integration was legitimate, but comparatively shallow around the edges.
+Particularly:
+
+stale-state protection
+human focus → agent context
+agent action provenance
+recoverable structured errors
+self-verification
+human rejection feedback
+concurrency
+explicit agent state lifecycle
+Your submission significantly under-explained what was already strong.
+Especially:
+
+runtime tracing → semantic frames → automatic visual structures → agent inspection.
+
+And you didn't make the project an experiment about WebMCP itself.
+Several winners effectively ask:
+
+“What happens if we really push this new interface?”
+
+Alza is a great example.
+
+It found limitations, built workarounds, tested actual runtimes, and even gave feedback about the specification.
+
+The most important lesson from Alza specifically is probably this:
+
+Don't just give the agent actions. Give it enough semantic feedback to know when it was wrong and recover by itself.
+
+For an algorithm debugger/visualizer, that principle is almost perfectly matched to your domain.
+
+Your runtime trace isn't merely something pretty to visualize. It could be the feedback mechanism through which the agent verifies and corrects its own reasoning.
+
+That would turn your project from “AI can control an algorithm visualizer” into something much stronger:
+
+“Human and agent share a live execution environment where the agent can inspect, modify, run, observe the consequences, detect where its fix failed, and try again—while the human retains control over source changes.”
+
+That, after looking at these ten winners, is the version of your idea that seems most aligned with what repeatedly succeeded.
+

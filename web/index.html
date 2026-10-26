@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#f5f4f0"><title>Relay — A little less busywork.</title><link rel="icon" href="/mark.svg" type="image/svg+xml"><link rel="stylesheet" href="/style.css"><script type="module" src="/app.js"></script></head>
+<body>
+<div class="shell">
+<aside class="sidebar">
+<a class="brand" href="/" aria-label="Relay home"><img src="/mark.svg" alt=""><span>relay<span class="brand-dot">.</span></span></a>
+<button class="new-task" id="new-task"><span>＋</span> New workflow <kbd>⌘ K</kbd></button>
+<div class="nav-label">WORKSPACE</div>
+<nav aria-label="Main navigation">
+<button class="nav-item active" data-view="workflows"><span class="nav-icon">⌘</span> Workflows <span class="count" id="run-count">0</span></button>
+<button class="nav-item" data-view="sources"><span class="nav-icon">▧</span> Sources <span class="count" id="source-count">2</span></button>
+<button class="nav-item" data-view="connections"><span class="nav-icon">⊞</span> Connections</button>
+</nav>
+<div class="nav-label recent-label">RECENT WORKFLOWS</div><div id="recent" class="recent"></div>
+<div class="sidebar-bottom"><div class="local-indicator"><span class="status-dot"></span> Your Mac, your workspace</div><p>Built to keep you in the loop.</p><div class="powered"><span class="nvidia-symbol">▰</span><span>NVIDIA Nemotron<br><small>on Nebius Token Factory</small></span></div></div>
+</aside>
+<main>
+<header class="topbar"><div><span class="breadcrumb">Personal workspace</span><span class="slash">/</span><span id="page-name">Workflows</span></div><button class="mode-pill" id="mode-toggle"><span class="status-dot amber"></span><span id="mode-text">Offline demo</span><span>⌄</span></button></header>
+<div id="content"></div>
+<footer><span><span class="status-dot"></span> Local companion connected</span><span>Made for the space between your apps.</span></footer>
+</main></div>
+<div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+<dialog id="modal"><div id="modal-body"></div></dialog>
+</body></html>

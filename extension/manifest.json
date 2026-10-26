@@ -1,0 +1,1 @@
+{"manifest_version":3,"name":"Relay — Bring a source along","version":"0.1.0","description":"Capture a page or selection into your local Relay workspace, only when you ask.","permissions":["activeTab","scripting","storage"],"host_permissions":["http://127.0.0.1:4280/*"],"action":{"default_popup":"popup.html","default_title":"Capture to Relay"}}
