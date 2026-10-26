@@ -47,3 +47,19 @@ After the provider/complex-workflow update: **38 tests passed**. New coverage in
 Live browser acceptance used `OLLAMA_TEST_API_KEY` with **gpt-oss:120b**. The selector fetched 23 models from Ollama's `/api/tags` and defaulted to GPT-OSS 120B. The metrics recipe completed one provider call (2,894 total tokens), producing three reviewable documents and a dependent ZIP. Human review removed unsupported numerical impact predictions before approving revision 2. All four saved output hashes matched; all three ZIP members matched their source outputs, including the human edit. Evidence is in `ollama-live-evidence.json`.
 
 This turn's live inference used Ollama, not Nebius. Nebius remains available in the selector, with existing prior live validation; its newly fetched catalog selector has not received separate browser acceptance. The new launch-readiness recipe has not had a separate live acceptance run. Arbitrary GUI automation remains outside this build's supported actions.
+
+## Research workspace validation — 26 October 2026
+
+- Live Ollama Cloud `gpt-oss:120b`, authenticated with the existing server-side environment key. Recorded evidence: `docs/research-live-evidence.json`.
+- Accepted test hypothesis: graph neural networks versus transformers for traffic forecasting under comparable datasets and horizons.
+- Two autonomous search queries retrieved 12 deduplicated OpenAlex records; available arXiv HTML was inspected. Six quoted metric rows remain in the final project. None are marked human-verified.
+- PDFormer inference timed out once; focused per-paper reassessment recovered. D2STGNN's later extraction produced no accepted numeric quotes, so its performance rank is withheld.
+- Model limitations contained incorrect claims about absent baselines/statistical tests. Validation corrected these against source text, added editable assessment fields, and prevented an unverified hypothesis conclusion. This is not a benchmark of extraction accuracy; source-quote matching does not prove table interpretation.
+- Chrome verified: expandable topic families, double-click paper inspection, editable review checkpoint, pointer dragging two paper nodes into the tray, comparison view, and the absence of an unsupported winner.
+- Two coding-agent review notes enabled a test draft; these were explicitly not user approval. GPT-OSS generated a proposed-study abstract, related work with two valid paper citations, and an evaluation plan. Human manuscript approval remains unchecked.
+- Actual Tectonic compilation produced a three-page PDF. All three pages were rendered with Poppler and visually inspected. Chrome displays the compiled PDF alongside the LaTeX editor. BibTeX has missing-journal/spacing warnings, not missing citations or fatal errors.
+- ZIP contents verified: `main.tex`, `references.bib`, `evidence.json`. No existing Overleaf project was edited.
+- 53 automated tests pass, including source-quote/value validation, conservative comparability, stale revisions, review-before-draft, topic normalization, escaped Markdown-to-LaTeX conversion, and compiler sandbox denial of parent/absolute file reads. Python compilation and `git diff --check` pass.
+- Screenshots: `docs/research-map.png`, `docs/research-manuscript.png`.
+
+Research-specific live Nemotron/Nebius testing, external user evaluation, and an annotated extraction benchmark remain submission preparation work. The earlier generic-workflow Nebius test is not counted as research-agent validation.

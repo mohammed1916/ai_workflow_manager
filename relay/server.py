@@ -8,6 +8,8 @@ from .core import Store, RelayError, read_config, digest
 ROOT=Path(__file__).resolve().parent.parent
 
 def make_handler(store,port):
+    from .research import Research, compare
+    research=Research(store.root)
     origin=f'http://127.0.0.1:{port}'
     class Handler(BaseHTTPRequestHandler):
         def log_message(self,*args): pass
@@ -19,7 +21,7 @@ def make_handler(store,port):
             self.send_header('Cache-Control','no-store')
             self.send_header('X-Content-Type-Options','nosniff')
             self.send_header('Referrer-Policy','no-referrer')
-            self.send_header('Content-Security-Policy',"default-src 'self'; style-src 'self'; script-src 'self'; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'")
+            self.send_header('Content-Security-Policy',"frame-ancestors 'self'" if content_type=='application/pdf' else "default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self'; img-src 'self' data:; connect-src 'self'; frame-ancestors 'self'")
             request_origin=self.headers.get('Origin','')
             if self.path=='/api/clips' and request_origin.startswith('chrome-extension://'):
                 self.send_header('Access-Control-Allow-Origin',request_origin)
@@ -51,6 +53,15 @@ def make_handler(store,port):
                     with store.lock:
                         cfg=read_config(store.root)
                         self.respond({'token':store.token,'providers':{'ollama':bool(cfg.get('OLLAMA_TEST_API_KEY') or cfg.get('OLLAMA_API_KEY')),'nebius':bool(cfg.get('NEBIUS_API_KEY'))},'configured':bool(cfg.get('NEBIUS_API_KEY') or cfg.get('OLLAMA_TEST_API_KEY') or cfg.get('OLLAMA_API_KEY')),'model':cfg.get('NEBIUS_MODEL','nvidia/nemotron-3-super-120b-a12b'),'platform':sys.platform,'sources':store.sources(),'runs':store.state['runs']})
+                elif route=='/api/research': self.respond(research.state())
+                elif route.startswith('/api/research/export/'):
+                    self.respond(research.bundle(route.split('/')[-1]),content_type='application/zip')
+                elif route.startswith('/api/research/pdf/'):
+                    parts=route.split('/')
+                    if len(parts)!=6 or not all(__import__('re').fullmatch(r'[a-f0-9]{16}',x) for x in parts[4:]): raise RelayError('NOT_FOUND','PDF not found.',404)
+                    path=store.root/'.relay/latex'/parts[4]/parts[5]/'main.pdf'
+                    if not path.is_file(): raise RelayError('NOT_FOUND','PDF not found.',404)
+                    self.respond(path.read_bytes(),content_type='application/pdf')
                 elif route=='/api/models':
                     from .providers import models
                     from urllib.parse import parse_qs
@@ -67,7 +78,7 @@ def make_handler(store,port):
                         if path.is_symlink() or not path.resolve().is_relative_to(store.outbox.resolve()): raise RelayError('INVALID_PATH','Unsafe output path.',403)
                         self.respond(path.read_bytes(),content_type='application/zip' if path.suffix=='.zip' else 'text/plain; charset=utf-8')
                 else:
-                    path=ROOT/'web'/('index.html' if route=='/' else route.lstrip('/'))
+                    path=ROOT/'web'/('research.html' if route=='/' else route.lstrip('/'))
                     if not path.resolve().is_relative_to((ROOT/'web').resolve()) or not path.is_file(): raise RelayError('NOT_FOUND','Page not found.',404)
                     self.respond(path.read_bytes(),content_type=mimetypes.guess_type(path.name)[0] or 'application/octet-stream')
             except RelayError as e: self.respond({'error':str(e),'code':e.code},e.status)
@@ -80,7 +91,14 @@ def make_handler(store,port):
                 if size<1 or size>300000: raise RelayError('BODY_LIMIT','Request body too large or empty.',413)
                 data=json.loads(self.rfile.read(size))
                 if not isinstance(data,dict): raise RelayError('INVALID_BODY','Use a JSON object.')
-                if self.path=='/api/clips': result=store.add_clip(data)
+                if self.path=='/api/research/start': result=research.start(data)
+                elif self.path=='/api/research/update': result=research.update(data)
+                elif self.path=='/api/research/draft': result=research.draft(data)
+                elif self.path=='/api/research/compile': result=research.compile(data)
+                elif self.path=='/api/research/compare':
+                    with research.lock:
+                        p=research.get(data.get('id')); result=compare([x for x in p['papers'] if x['id'] in data.get('papers',[])])
+                elif self.path=='/api/clips': result=store.add_clip(data)
                 elif self.path=='/api/sources/remove':
                     with store.lock:
                         store.state['clips']=[s for s in store.state['clips'] if s['id']!=data.get('id')]; store.save(); result={'ok':True}

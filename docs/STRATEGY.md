@@ -2,13 +2,13 @@
 
 Research date: 26 October 2026 (India time).
 
-## Choice: Relay — Best Apps and Agents
+## Choice: Relay Research — Best Apps and Agents
 
-The event's public overview describes this track as practical apps, copilots, and workflows powered by Nemotron on Nebius Token Factory. Relay fits a specific audience: small product teams converting fragmented research and meeting notes into useful handoffs. NVIDIA Nemotron is responsible for synthesis and structured action planning; the local executor makes its output operational.
+The user has clarified that “research” means scholarly paper discovery and experimental comparison. The current product is a hypothesis-to-manuscript workspace, not a product-team document handoff tool.
 
-The alternate coding playground has substantial existing runtime/visualization technology. It would fit Coding and Agentic Engineering if developed into a trace-grounded agent debugger. Relay was selected because the user prefers trying Mac workflows and a fresh, coherent product can demonstrate that direction without importing the large existing application. No code from the visualizer was copied or changed.
+The existing Best Apps and Agents direction remains the candidate track: an agent searches real records, inspects available full text, extracts quoted evidence, exposes uncertain experimental context, and drafts a cited manuscript after review. GPT-OSS on Ollama Cloud is the requested development/test model. A submission relying on the event's Nemotron/Nebius requirement still needs the **research-specific** flow tested on the required model; previous generic-workflow Nebius tests do not prove that.
 
-The differentiator must be the complete handoff: selected browser/page context + local notes → editable plan → explicit human changes → execution → byte-level evidence. A universal computer-control claim would exceed this implementation and weaken the demo.
+The differentiator is a shared research state: topic map → paper/metric provenance → context-matched comparison → corrections → cited draft → compiled PDF. Do not claim an autonomous systematic review, universal Mac automation, direct Overleaf synchronization, validated paper-quality ranking, or a scientifically proven hypothesis.
 
 ## Lessons applied from lessons.txt
 
@@ -24,7 +24,7 @@ The differentiator must be the complete handoff: selected browser/page context +
 
 - Test the optional Chrome extension end-to-end in an installed, paired browser.
 - Collect real user feedback and measure time-to-deliverable against a manual baseline. Do not invent a time-saved metric.
-- Exercise all three recipes with live Nemotron and document failures as well as successes.
+- Run the research discovery, assessment, and drafting flow with live Nemotron on Nebius; record quote-validity, context extraction, citation validity, and inference latency on a manually checked paper set. Report failures.
 - Record a concise demo with at least a minute of actual app operation; verify current video-length rules before recording the final cut.
 - Publish a public licensed repository and provide a reproducible working test build/demo.
 - Complete Devpost registration/submission only with the user's authorization and current eligibility/rules review.

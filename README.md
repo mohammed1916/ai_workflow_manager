@@ -1,3 +1,7 @@
+# Relay Research
+
+The main app is now an evidence-first research workspace: real paper discovery, topic maps, context-aware comparisons, reviewed LaTeX drafting, and local PDF compilation. See [the research guide](docs/RESEARCH.md) for setup, evidence guarantees, and current limits. Start with `python3 -m relay.server` and open http://127.0.0.1:4280/.
+
 # Relay
 
 **A little help between apps.** A local Mac workflow companion powered by NVIDIA Nemotron on Nebius Token Factory.
