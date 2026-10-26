@@ -1,0 +1,45 @@
+{
+  "id": "08d89483664f6c63",
+  "provider": "ollama",
+  "model": "gpt-oss:120b",
+  "usage": {
+    "prompt_tokens": 1420,
+    "completion_tokens": 1474,
+    "total_tokens": 2894,
+    "provider_requests": 1
+  },
+  "status": "complete",
+  "revision": 2,
+  "outputs": [
+    {
+      "filename": "metrics-review.md",
+      "path": "workspace/outputs/08d89483664f6c63/metrics-review.md",
+      "bytes": 1465,
+      "sha256": "98b431923ce496b91518d4c14a47ef2c77634e33adfe730e828ccbf241ba41aa",
+      "step": 0
+    },
+    {
+      "filename": "recommended-experiments.csv",
+      "path": "workspace/outputs/08d89483664f6c63/recommended-experiments.csv",
+      "bytes": 592,
+      "sha256": "de6f0391f6f776e04fa4e390bf57354ba78389d2ca465daf1f9e95c8097adcff",
+      "step": 1
+    },
+    {
+      "filename": "data-quality.json",
+      "path": "workspace/outputs/08d89483664f6c63/data-quality.json",
+      "bytes": 155,
+      "sha256": "924b2106e1b55f8f283eca5bc657451ffa8fa91038b1b3ec458d52d1b1d1f908",
+      "step": 2
+    },
+    {
+      "filename": "metrics-kit.zip",
+      "path": "workspace/outputs/08d89483664f6c63/metrics-kit.zip",
+      "bytes": 1473,
+      "sha256": "72328e997d07e3682c2a7667611dda02802a4cd77ac42108ec9f2a9c0a6fc528",
+      "step": 3
+    }
+  ],
+  "createdAt": "2026-10-26T11:40:36.228746+00:00",
+  "completedAt": "2026-10-26T11:41:57.962568+00:00"
+}

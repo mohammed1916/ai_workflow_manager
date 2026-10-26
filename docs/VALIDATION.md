@@ -39,3 +39,11 @@ Machine-readable evidence: [live-run-evidence.json](live-run-evidence.json). No 
 ## Limits of this evidence
 
 The optional Chrome extension was implemented and its restricted ingestion endpoint tested, but the extension was not installed or end-to-end tested. Mobile breakpoints are implemented but have not been browser-verified. The `open_url` adapter was not exercised in a live model run. Research and handoff recipes have not yet received their own live acceptance runs. No user study, accuracy benchmark, or measured time-saving claim is made. File integrity does not establish semantic correctness.
+
+## Model selector and complex-workflow validation
+
+After the provider/complex-workflow update: **38 tests passed**. New coverage includes credential separation and precedence, native Ollama model discovery and response parsing, deterministic CSV profiles, invalid CSV shape, archive dependency/path validation, and preservation of human edits inside a real ZIP.
+
+Live browser acceptance used `OLLAMA_TEST_API_KEY` with **gpt-oss:120b**. The selector fetched 23 models from Ollama's `/api/tags` and defaulted to GPT-OSS 120B. The metrics recipe completed one provider call (2,894 total tokens), producing three reviewable documents and a dependent ZIP. Human review removed unsupported numerical impact predictions before approving revision 2. All four saved output hashes matched; all three ZIP members matched their source outputs, including the human edit. Evidence is in `ollama-live-evidence.json`.
+
+This turn's live inference used Ollama, not Nebius. Nebius remains available in the selector, with existing prior live validation; its newly fetched catalog selector has not received separate browser acceptance. The new launch-readiness recipe has not had a separate live acceptance run. Arbitrary GUI automation remains outside this build's supported actions.

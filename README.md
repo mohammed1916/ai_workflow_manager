@@ -26,7 +26,7 @@ NEBIUS_BASE_URL=https://api.tokenfactory.nebius.com/v1
 NEBIUS_MODEL=nvidia/nemotron-3-super-120b-a12b
 ```
 
-Configuration is read at each live request. Choose **Live Nemotron** in the upper-right mode selector, select your sources, and check the source-sharing checkbox. Only selected source text and the task are sent to Nebius. Keys stay in Python, never in frontend bundles, API responses, or the extension. The app validates that the endpoint is an official Nebius HTTPS API and the model is an NVIDIA Nemotron model. Exact model access depends on your account; use the catalog's API ID if yours differs.
+Configuration is read at each live request. Choose **Nebius Token Factory** and your Nemotron model in the upper-right model selector, select your sources, and check the source-sharing checkbox. Only selected source text and the task are sent to Nebius. Keys stay in Python, never in frontend bundles, API responses, or the extension. The app validates the official provider endpoint and selected model against the live catalog. Exact model access depends on your account; use the catalog's API ID if yours differs.
 
 ## Try a complete workflow
 
@@ -54,6 +54,7 @@ The extension uses `activeTab`, `scripting`, and session storage. It does not re
 ## Supported actions and limits
 
 - `write_file`: save complete, reviewed Markdown, text, CSV or JSON to a new run folder; verify SHA-256 against the approved content.
+- `create_archive`: package only earlier approved outputs into a verified ZIP.
 - `open_url`: hand an explicit HTTPS URL to macOS when it appears in the task or selected context. A successful OS handoff does **not** mean page contents were verified.
 - User-triggered **Show in Finder**: open the completed output folder.
 - Chrome extension: capture selected-page text into the source shelf.
@@ -82,3 +83,18 @@ python3 -m unittest discover -s tests -v
 ```
 
 See [validation](docs/VALIDATION.md), [hackathon strategy](docs/STRATEGY.md), and [demo script](docs/DEMO.md).
+
+## Model selector and complex workflows (updated)
+
+Click the model pill in the top-right corner. Choose **Ollama Cloud** or **Nebius**, then select a model fetched directly from that provider. **Refresh models** fetches the current catalog. The selected provider/model is saved in this browser, and every run records the actual choice. A listed model may not support chat/JSON; provider errors remain visible rather than silently switching models.
+
+Ollama testing uses `OLLAMA_TEST_API_KEY` from `.env` (preferred over `OLLAMA_API_KEY`), with `gpt-oss:120b` as the default. `OLLAMA_MODEL` can override the initial model. Requests use Ollama's native cloud `/api/chat`; discovery uses `/api/tags`. No credentials reach the browser. See https://docs.ollama.com/cloud.
+
+The earlier NVIDIA-only validation has been replaced by provider catalog validation. Use Ollama/GPT-OSS for development; choose Nebius/Nemotron for the NVIDIA integration in the hackathon demonstration.
+
+Two additional workflows support longer tasks:
+
+- **Launch readiness review:** cross-source decisions, blockers, risk register, owner actions, checklist, and a launch-kit ZIP.
+- **Metrics to decisions:** deterministic local CSV profiling (row counts, missing values, duplicates, numeric min/max/sum/mean), followed by a model-written trends report, experiment list, JSON quality report, and ZIP.
+
+Plans support up to ten actions. `create_archive` can reference only outputs from earlier steps, preserves human edits, and verifies each ZIP member against its original file. Models still generate analyses and proposals; review recommendations and arithmetic that fall outside the local profile calculations.

@@ -50,7 +50,12 @@ def make_handler(store,port):
                 if route=='/api/state':
                     with store.lock:
                         cfg=read_config(store.root)
-                        self.respond({'token':store.token,'configured':bool(cfg.get('NEBIUS_API_KEY')),'model':cfg.get('NEBIUS_MODEL','nvidia/nemotron-3-super-120b-a12b'),'platform':sys.platform,'sources':store.sources(),'runs':store.state['runs']})
+                        self.respond({'token':store.token,'providers':{'ollama':bool(cfg.get('OLLAMA_TEST_API_KEY') or cfg.get('OLLAMA_API_KEY')),'nebius':bool(cfg.get('NEBIUS_API_KEY'))},'configured':bool(cfg.get('NEBIUS_API_KEY') or cfg.get('OLLAMA_TEST_API_KEY') or cfg.get('OLLAMA_API_KEY')),'model':cfg.get('NEBIUS_MODEL','nvidia/nemotron-3-super-120b-a12b'),'platform':sys.platform,'sources':store.sources(),'runs':store.state['runs']})
+                elif route=='/api/models':
+                    from .providers import models
+                    from urllib.parse import parse_qs
+                    provider=parse_qs(urlsplit(self.path).query).get('provider',['ollama'])[0]
+                    self.respond(models(read_config(store.root),provider))
                 elif route=='/api/pair': self.respond({'token':store.pair_token,'endpoint':origin})
                 elif route.startswith('/api/output/'):
                     parts=route.split('/')
@@ -60,7 +65,7 @@ def make_handler(store,port):
                         if not item: raise RelayError('NOT_FOUND','File not found.',404)
                         path=store.root/item['path']
                         if path.is_symlink() or not path.resolve().is_relative_to(store.outbox.resolve()): raise RelayError('INVALID_PATH','Unsafe output path.',403)
-                        self.respond(path.read_bytes(),content_type='text/plain; charset=utf-8')
+                        self.respond(path.read_bytes(),content_type='application/zip' if path.suffix=='.zip' else 'text/plain; charset=utf-8')
                 else:
                     path=ROOT/'web'/('index.html' if route=='/' else route.lstrip('/'))
                     if not path.resolve().is_relative_to((ROOT/'web').resolve()) or not path.is_file(): raise RelayError('NOT_FOUND','Page not found.',404)
@@ -79,7 +84,7 @@ def make_handler(store,port):
                 elif self.path=='/api/sources/remove':
                     with store.lock:
                         store.state['clips']=[s for s in store.state['clips'] if s['id']!=data.get('id')]; store.save(); result={'ok':True}
-                elif self.path=='/api/runs': result=store.create(data.get('goal'),data.get('sources'),data.get('mode'),data.get('recipe','brief'),data.get('feedback',''))
+                elif self.path=='/api/runs': result=store.create(data.get('goal'),data.get('sources'),data.get('mode'),data.get('recipe','brief'),data.get('feedback',''),data.get('provider','nebius'),data.get('model'))
                 elif self.path=='/api/approve': result=store.approve(data.get('id'),data.get('revision'))
                 elif self.path=='/api/edit': result=store.edit(data.get('id'),data.get('revision'),data.get('index'),data.get('content'))
                 elif self.path=='/api/reject': result=store.reject(data.get('id'),data.get('revision'),data.get('reason',''))
