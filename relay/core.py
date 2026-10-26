@@ -192,6 +192,23 @@ class Store:
     def _log(self,run,title,detail):
         with self.lock: self.event(run,title,detail); self.save()
 
+    def branch(self,run_id,revision):
+        with self.lock:
+            parent=self.run(run_id)
+            if not parent.get('plan') or parent['status'] in ('planning','running'):
+                raise RelayError('INVALID_STATE','Branch a saved plan after its active step finishes.',409)
+            if parent['revision']!=revision: raise RelayError('STALE_REVISION','The plan changed. Refresh before branching.',409)
+            plan=json.loads(json.dumps(parent['plan']))
+            for step in plan['steps']:
+                step.pop('status',None); step.pop('elapsedMs',None)
+            validate_plan(plan)
+            child={k:json.loads(json.dumps(parent[k])) for k in ('goal','recipe','mode','sources','provider','selectedModel','model') if k in parent}
+            child.update(id=secrets.token_hex(8),createdAt=now(),revision=1,status='review',plan=plan,outputs=[],events=[],feedback='',parentRun=parent['id'],parentRevision=revision,usage={})
+            child['plan']['title']=parent['plan']['title']+' — branch'
+            self.state['runs'].insert(0,child)
+            self.event(child,'Branched from saved plan',parent['id']+' · revision '+str(revision)+'. Original outputs are unchanged; this branch has not executed.')
+            self.save(); return child
+
     def edit(self,run_id,revision,index,content):
         with self.lock:
             run=self.run(run_id)

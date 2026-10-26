@@ -54,6 +54,10 @@ def make_handler(store,port):
                         cfg=read_config(store.root)
                         self.respond({'token':store.token,'providers':{'ollama':bool(cfg.get('OLLAMA_TEST_API_KEY') or cfg.get('OLLAMA_API_KEY')),'nebius':bool(cfg.get('NEBIUS_API_KEY'))},'configured':bool(cfg.get('NEBIUS_API_KEY') or cfg.get('OLLAMA_TEST_API_KEY') or cfg.get('OLLAMA_API_KEY')),'model':cfg.get('NEBIUS_MODEL','nvidia/nemotron-3-super-120b-a12b'),'platform':sys.platform,'sources':store.sources(),'runs':store.state['runs']})
                 elif route=='/api/research': self.respond(research.state())
+                elif route=='/api/research/checkpoint':
+                    from urllib.parse import parse_qs
+                    q=parse_qs(urlsplit(self.path).query)
+                    self.respond(research.inspect_checkpoint(q.get('id',[''])[0],q.get('node',[''])[0]))
                 elif route.startswith('/api/research/export/'):
                     self.respond(research.bundle(route.split('/')[-1]),content_type='application/zip')
                 elif route.startswith('/api/research/pdf/'):
@@ -92,6 +96,7 @@ def make_handler(store,port):
                 data=json.loads(self.rfile.read(size))
                 if not isinstance(data,dict): raise RelayError('INVALID_BODY','Use a JSON object.')
                 if self.path=='/api/research/start': result=research.start(data)
+                elif self.path=='/api/research/branch': result=research.branch(data)
                 elif self.path=='/api/research/update': result=research.update(data)
                 elif self.path=='/api/research/draft': result=research.draft(data)
                 elif self.path=='/api/research/compile': result=research.compile(data)
@@ -103,6 +108,7 @@ def make_handler(store,port):
                     with store.lock:
                         store.state['clips']=[s for s in store.state['clips'] if s['id']!=data.get('id')]; store.save(); result={'ok':True}
                 elif self.path=='/api/runs': result=store.create(data.get('goal'),data.get('sources'),data.get('mode'),data.get('recipe','brief'),data.get('feedback',''),data.get('provider','nebius'),data.get('model'))
+                elif self.path=='/api/workflow/branch': result=store.branch(data.get('id'),data.get('revision'))
                 elif self.path=='/api/approve': result=store.approve(data.get('id'),data.get('revision'))
                 elif self.path=='/api/edit': result=store.edit(data.get('id'),data.get('revision'),data.get('index'),data.get('content'))
                 elif self.path=='/api/reject': result=store.reject(data.get('id'),data.get('revision'),data.get('reason',''))
