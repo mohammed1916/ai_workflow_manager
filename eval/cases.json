@@ -1,0 +1,1812 @@
+{
+ "description": "Annotated traffic-forecasting comparison cases for evaluating Relay against a single-pass baseline.",
+ "annotator": "Claude (coding agent) from arXiv HTML full text on 26 October 2026; every gold label has a verbatim quote. Not yet reviewed by a domain researcher.",
+ "policy": {
+  "outcomes": {
+   "comparable": "dataset, split, horizon (including single vs averaged), and metric match, and no stated conflict in metric definition",
+   "incompatible": "at least one of these is stated and differs, or a source states that one metric was computed non-standardly",
+   "insufficient": "no stated conflict, but dataset, split, or horizon aggregation is not stated for at least one result"
+  },
+  "metricDefinition": "masked, unmasked, nonstandard, or null when not stated; unknown definitions are caveats, not conflicts",
+  "provenance": "own, reproduced, cited, or unknown; requires an explicit statement or table legend",
+  "evidence": "paper text only (arXiv HTML), same for every system; repository evidence is not used in this evaluation"
+ },
+ "papers": [
+  {
+   "arxiv": "1707.01926",
+   "name": "DCRNN"
+  },
+  {
+   "arxiv": "1906.00121",
+   "name": "Graph WaveNet"
+  },
+  {
+   "arxiv": "2005.11650",
+   "name": "MTGNN"
+  },
+  {
+   "arxiv": "1911.08415",
+   "name": "GMAN"
+  },
+  {
+   "arxiv": "2007.02842",
+   "name": "AGCRN"
+  },
+  {
+   "arxiv": "2308.10425",
+   "name": "STAEformer"
+  },
+  {
+   "arxiv": "2301.07945",
+   "name": "PDFormer"
+  },
+  {
+   "arxiv": "2208.05233",
+   "name": "STID"
+  },
+  {
+   "arxiv": "2101.06861",
+   "name": "GTS"
+  },
+  {
+   "arxiv": "2206.09113",
+   "name": "STEP"
+  },
+  {
+   "arxiv": "2206.09112",
+   "name": "D2STGNN"
+  },
+  {
+   "arxiv": "2211.14701",
+   "name": "MegaCRN"
+  },
+  {
+   "arxiv": "2012.09641",
+   "name": "STFGNN"
+  },
+  {
+   "arxiv": "1709.04875",
+   "name": "STGCN"
+  }
+ ],
+ "targets": [
+  {
+   "id": "dcrnn_mla_15",
+   "paper": "1707.01926",
+   "value": "2.77",
+   "methodHint": "DCRNN",
+   "name": "MAE",
+   "gold": {
+    "method": "DCRNN",
+    "dataset": "metrla",
+    "split": [
+     70,
+     10,
+     20
+    ],
+    "horizon": {
+     "mode": "single",
+     "minutes": 15
+    },
+    "metricDefinition": "masked",
+    "provenance": "own"
+   },
+   "goldQuotes": [
+    "70% of data is used for training, 20% are used for testing while the remaining 10% for validation",
+    "Missing values are excluded in calculating these metrics."
+   ],
+   "note": ""
+  },
+  {
+   "id": "dcrnn_mla_60",
+   "paper": "1707.01926",
+   "value": "3.60",
+   "methodHint": "DCRNN",
+   "name": "MAE",
+   "gold": {
+    "method": "DCRNN",
+    "dataset": "metrla",
+    "split": [
+     70,
+     10,
+     20
+    ],
+    "horizon": {
+     "mode": "single",
+     "minutes": 60
+    },
+    "metricDefinition": "masked",
+    "provenance": "own"
+   },
+   "goldQuotes": [
+    "70% of data is used for training, 20% are used for testing while the remaining 10% for validation",
+    "Missing values are excluded in calculating these metrics."
+   ],
+   "note": ""
+  },
+  {
+   "id": "dcrnn_mla_60_rmse",
+   "paper": "1707.01926",
+   "value": "7.59",
+   "methodHint": "DCRNN",
+   "name": "RMSE",
+   "gold": {
+    "method": "DCRNN",
+    "dataset": "metrla",
+    "split": [
+     70,
+     10,
+     20
+    ],
+    "horizon": {
+     "mode": "single",
+     "minutes": 60
+    },
+    "metricDefinition": "masked",
+    "provenance": "own"
+   },
+   "goldQuotes": [
+    "70% of data is used for training, 20% are used for testing while the remaining 10% for validation",
+    "Missing values are excluded in calculating these metrics."
+   ],
+   "note": ""
+  },
+  {
+   "id": "dcrnn_bay_60",
+   "paper": "1707.01926",
+   "value": "2.07",
+   "methodHint": "DCRNN",
+   "name": "MAE",
+   "gold": {
+    "method": "DCRNN",
+    "dataset": "pemsbay",
+    "split": [
+     70,
+     10,
+     20
+    ],
+    "horizon": {
+     "mode": "single",
+     "minutes": 60
+    },
+    "metricDefinition": "masked",
+    "provenance": "own"
+   },
+   "goldQuotes": [
+    "70% of data is used for training, 20% are used for testing while the remaining 10% for validation",
+    "Missing values are excluded in calculating these metrics."
+   ],
+   "note": ""
+  },
+  {
+   "id": "gwn_mla_60",
+   "paper": "1906.00121",
+   "value": "3.53",
+   "methodHint": "Graph WaveNet",
+   "name": "MAE",
+   "gold": {
+    "method": "Graph WaveNet",
+    "dataset": "metrla",
+    "split": [
+     70,
+     10,
+     20
+    ],
+    "horizon": {
+     "mode": "single",
+     "minutes": 60
+    },
+    "metricDefinition": "masked",
+    "provenance": "own"
+   },
+   "goldQuotes": [
+    "The datasets are split in chronological order with 70% for training, 10% for validation and 20% for testing.",
+    "Missing values are excluded both from training and testing."
+   ],
+   "note": ""
+  },
+  {
+   "id": "gwn_mla_15",
+   "paper": "1906.00121",
+   "value": "2.69",
+   "methodHint": "Graph WaveNet",
+   "name": "MAE",
+   "gold": {
+    "method": "Graph WaveNet",
+    "dataset": "metrla",
+    "split": [
+     70,
+     10,
+     20
+    ],
+    "horizon": {
+     "mode": "single",
+     "minutes": 15
+    },
+    "metricDefinition": "masked",
+    "provenance": "own"
+   },
+   "goldQuotes": [
+    "The datasets are split in chronological order with 70% for training, 10% for validation and 20% for testing.",
+    "Missing values are excluded both from training and testing."
+   ],
+   "note": ""
+  },
+  {
+   "id": "gwn_dcrnn_mla_60",
+   "paper": "1906.00121",
+   "value": "3.60",
+   "methodHint": "DCRNN",
+   "name": "MAE",
+   "gold": {
+    "method": "DCRNN",
+    "dataset": "metrla",
+    "split": [
+     70,
+     10,
+     20
+    ],
+    "horizon": {
+     "mode": "single",
+     "minutes": 60
+    },
+    "metricDefinition": "masked",
+    "provenance": "unknown"
+   },
+   "goldQuotes": [
+    "The datasets are split in chronological order with 70% for training, 10% for validation and 20% for testing.",
+    "Missing values are excluded both from training and testing."
+   ],
+   "note": "Row label cites Li et al. (2018b) for the method; the paper does not say the numbers were copied."
+  },
+  {
+   "id": "gwn_dcrnn_mla_60_rmse",
+   "paper": "1906.00121",
+   "value": "7.60",
+   "methodHint": "DCRNN",
+   "name": "RMSE",
+   "gold": {
+    "method": "DCRNN",
+    "dataset": "metrla",
+    "split": [
+     70,
+     10,
+     20
+    ],
+    "horizon": {
+     "mode": "single",
+     "minutes": 60
+    },
+    "metricDefinition": "masked",
+    "provenance": "unknown"
+   },
+   "goldQuotes": [
+    "The datasets are split in chronological order with 70% for training, 10% for validation and 20% for testing.",
+    "Missing values are excluded both from training and testing."
+   ],
+   "note": "DCRNN's own table prints 7.59."
+  },
+  {
+   "id": "gwn_mla_mean",
+   "paper": "1906.00121",
+   "value": "3.04",
+   "methodHint": "Graph WaveNet",
+   "name": "MAE",
+   "gold": {
+    "method": "Graph WaveNet",
+    "dataset": "metrla",
+    "split": [
+     70,
+     10,
+     20
+    ],
+    "horizon": {
+     "mode": "average",
+     "minutes": 60
+    },
+    "metricDefinition": "masked",
+    "provenance": "own"
+   },
+   "goldQuotes": [
+    "The datasets are split in chronological order with 70% for training, 10% for validation and 20% for testing.",
+    "Missing values are excluded both from training and testing.",
+    "Table 3 shows the average score of MAE, RMSE, and MAPE over 12 prediction horizons."
+   ],
+   "note": "Row label is the adjacency configuration \"Forward-backward-adaptive\", not the model name."
+  },
+  {
+   "id": "gwn_bay_60",
+   "paper": "1906.00121",
+   "value": "1.95",
+   "methodHint": "Graph WaveNet",
+   "name": "MAE",
+   "gold": {
+    "method": "Graph WaveNet",
+    "dataset": "pemsbay",
+    "split": [
+     70,
+     10,
+     20
+    ],
+    "horizon": {
+     "mode": "single",
+     "minutes": 60
+    },
+    "metricDefinition": "masked",
+    "provenance": "own"
+   },
+   "goldQuotes": [
+    "The datasets are split in chronological order with 70% for training, 10% for validation and 20% for testing.",
+    "Missing values are excluded both from training and testing."
+   ],
+   "note": ""
+  },
+  {
+   "id": "mtgnn_mla_12",
+   "paper": "2005.11650",
+   "value": "3.49",
+   "methodHint": "MTGNN",
+   "name": "MAE",
+   "gold": {
+    "method": "MTGNN",
+    "dataset": "metrla",
+    "split": [
+     70,
+     20,
+     10
+    ],
+    "horizon": {
+     "mode": "single",
+     "minutes": 60
+    },
+    "metricDefinition": null,
+    "provenance": "own"
+   },
+   "goldQuotes": [
+    "we split these two datasets into a training set (70%), validation set (20%), and test set (10%) in chronological order.",
+    "We repeat the experiment 10 times and report the average value of evaluation metrics."
+   ],
+   "note": "Text states 70/20/10 while claiming to follow DCRNN; the released code uses 70/10/20. Gold follows the paper text."
+  },
+  {
+   "id": "mtgnn_bay_12",
+   "paper": "2005.11650",
+   "value": "1.94",
+   "methodHint": "MTGNN",
+   "name": "MAE",
+   "gold": {
+    "method": "MTGNN",
+    "dataset": "pemsbay",
+    "split": [
+     70,
+     20,
+     10
+    ],
+    "horizon": {
+     "mode": "single",
+     "minutes": 60
+    },
+    "metricDefinition": null,
+    "provenance": "own"
+   },
+   "goldQuotes": [
+    "we split these two datasets into a training set (70%), validation set (20%), and test set (10%) in chronological order.",
+    "We repeat the experiment 10 times and report the average value of evaluation metrics."
+   ],
+   "note": ""
+  },
+  {
+   "id": "mtgnn_dcrnn_mla_12",
+   "paper": "2005.11650",
+   "value": "3.60",
+   "methodHint": "DCRNN",
+   "name": "MAE",
+   "gold": {
+    "method": "DCRNN",
+    "dataset": "metrla",
+    "split": [
+     70,
+     20,
+     10
+    ],
+    "horizon": {
+     "mode": "single",
+     "minutes": 60
+    },
+    "metricDefinition": null,
+    "provenance": "unknown"
+   },
+   "goldQuotes": [
+    "we split these two datasets into a training set (70%), validation set (20%), and test set (10%) in chronological order."
+   ],
+   "note": ""
+  },
+  {
+   "id": "mtgnn_gman_mla_12",
+   "paper": "2005.11650",
+   "value": "3.40",
+   "methodHint": "GMAN",
+   "name": "MAE",
+   "gold": {
+    "method": "GMAN",
+    "dataset": "metrla",
+    "split": [
+     70,
+     20,
+     10
+    ],
+    "horizon": {
+     "mode": "single",
+     "minutes": 60
+    },
+    "metricDefinition": null,
+    "provenance": "unknown"
+   },
+   "goldQuotes": [
+    "we split these two datasets into a training set (70%), validation set (20%), and test set (10%) in chronological order."
+   ],
+   "note": ""
+  },
+  {
+   "id": "gman_bay_60",
+   "paper": "1911.08415",
+   "value": "1.86",
+   "methodHint": "GMAN",
+   "name": "MAE",
+   "gold": {
+    "method": "GMAN",
+    "dataset": "pemsbay",
+    "split": [
+     70,
+     10,
+     20
+    ],
+    "horizon": {
+     "mode": "single",
+     "minutes": 60
+    },
+    "metricDefinition": null,
+    "provenance": "own"
+   },
+   "goldQuotes": [
+    "We use 70% of the data for training, 10% for validation, and 20% for testing.",
+    "traffic speed prediction on the PeMS dataset [\\citeauthoryearLi et al.2018b]), which contains 6 months of data recorded by 325 traffic sensors"
+   ],
+   "note": "The dataset is called \"PeMS\"; it is the 325-sensor Bay Area release of Li et al. 2018b."
+  },
+  {
+   "id": "gman_gwn_bay_60",
+   "paper": "1911.08415",
+   "value": "1.95",
+   "methodHint": "Graph WaveNet",
+   "name": "MAE",
+   "gold": {
+    "method": "Graph WaveNet",
+    "dataset": "pemsbay",
+    "split": [
+     70,
+     10,
+     20
+    ],
+    "horizon": {
+     "mode": "single",
+     "minutes": 60
+    },
+    "metricDefinition": null,
+    "provenance": "unknown"
+   },
+   "goldQuotes": [
+    "We use 70% of the data for training, 10% for validation, and 20% for testing.",
+    "traffic speed prediction on the PeMS dataset [\\citeauthoryearLi et al.2018b]), which contains 6 months of data recorded by 325 traffic sensors"
+   ],
+   "note": ""
+  },
+  {
+   "id": "agcrn_p4",
+   "paper": "2007.02842",
+   "value": "19.83",
+   "methodHint": "AGCRN",
+   "name": "MAE",
+   "gold": {
+    "method": "AGCRN",
+    "dataset": "pems04",
+    "split": [
+     60,
+     20,
+     20
+    ],
+    "horizon": {
+     "mode": "average",
+     "minutes": 60
+    },
+    "metricDefinition": null,
+    "provenance": "own"
+   },
+   "goldQuotes": [
+    "The split ratio is 6:2:2 for both datasets.",
+    "which are the averaged MAE, RMSE and MAPE over 12 prediction horizons"
+   ],
+   "note": ""
+  },
+  {
+   "id": "agcrn_stsgcn_p4",
+   "paper": "2007.02842",
+   "value": "21.19",
+   "methodHint": "STSGCN",
+   "name": "MAE",
+   "gold": {
+    "method": "STSGCN",
+    "dataset": "pems04",
+    "split": [
+     60,
+     20,
+     20
+    ],
+    "horizon": {
+     "mode": "average",
+     "minutes": 60
+    },
+    "metricDefinition": null,
+    "provenance": "cited"
+   },
+   "goldQuotes": [
+    "The split ratio is 6:2:2 for both datasets.",
+    "which are the averaged MAE, RMSE and MAPE over 12 prediction horizons",
+    "results with * are reported performance in the paper used the same datasets"
+   ],
+   "note": ""
+  },
+  {
+   "id": "agcrn_dcrnn_p4",
+   "paper": "2007.02842",
+   "value": "21.22",
+   "methodHint": "DCRNN",
+   "name": "MAE",
+   "gold": {
+    "method": "DCRNN",
+    "dataset": "pems04",
+    "split": [
+     60,
+     20,
+     20
+    ],
+    "horizon": {
+     "mode": "average",
+     "minutes": 60
+    },
+    "metricDefinition": null,
+    "provenance": "reproduced"
+   },
+   "goldQuotes": [
+    "The split ratio is 6:2:2 for both datasets.",
+    "which are the averaged MAE, RMSE and MAPE over 12 prediction horizons",
+    "results with * are reported performance in the paper used the same datasets"
+   ],
+   "note": "Unstarred under a legend that marks copied results with *."
+  },
+  {
+   "id": "agcrn_p8",
+   "paper": "2007.02842",
+   "value": "15.95",
+   "methodHint": "AGCRN",
+   "name": "MAE",
+   "gold": {
+    "method": "AGCRN",
+    "dataset": "pems08",
+    "split": [
+     60,
+     20,
+     20
+    ],
+    "horizon": {
+     "mode": "average",
+     "minutes": 60
+    },
+    "metricDefinition": null,
+    "provenance": "own"
+   },
+   "goldQuotes": [
+    "The split ratio is 6:2:2 for both datasets.",
+    "which are the averaged MAE, RMSE and MAPE over 12 prediction horizons"
+   ],
+   "note": ""
+  },
+  {
+   "id": "stae_p4",
+   "paper": "2308.10425",
+   "value": "18.22",
+   "methodHint": "STAEformer",
+   "name": "MAE",
+   "gold": {
+    "method": "STAEformer",
+    "dataset": "pems04",
+    "split": [
+     60,
+     20,
+     20
+    ],
+    "horizon": {
+     "mode": "average",
+     "minutes": 60
+    },
+    "metricDefinition": null,
+    "provenance": "own"
+   },
+   "goldQuotes": [
+    "PEMS03, PEMS04, PEMS07 and PEMS08 are divided in a fraction of 6:2:2.",
+    "we select the average performance of all predicted 12 horizons on the PEMS03, PEMS04, PEMS07 and PEMS08 datasets."
+   ],
+   "note": ""
+  },
+  {
+   "id": "stae_agcrn_p4",
+   "paper": "2308.10425",
+   "value": "19.38",
+   "methodHint": "AGCRN",
+   "name": "MAE",
+   "gold": {
+    "method": "AGCRN",
+    "dataset": "pems04",
+    "split": [
+     60,
+     20,
+     20
+    ],
+    "horizon": {
+     "mode": "average",
+     "minutes": 60
+    },
+    "metricDefinition": null,
+    "provenance": "unknown"
+   },
+   "goldQuotes": [
+    "PEMS03, PEMS04, PEMS07 and PEMS08 are divided in a fraction of 6:2:2.",
+    "we select the average performance of all predicted 12 horizons on the PEMS03, PEMS04, PEMS07 and PEMS08 datasets."
+   ],
+   "note": ""
+  },
+  {
+   "id": "stae_dcrnn_p4",
+   "paper": "2308.10425",
+   "value": "19.63",
+   "methodHint": "DCRNN",
+   "name": "MAE",
+   "gold": {
+    "method": "DCRNN",
+    "dataset": "pems04",
+    "split": [
+     60,
+     20,
+     20
+    ],
+    "horizon": {
+     "mode": "average",
+     "minutes": 60
+    },
+    "metricDefinition": null,
+    "provenance": "unknown"
+   },
+   "goldQuotes": [
+    "PEMS03, PEMS04, PEMS07 and PEMS08 are divided in a fraction of 6:2:2.",
+    "we select the average performance of all predicted 12 horizons on the PEMS03, PEMS04, PEMS07 and PEMS08 datasets."
+   ],
+   "note": ""
+  },
+  {
+   "id": "stae_mla_12",
+   "paper": "2308.10425",
+   "value": "3.34",
+   "methodHint": "STAEformer",
+   "name": "MAE",
+   "gold": {
+    "method": "STAEformer",
+    "dataset": "metrla",
+    "split": [
+     70,
+     10,
+     20
+    ],
+    "horizon": {
+     "mode": "single",
+     "minutes": 60
+    },
+    "metricDefinition": null,
+    "provenance": "own"
+   },
+   "goldQuotes": [
+    "METR-LA and PEMS-BAY are divided into the training, validation, and test sets in a fraction of 7:1:2."
+   ],
+   "note": ""
+  },
+  {
+   "id": "stae_gwn_mla_12",
+   "paper": "2308.10425",
+   "value": "3.51",
+   "methodHint": "GWNet",
+   "name": "MAE",
+   "gold": {
+    "method": "GWNet",
+    "dataset": "metrla",
+    "split": [
+     70,
+     10,
+     20
+    ],
+    "horizon": {
+     "mode": "single",
+     "minutes": 60
+    },
+    "metricDefinition": null,
+    "provenance": "unknown"
+   },
+   "goldQuotes": [
+    "METR-LA and PEMS-BAY are divided into the training, validation, and test sets in a fraction of 7:1:2."
+   ],
+   "note": ""
+  },
+  {
+   "id": "stae_dcrnn_mla_3",
+   "paper": "2308.10425",
+   "value": "2.67",
+   "methodHint": "DCRNN",
+   "name": "MAE",
+   "gold": {
+    "method": "DCRNN",
+    "dataset": "metrla",
+    "split": [
+     70,
+     10,
+     20
+    ],
+    "horizon": {
+     "mode": "single",
+     "minutes": 15
+    },
+    "metricDefinition": null,
+    "provenance": "unknown"
+   },
+   "goldQuotes": [
+    "METR-LA and PEMS-BAY are divided into the training, validation, and test sets in a fraction of 7:1:2."
+   ],
+   "note": ""
+  },
+  {
+   "id": "pdf_p4",
+   "paper": "2301.07945",
+   "value": "18.321",
+   "methodHint": "PDFormer",
+   "name": "MAE",
+   "gold": {
+    "method": "PDFormer",
+    "dataset": "pems04",
+    "split": [
+     60,
+     20,
+     20
+    ],
+    "horizon": {
+     "mode": null,
+     "minutes": 60
+    },
+    "metricDefinition": "masked",
+    "provenance": "own"
+   },
+   "goldQuotes": [
+    "we split the three graph-based datasets into training, validation, and test sets in a 6:2:2 ratio.",
+    "Missing values are excluded when calculating these metrics."
+   ],
+   "note": "Prediction length is 12 steps; whether the table averages horizons is not stated."
+  },
+  {
+   "id": "pdf_dcrnn_p4",
+   "paper": "2301.07945",
+   "value": "22.737",
+   "methodHint": "DCRNN",
+   "name": "MAE",
+   "gold": {
+    "method": "DCRNN",
+    "dataset": "pems04",
+    "split": [
+     60,
+     20,
+     20
+    ],
+    "horizon": {
+     "mode": null,
+     "minutes": 60
+    },
+    "metricDefinition": "masked",
+    "provenance": "unknown"
+   },
+   "goldQuotes": [
+    "we split the three graph-based datasets into training, validation, and test sets in a 6:2:2 ratio.",
+    "Missing values are excluded when calculating these metrics."
+   ],
+   "note": ""
+  },
+  {
+   "id": "pdf_stsgcn_p4",
+   "paper": "2301.07945",
+   "value": "21.185",
+   "methodHint": "STSGCN",
+   "name": "MAE",
+   "gold": {
+    "method": "STSGCN",
+    "dataset": "pems04",
+    "split": [
+     60,
+     20,
+     20
+    ],
+    "horizon": {
+     "mode": null,
+     "minutes": 60
+    },
+    "metricDefinition": "masked",
+    "provenance": "unknown"
+   },
+   "goldQuotes": [
+    "we split the three graph-based datasets into training, validation, and test sets in a 6:2:2 ratio.",
+    "Missing values are excluded when calculating these metrics."
+   ],
+   "note": ""
+  },
+  {
+   "id": "stid_p8_avg",
+   "paper": "2208.05233",
+   "value": "14.20",
+   "methodHint": "STID",
+   "name": "MAE",
+   "gold": {
+    "method": "STID",
+    "dataset": "pems08",
+    "split": [
+     60,
+     20,
+     20
+    ],
+    "horizon": {
+     "mode": "average",
+     "minutes": 60
+    },
+    "metricDefinition": null,
+    "provenance": "own"
+   },
+   "goldQuotes": [
+    "The ratio of training, validation, and test sets for the PEMS-BAY dataset is 7 : 1 : 2, while the ratio for other datasets is 6 : 2 : 2.",
+    "We compared the performance of these methods on the 3rd, 6th, and 12th time slots as well as the performance of the average 12 time slots"
+   ],
+   "note": ""
+  },
+  {
+   "id": "stid_p4_12",
+   "paper": "2208.05233",
+   "value": "19.58",
+   "methodHint": "STID",
+   "name": "MAE",
+   "gold": {
+    "method": "STID",
+    "dataset": "pems04",
+    "split": [
+     60,
+     20,
+     20
+    ],
+    "horizon": {
+     "mode": "single",
+     "minutes": 60
+    },
+    "metricDefinition": null,
+    "provenance": "own"
+   },
+   "goldQuotes": [
+    "The ratio of training, validation, and test sets for the PEMS-BAY dataset is 7 : 1 : 2, while the ratio for other datasets is 6 : 2 : 2.",
+    "We compared the performance of these methods on the 3rd, 6th, and 12th time slots as well as the performance of the average 12 time slots"
+   ],
+   "note": ""
+  },
+  {
+   "id": "stid_agcrn_p4_avg",
+   "paper": "2208.05233",
+   "value": "19.36",
+   "methodHint": "AGCRN",
+   "name": "MAE",
+   "gold": {
+    "method": "AGCRN",
+    "dataset": "pems04",
+    "split": [
+     60,
+     20,
+     20
+    ],
+    "horizon": {
+     "mode": "average",
+     "minutes": 60
+    },
+    "metricDefinition": null,
+    "provenance": "unknown"
+   },
+   "goldQuotes": [
+    "The ratio of training, validation, and test sets for the PEMS-BAY dataset is 7 : 1 : 2, while the ratio for other datasets is 6 : 2 : 2.",
+    "We compared the performance of these methods on the 3rd, 6th, and 12th time slots as well as the performance of the average 12 time slots"
+   ],
+   "note": ""
+  },
+  {
+   "id": "stid_dcrnn_p4_avg",
+   "paper": "2208.05233",
+   "value": "19.71",
+   "methodHint": "DCRNN",
+   "name": "MAE",
+   "gold": {
+    "method": "DCRNN",
+    "dataset": "pems04",
+    "split": [
+     60,
+     20,
+     20
+    ],
+    "horizon": {
+     "mode": "average",
+     "minutes": 60
+    },
+    "metricDefinition": null,
+    "provenance": "unknown"
+   },
+   "goldQuotes": [
+    "The ratio of training, validation, and test sets for the PEMS-BAY dataset is 7 : 1 : 2, while the ratio for other datasets is 6 : 2 : 2.",
+    "We compared the performance of these methods on the 3rd, 6th, and 12th time slots as well as the performance of the average 12 time slots"
+   ],
+   "note": ""
+  },
+  {
+   "id": "stid_bay_12",
+   "paper": "2208.05233",
+   "value": "1.89",
+   "methodHint": "STID",
+   "name": "MAE",
+   "gold": {
+    "method": "STID",
+    "dataset": "pemsbay",
+    "split": [
+     70,
+     10,
+     20
+    ],
+    "horizon": {
+     "mode": "single",
+     "minutes": 60
+    },
+    "metricDefinition": null,
+    "provenance": "own"
+   },
+   "goldQuotes": [
+    "The ratio of training, validation, and test sets for the PEMS-BAY dataset is 7 : 1 : 2, while the ratio for other datasets is 6 : 2 : 2.",
+    "We compared the performance of these methods on the 3rd, 6th, and 12th time slots as well as the performance of the average 12 time slots"
+   ],
+   "note": ""
+  },
+  {
+   "id": "gts_mla_60_t1",
+   "paper": "2101.06861",
+   "value": "2.99",
+   "methodHint": "GTS",
+   "name": "MAE",
+   "gold": {
+    "method": "GTS",
+    "dataset": "metrla",
+    "split": [
+     70,
+     10,
+     20
+    ],
+    "horizon": {
+     "mode": "single",
+     "minutes": 60
+    },
+    "metricDefinition": "nonstandard",
+    "provenance": "own"
+   },
+   "goldQuotes": [
+    "For all data sets, we use a temporal 70/10/20 split for training, validation, and testing, respectively.",
+    "this version calculated the evaluation metrics MAE/RMSE/MAPE in a manner slightly different from that used to report the results of DCRNN in the official publication"
+   ],
+   "note": "Appendix D says Table 1 used a metric calculation that differs from the official DCRNN protocol."
+  },
+  {
+   "id": "gts_mla_60_t4",
+   "paper": "2101.06861",
+   "value": "3.41",
+   "methodHint": "GTS",
+   "name": "MAE",
+   "gold": {
+    "method": "GTS",
+    "dataset": "metrla",
+    "split": [
+     70,
+     10,
+     20
+    ],
+    "horizon": {
+     "mode": "single",
+     "minutes": 60
+    },
+    "metricDefinition": null,
+    "provenance": "own"
+   },
+   "goldQuotes": [
+    "For all data sets, we use a temporal 70/10/20 split for training, validation, and testing, respectively.",
+    "this version calculated the evaluation metrics MAE/RMSE/MAPE in a manner slightly different from that used to report the results of DCRNN in the official publication"
+   ],
+   "note": "Corrected Table 4, \"consistent with the official DCRNN results\"."
+  },
+  {
+   "id": "step_mla_12",
+   "paper": "2206.09113",
+   "value": "3.37",
+   "methodHint": "STEP",
+   "name": "MAE",
+   "gold": {
+    "method": "STEP",
+    "dataset": "metrla",
+    "split": [
+     70,
+     10,
+     20
+    ],
+    "horizon": {
+     "mode": "single",
+     "minutes": 60
+    },
+    "metricDefinition": null,
+    "provenance": "own"
+   },
+   "goldQuotes": [
+    "we use about 70% of data for training, 20% of data for testing, and the remaining 10% for validation"
+   ],
+   "note": ""
+  },
+  {
+   "id": "step_gts_mla_12",
+   "paper": "2206.09113",
+   "value": "3.46",
+   "methodHint": "GTS",
+   "name": "MAE",
+   "gold": {
+    "method": "GTS",
+    "dataset": "metrla",
+    "split": [
+     70,
+     10,
+     20
+    ],
+    "horizon": {
+     "mode": "single",
+     "minutes": 60
+    },
+    "metricDefinition": null,
+    "provenance": "reproduced"
+   },
+   "goldQuotes": [
+    "we use about 70% of data for training, 20% of data for testing, and the remaining 10% for validation",
+    "We unify the evaluation process with other baselines, run GTS five times, and report its best performance."
+   ],
+   "note": "Best of five runs."
+  },
+  {
+   "id": "step_p4_12",
+   "paper": "2206.09113",
+   "value": "19.27",
+   "methodHint": "STEP",
+   "name": "MAE",
+   "gold": {
+    "method": "STEP",
+    "dataset": "pems04",
+    "split": [
+     60,
+     20,
+     20
+    ],
+    "horizon": {
+     "mode": "single",
+     "minutes": 60
+    },
+    "metricDefinition": null,
+    "provenance": "own"
+   },
+   "goldQuotes": [
+    "we use about 70% of data for training, 20% of data for testing, and the remaining 10% for validation"
+   ],
+   "note": ""
+  },
+  {
+   "id": "d2_mla_12",
+   "paper": "2206.09112",
+   "value": "3.35",
+   "methodHint": "D2STGNN",
+   "name": "MAE",
+   "gold": {
+    "method": "D2STGNN",
+    "dataset": "metrla",
+    "split": [
+     70,
+     10,
+     20
+    ],
+    "horizon": {
+     "mode": "single",
+     "minutes": 60
+    },
+    "metricDefinition": null,
+    "provenance": "own"
+   },
+   "goldQuotes": [
+    "we use about 70% of data for training, 20% of data for testing, and the remaining 10% for validation"
+   ],
+   "note": ""
+  },
+  {
+   "id": "d2_gman_mla_12",
+   "paper": "2206.09112",
+   "value": "3.44",
+   "methodHint": "GMAN",
+   "name": "MAE",
+   "gold": {
+    "method": "GMAN",
+    "dataset": "metrla",
+    "split": [
+     70,
+     10,
+     20
+    ],
+    "horizon": {
+     "mode": "single",
+     "minutes": 60
+    },
+    "metricDefinition": null,
+    "provenance": "unknown"
+   },
+   "goldQuotes": [
+    "we use about 70% of data for training, 20% of data for testing, and the remaining 10% for validation"
+   ],
+   "note": ""
+  },
+  {
+   "id": "mega_mla_12",
+   "paper": "2211.14701",
+   "value": "3.38",
+   "methodHint": "MegaCRN",
+   "name": "MAE",
+   "gold": {
+    "method": "MegaCRN",
+    "dataset": "metrla",
+    "split": [
+     70,
+     10,
+     20
+    ],
+    "horizon": {
+     "mode": "single",
+     "minutes": 60
+    },
+    "metricDefinition": null,
+    "provenance": "own"
+   },
+   "goldQuotes": [
+    "splitting the datasets in chronological order with 70% for training, 10% for validation, and 20% for testing (namely 7:1:2)"
+   ],
+   "note": ""
+  },
+  {
+   "id": "mega_gts_mla_12",
+   "paper": "2211.14701",
+   "value": "3.47",
+   "methodHint": "GTS",
+   "name": "MAE",
+   "gold": {
+    "method": "GTS",
+    "dataset": "metrla",
+    "split": [
+     70,
+     10,
+     20
+    ],
+    "horizon": {
+     "mode": "single",
+     "minutes": 60
+    },
+    "metricDefinition": null,
+    "provenance": "unknown"
+   },
+   "goldQuotes": [
+    "splitting the datasets in chronological order with 70% for training, 10% for validation, and 20% for testing (namely 7:1:2)"
+   ],
+   "note": "Starred: \"either from our own experiments or other literature\"."
+  },
+  {
+   "id": "mega_dcrnn_mla_12",
+   "paper": "2211.14701",
+   "value": "3.60",
+   "methodHint": "DCRNN",
+   "name": "MAE",
+   "gold": {
+    "method": "DCRNN",
+    "dataset": "metrla",
+    "split": [
+     70,
+     10,
+     20
+    ],
+    "horizon": {
+     "mode": "single",
+     "minutes": 60
+    },
+    "metricDefinition": null,
+    "provenance": "cited"
+   },
+   "goldQuotes": [
+    "splitting the datasets in chronological order with 70% for training, 10% for validation, and 20% for testing (namely 7:1:2)",
+    "Most of the baselines’ results on the benchmarks are reported from their original papers."
+   ],
+   "note": ""
+  },
+  {
+   "id": "stfgnn_p4",
+   "paper": "2012.09641",
+   "value": "19.83",
+   "methodHint": "STFGNN",
+   "name": "MAE",
+   "gold": {
+    "method": "STFGNN",
+    "dataset": "pems04",
+    "split": [
+     60,
+     20,
+     20
+    ],
+    "horizon": {
+     "mode": null,
+     "minutes": 60
+    },
+    "metricDefinition": null,
+    "provenance": "own"
+   },
+   "goldQuotes": [
+    "we split the data with ratio 6 : 2 : 2 at PEMS03, PEMS04, PEMS07, PEMS08 into training sets, validation sets and test sets."
+   ],
+   "note": ""
+  },
+  {
+   "id": "stfgnn_dcrnn_p4",
+   "paper": "2012.09641",
+   "value": "24.70",
+   "methodHint": "DCRNN",
+   "name": "MAE",
+   "gold": {
+    "method": "DCRNN",
+    "dataset": "pems04",
+    "split": [
+     60,
+     20,
+     20
+    ],
+    "horizon": {
+     "mode": null,
+     "minutes": 60
+    },
+    "metricDefinition": null,
+    "provenance": "unknown"
+   },
+   "goldQuotes": [
+    "we split the data with ratio 6 : 2 : 2 at PEMS03, PEMS04, PEMS07, PEMS08 into training sets, validation sets and test sets."
+   ],
+   "note": ""
+  },
+  {
+   "id": "stgcn_p7_15",
+   "paper": "1709.04875",
+   "value": "2.25",
+   "methodHint": "STGCN(Cheb)",
+   "name": "MAE",
+   "gold": {
+    "method": "STGCN(Cheb)",
+    "dataset": "pemsd7m",
+    "split": null,
+    "horizon": {
+     "mode": "single",
+     "minutes": 15
+    },
+    "metricDefinition": null,
+    "provenance": "own"
+   },
+   "goldQuotes": [],
+   "note": "Combined cell \"2.25/ 3.03/ 3.57\" holds 15/30/45-minute values; split is not given as percentages."
+  }
+ ],
+ "cases": [
+  {
+   "id": "C01",
+   "a": "gts_mla_60_t1",
+   "b": "gwn_mla_60",
+   "gold": {
+    "outcome": "incompatible",
+    "independent": true
+   },
+   "why": "GTS Table 1 used a non-standard metric calculation (Appendix D).",
+   "heldOut": false
+  },
+  {
+   "id": "C02",
+   "a": "gts_mla_60_t4",
+   "b": "gwn_mla_60",
+   "gold": {
+    "outcome": "comparable",
+    "independent": true
+   },
+   "why": "Corrected GTS value, same split and horizon.",
+   "heldOut": false
+  },
+  {
+   "id": "C03",
+   "a": "gts_mla_60_t1",
+   "b": "gts_mla_60_t4",
+   "gold": {
+    "outcome": "incompatible",
+    "independent": false
+   },
+   "why": "Original vs corrected calculation in one paper.",
+   "heldOut": false
+  },
+  {
+   "id": "C04",
+   "a": "step_gts_mla_12",
+   "b": "gts_mla_60_t4",
+   "gold": {
+    "outcome": "comparable",
+    "independent": true
+   },
+   "why": "Re-run under unified evaluation; best of five runs is a caveat.",
+   "heldOut": true
+  },
+  {
+   "id": "C05",
+   "a": "step_gts_mla_12",
+   "b": "gts_mla_60_t1",
+   "gold": {
+    "outcome": "incompatible",
+    "independent": true
+   },
+   "why": "Original GTS value used the non-standard calculation.",
+   "heldOut": true
+  },
+  {
+   "id": "C06",
+   "a": "mega_gts_mla_12",
+   "b": "step_gts_mla_12",
+   "gold": {
+    "outcome": "comparable",
+    "independent": true
+   },
+   "why": "",
+   "heldOut": true
+  },
+  {
+   "id": "C07",
+   "a": "agcrn_p4",
+   "b": "stae_p4",
+   "gold": {
+    "outcome": "comparable",
+    "independent": true
+   },
+   "why": "Both 6:2:2 and averaged over 12 horizons; neither paper states the metric definition (caveat). Code shows different masking.",
+   "heldOut": false
+  },
+  {
+   "id": "C08",
+   "a": "agcrn_p4",
+   "b": "stid_agcrn_p4_avg",
+   "gold": {
+    "outcome": "comparable",
+    "independent": true
+   },
+   "why": "Same method re-run: 19.83 vs 19.36.",
+   "heldOut": false
+  },
+  {
+   "id": "C09",
+   "a": "agcrn_p4",
+   "b": "stid_p4_12",
+   "gold": {
+    "outcome": "incompatible",
+    "independent": true
+   },
+   "why": "Average over horizons vs horizon 12.",
+   "heldOut": false
+  },
+  {
+   "id": "C10",
+   "a": "agcrn_p4",
+   "b": "pdf_p4",
+   "gold": {
+    "outcome": "insufficient",
+    "independent": true
+   },
+   "why": "PDFormer does not state whether PEMS04 results are averaged.",
+   "heldOut": false
+  },
+  {
+   "id": "C11",
+   "a": "agcrn_p4",
+   "b": "stfgnn_p4",
+   "gold": {
+    "outcome": "insufficient",
+    "independent": true
+   },
+   "why": "STFGNN does not state the horizon aggregation.",
+   "heldOut": true
+  },
+  {
+   "id": "C12",
+   "a": "agcrn_dcrnn_p4",
+   "b": "stae_dcrnn_p4",
+   "gold": {
+    "outcome": "comparable",
+    "independent": true
+   },
+   "why": "DCRNN reported as 21.22 and 19.63 under stated-equal protocols.",
+   "heldOut": false
+  },
+  {
+   "id": "C13",
+   "a": "agcrn_dcrnn_p4",
+   "b": "stid_dcrnn_p4_avg",
+   "gold": {
+    "outcome": "comparable",
+    "independent": true
+   },
+   "why": "",
+   "heldOut": false
+  },
+  {
+   "id": "C14",
+   "a": "agcrn_dcrnn_p4",
+   "b": "pdf_dcrnn_p4",
+   "gold": {
+    "outcome": "insufficient",
+    "independent": true
+   },
+   "why": "",
+   "heldOut": false
+  },
+  {
+   "id": "C15",
+   "a": "agcrn_dcrnn_p4",
+   "b": "stfgnn_dcrnn_p4",
+   "gold": {
+    "outcome": "insufficient",
+    "independent": true
+   },
+   "why": "",
+   "heldOut": true
+  },
+  {
+   "id": "C16",
+   "a": "agcrn_stsgcn_p4",
+   "b": "pdf_stsgcn_p4",
+   "gold": {
+    "outcome": "insufficient",
+    "independent": false
+   },
+   "why": "AGCRN cites STSGCN's number; PDFormer's is 21.185.",
+   "heldOut": false
+  },
+  {
+   "id": "C17",
+   "a": "stae_p4",
+   "b": "stid_agcrn_p4_avg",
+   "gold": {
+    "outcome": "comparable",
+    "independent": true
+   },
+   "why": "",
+   "heldOut": false
+  },
+  {
+   "id": "C18",
+   "a": "stae_p4",
+   "b": "pdf_p4",
+   "gold": {
+    "outcome": "insufficient",
+    "independent": true
+   },
+   "why": "",
+   "heldOut": false
+  },
+  {
+   "id": "C19",
+   "a": "stae_agcrn_p4",
+   "b": "agcrn_p4",
+   "gold": {
+    "outcome": "comparable",
+    "independent": true
+   },
+   "why": "AGCRN reported as 19.38 by STAEformer and 19.83 by its authors.",
+   "heldOut": false
+  },
+  {
+   "id": "C20",
+   "a": "stid_p4_12",
+   "b": "step_p4_12",
+   "gold": {
+    "outcome": "comparable",
+    "independent": true
+   },
+   "why": "",
+   "heldOut": true
+  },
+  {
+   "id": "C21",
+   "a": "step_p4_12",
+   "b": "agcrn_p4",
+   "gold": {
+    "outcome": "incompatible",
+    "independent": true
+   },
+   "why": "Horizon 12 vs average over horizons.",
+   "heldOut": true
+  },
+  {
+   "id": "C22",
+   "a": "stid_p8_avg",
+   "b": "agcrn_p8",
+   "gold": {
+    "outcome": "comparable",
+    "independent": true
+   },
+   "why": "",
+   "heldOut": false
+  },
+  {
+   "id": "C23",
+   "a": "agcrn_p8",
+   "b": "agcrn_p4",
+   "gold": {
+    "outcome": "incompatible",
+    "independent": false
+   },
+   "why": "Different datasets.",
+   "heldOut": false
+  },
+  {
+   "id": "C24",
+   "a": "dcrnn_mla_60",
+   "b": "gwn_dcrnn_mla_60",
+   "gold": {
+    "outcome": "comparable",
+    "independent": false
+   },
+   "why": "Identical value; the Graph WaveNet row repeats DCRNN's published result.",
+   "heldOut": false
+  },
+  {
+   "id": "C25",
+   "a": "dcrnn_mla_60_rmse",
+   "b": "gwn_dcrnn_mla_60_rmse",
+   "gold": {
+    "outcome": "comparable",
+    "independent": false
+   },
+   "why": "Repeated result with a transcription difference (7.59 vs 7.60).",
+   "heldOut": false
+  },
+  {
+   "id": "C26",
+   "a": "gwn_mla_60",
+   "b": "mtgnn_mla_12",
+   "gold": {
+    "outcome": "incompatible",
+    "independent": true
+   },
+   "why": "Split stated as 70/10/20 vs 70/20/10 (MTGNN text).",
+   "heldOut": false
+  },
+  {
+   "id": "C27",
+   "a": "gwn_mla_60",
+   "b": "stae_mla_12",
+   "gold": {
+    "outcome": "comparable",
+    "independent": true
+   },
+   "why": "",
+   "heldOut": false
+  },
+  {
+   "id": "C28",
+   "a": "gwn_mla_60",
+   "b": "d2_mla_12",
+   "gold": {
+    "outcome": "comparable",
+    "independent": true
+   },
+   "why": "",
+   "heldOut": true
+  },
+  {
+   "id": "C29",
+   "a": "gwn_mla_60",
+   "b": "step_mla_12",
+   "gold": {
+    "outcome": "comparable",
+    "independent": true
+   },
+   "why": "",
+   "heldOut": true
+  },
+  {
+   "id": "C30",
+   "a": "gwn_mla_60",
+   "b": "mega_mla_12",
+   "gold": {
+    "outcome": "comparable",
+    "independent": true
+   },
+   "why": "",
+   "heldOut": true
+  },
+  {
+   "id": "C31",
+   "a": "gwn_mla_60",
+   "b": "gwn_mla_mean",
+   "gold": {
+    "outcome": "incompatible",
+    "independent": false
+   },
+   "why": "Horizon 12 vs mean over 12 horizons.",
+   "heldOut": false
+  },
+  {
+   "id": "C32",
+   "a": "gwn_mla_15",
+   "b": "dcrnn_mla_60",
+   "gold": {
+    "outcome": "incompatible",
+    "independent": true
+   },
+   "why": "15 vs 60 minutes.",
+   "heldOut": false
+  },
+  {
+   "id": "C33",
+   "a": "stae_dcrnn_mla_3",
+   "b": "dcrnn_mla_15",
+   "gold": {
+    "outcome": "comparable",
+    "independent": true
+   },
+   "why": "DCRNN at 15 minutes: 2.67 re-reported vs 2.77 original.",
+   "heldOut": false
+  },
+  {
+   "id": "C34",
+   "a": "gman_bay_60",
+   "b": "dcrnn_bay_60",
+   "gold": {
+    "outcome": "comparable",
+    "independent": true
+   },
+   "why": "\"PeMS\" in GMAN is PEMS-BAY.",
+   "heldOut": false
+  },
+  {
+   "id": "C35",
+   "a": "gman_bay_60",
+   "b": "gwn_bay_60",
+   "gold": {
+    "outcome": "comparable",
+    "independent": true
+   },
+   "why": "",
+   "heldOut": false
+  },
+  {
+   "id": "C36",
+   "a": "gman_gwn_bay_60",
+   "b": "gwn_bay_60",
+   "gold": {
+    "outcome": "comparable",
+    "independent": false
+   },
+   "why": "Identical value with unstated provenance.",
+   "heldOut": false
+  },
+  {
+   "id": "C37",
+   "a": "mtgnn_bay_12",
+   "b": "gwn_bay_60",
+   "gold": {
+    "outcome": "incompatible",
+    "independent": true
+   },
+   "why": "Split per MTGNN text.",
+   "heldOut": false
+  },
+  {
+   "id": "C38",
+   "a": "stid_bay_12",
+   "b": "gwn_bay_60",
+   "gold": {
+    "outcome": "comparable",
+    "independent": true
+   },
+   "why": "",
+   "heldOut": false
+  },
+  {
+   "id": "C39",
+   "a": "mtgnn_gman_mla_12",
+   "b": "d2_gman_mla_12",
+   "gold": {
+    "outcome": "incompatible",
+    "independent": true
+   },
+   "why": "Split per MTGNN text.",
+   "heldOut": true
+  },
+  {
+   "id": "C40",
+   "a": "mega_dcrnn_mla_12",
+   "b": "dcrnn_mla_60",
+   "gold": {
+    "outcome": "comparable",
+    "independent": false
+   },
+   "why": "MegaCRN copies DCRNN's published results.",
+   "heldOut": true
+  },
+  {
+   "id": "C41",
+   "a": "mtgnn_dcrnn_mla_12",
+   "b": "dcrnn_mla_60",
+   "gold": {
+    "outcome": "incompatible",
+    "independent": true
+   },
+   "why": "Split per MTGNN text.",
+   "heldOut": false
+  },
+  {
+   "id": "C42",
+   "a": "stgcn_p7_15",
+   "b": "gwn_mla_15",
+   "gold": {
+    "outcome": "incompatible",
+    "independent": true
+   },
+   "why": "Different datasets.",
+   "heldOut": true
+  },
+  {
+   "id": "C43",
+   "a": "stae_gwn_mla_12",
+   "b": "gwn_mla_60",
+   "gold": {
+    "outcome": "comparable",
+    "independent": true
+   },
+   "why": "Graph WaveNet re-reported as 3.51 vs 3.53.",
+   "heldOut": false
+  },
+  {
+   "id": "C44",
+   "a": "pdf_p4",
+   "b": "stfgnn_p4",
+   "gold": {
+    "outcome": "insufficient",
+    "independent": true
+   },
+   "why": "",
+   "heldOut": true
+  }
+ ]
+}

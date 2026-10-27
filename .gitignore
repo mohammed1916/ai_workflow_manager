@@ -8,3 +8,6 @@ workspace/outputs/*
 !workspace/outputs/.gitkeep
 
 tmp/
+
+# evaluation source cache (arXiv text is not redistributed)
+eval/.cache/

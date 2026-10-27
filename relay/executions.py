@@ -49,7 +49,7 @@ class ExecutionHistory:
         changed=hypothesis!=snapshot['hypothesis']
         if changed and action in ('synthesize','draft'): raise RelayError('REASSESS_REQUIRED','For a changed hypothesis, choose Reassess evidence or New discovery first.')
         with self.lock:
-            if action!='snapshot' and sum(p['status'] in ('discovering','drafting') for p in self.projects)>=2:
+            if action!='snapshot' and sum(p['status'] in ('discovering','drafting','investigating') for p in self.projects)>=2:
                 raise RelayError('BUSY','Two agents are already running. You can still create an editable checkpoint copy.')
             p=copy.deepcopy(snapshot)
             p.update(id=secrets.token_hex(8),created=now(),hypothesis=hypothesis,provider=provider,model=model,
@@ -81,7 +81,7 @@ class ExecutionHistory:
                 from .research import analysis_text, validate_analysis
                 for paper in p['papers']:
                     self.event(p,'Reassessing hypothesis fit: '+paper['title'][:100])
-                    a=self.llm(p,'Assess hypothesis fit from source text. Return JSON with relevance (0 to 100), rationale, topic, and limitations. Distinguish unknown context from demonstrated limitations. Do not extract or change numeric metrics.',{'hypothesis':p['hypothesis'],'title':paper['title'],'text':analysis_text(paper.get('evidence','')),'feedback':p.get('feedback','')})
+                    a=self.llm(p,'Assess hypothesis fit from source text. Return JSON with relevance (0 to 100), rationale, topic, and limitations. Distinguish unknown context from demonstrated limitations. Do not extract or change numeric metrics.',{'hypothesis':p['hypothesis'],'title':paper['title'],'text':analysis_text(self.source(paper)),'feedback':p.get('feedback','')},'reassess',6000)
                     with self.lock:
                         metrics=copy.deepcopy(paper['metrics']); validate_analysis(paper,a); paper['metrics']=metrics; paper.pop('assessmentStale',None)
                         p['revision']+=1
