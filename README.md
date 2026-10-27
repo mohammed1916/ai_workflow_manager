@@ -112,3 +112,16 @@ The research workspace checks whether two published results can be compared. It 
 - Live model runs use Nebius Token Factory with `NEBIUS_API_KEY` in `.env`. Live test scripts are in `scripts/live/`.
 
 Limits: the interface has not been browser-tested, the gold labels are not yet checked by a researcher, and single evaluation runs vary.
+
+## Hosted deployment (visitors bring their own key)
+
+Set `RELAY_HOSTED=1` on the server. In this mode the server never uses a key from its own environment. Each visitor pastes their own Nebius or Ollama key in the app; the browser keeps it in the tab (session storage) and sends it with each request. The server holds it only in memory while that visitor's work runs, and never writes it to disk or logs it.
+
+- Start command: `python3 -m relay.server`. Standard library only.
+- Required: `RELAY_PUBLIC_HOST` set to the public hostname, and `RELAY_HOST=0.0.0.0`. The server rejects other Host and Origin headers.
+- Persistent state lives in `.relay/`. Mount a disk there so investigations survive restarts.
+- PDF compilation runs only on a computer with the macOS sandbox. In hosted mode the app refuses to compile and offers the ZIP to compile locally with Tectonic or import into Overleaf.
+- Local-only features: opening links and revealing folders in Finder need macOS.
+- Blueprint: `render.yaml`.
+
+Local use is unchanged: keys can still come from `.env`, and PDF compilation runs inside the macOS sandbox.

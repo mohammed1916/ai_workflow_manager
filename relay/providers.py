@@ -2,6 +2,16 @@
 import json, urllib.request, urllib.error
 from urllib.parse import urlparse
 
+KEY_FIELDS = {'nebius': 'NEBIUS_API_KEY', 'ollama': 'OLLAMA_TEST_API_KEY'}
+
+
+def with_key(cfg, provider, key):
+    """Return a copy of cfg with one visitor-supplied key for a provider. The key is never written anywhere."""
+    if not key: return cfg
+    out = dict(cfg); out[KEY_FIELDS[provider]] = key
+    return out
+
+
 def settings(cfg, provider):
     from .core import RelayError
     if provider=='ollama':

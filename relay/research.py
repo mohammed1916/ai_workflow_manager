@@ -2,7 +2,7 @@
 import concurrent.futures, copy, io, json, re, secrets, shutil, subprocess, threading, time, urllib.parse, urllib.request, zipfile
 import xml.etree.ElementTree as ET
 from .core import RelayError, read_config, now, digest
-from .providers import complete, models
+from .providers import complete, models, with_key
 from .evidence import (FIELDS, LABELS, check_metric, compare as compare_results, html_to_text, known, norm, passages, cell_context, mentions, window, table_notes, split_key, split_supported,
                        repository_links, code_passages, REPO_FILES, supports, short_id, provenance_key, metric_key)
 
@@ -429,7 +429,7 @@ from .executions import ExecutionHistory
 
 class Research(ExecutionHistory):
     def __init__(self, root):
-        self.root = root; self.path = root / '.relay/research.json'; self.lock = threading.RLock()
+        self.root = root; self.path = root / '.relay/research.json'; self.lock = threading.RLock(); self.keys = {}
         self.projects = json.loads(self.path.read_text()) if self.path.exists() else []
         for p in self.projects:
             for paper in p['papers']:
@@ -442,6 +442,12 @@ class Research(ExecutionHistory):
                 self.checkpoint(p, 'import', 'Existing saved result', details={'note': 'Historical intermediate snapshots were not recorded; this is the saved state at migration.'})
 
     # ------------------------------------------------------------ storage
+    def set_key(self, pid, provider, key):
+        """Hold a visitor's key in memory for one project. It is never saved to disk and is released when the work ends."""
+        with self.lock:
+            base = self.keys.get(pid) or read_config(self.root)
+            self.keys[pid] = with_key(base, provider, key)
+
     def save(self):
         self.path.parent.mkdir(exist_ok=True); tmp = self.path.with_suffix('.tmp'); tmp.write_text(json.dumps(self.projects)); tmp.replace(self.path)
 
@@ -497,7 +503,7 @@ class Research(ExecutionHistory):
             with self.lock: p['tokens'] = p.get('tokens', 0) + tokens
         record = {}
         try:
-            return model_call(read_config(self.root), p['provider'], p['model'], system, payload, kind, max_tokens, usage, record)
+            return model_call(self.cfg_for_id(p['id']), p['provider'], p['model'], system, payload, kind, max_tokens, usage, record)
         finally:
             with self.lock:
                 p.setdefault('calls', []).append(record); p['calls'] = p['calls'][-500:]
@@ -506,8 +512,9 @@ class Research(ExecutionHistory):
     def start(self, data):
         hypothesis = data.get('hypothesis', '').strip()
         if not 10 <= len(hypothesis) <= 2000: raise RelayError('HYPOTHESIS_REQUIRED', 'Write a hypothesis between 10 and 2,000 characters.')
-        cfg = read_config(self.root)
-        provider = data.get('provider') or ('nebius' if cfg.get('NEBIUS_API_KEY') else 'ollama')
+        key = data.pop('providerKey', None)
+        provider = data.get('provider') or ('nebius' if (read_config(self.root).get('NEBIUS_API_KEY') or key) else 'ollama')
+        cfg = with_key(read_config(self.root), provider, key)
         model = data.get('model') or (cfg.get('NEBIUS_MODEL', 'nvidia/nemotron-3-super-120b-a12b') if provider == 'nebius' else 'gpt-oss:120b')
         seeds = [str(s).strip() for s in (data.get('seeds') or []) if str(s).strip()][:12]
         for s in seeds:
@@ -518,7 +525,7 @@ class Research(ExecutionHistory):
             if any(p['status'] in BUSY for p in self.projects): raise RelayError('BUSY', 'Wait for the active research agent to finish.')
             p = {'id': secrets.token_hex(8), 'hypothesis': hypothesis, 'provider': provider, 'model': model, 'created': now(), 'status': 'discovering', 'events': [], 'papers': [],
                  'suggestions': [], 'revision': 1, 'tokens': 0, 'tex': '', 'bib': '', 'seeds': seeds, 'seedOnly': seed_only, 'proposals': [], 'corrections': [], 'calls': []}
-            self.projects.insert(0, p); self.checkpoint(p, 'hypothesis', 'Hypothesis accepted', details={'seeds': seeds, 'seedOnly': seed_only})
+            self.keys[p['id']] = cfg; self.projects.insert(0, p); self.checkpoint(p, 'hypothesis', 'Hypothesis accepted', details={'seeds': seeds, 'seedOnly': seed_only})
         threading.Thread(target=self.run, args=(p,), daemon=True).start()
         return {'id': p['id']}
 
@@ -994,6 +1001,8 @@ class Research(ExecutionHistory):
         return b.getvalue()
 
     def compile(self, data):
+        if __import__('os').environ.get('RELAY_HOSTED') == '1':
+            raise RelayError('COMPILE_LOCAL_ONLY', 'PDF compilation runs on your own computer. Download the Overleaf ZIP and compile it there with Tectonic, or import it into Overleaf.', 409)
         with self.lock:
             p = self.get(data.get('id'))
             if data.get('revision') != p['revision']: raise RelayError('STALE_REVISION', 'Save the latest manuscript first.', 409)

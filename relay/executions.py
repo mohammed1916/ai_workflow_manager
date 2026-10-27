@@ -1,6 +1,7 @@
 """Immutable execution checkpoints and non-destructive research branches."""
 import copy, json, secrets, threading
 from .core import RelayError, digest, now, read_config
+from .providers import with_key
 from .providers import models
 
 class ExecutionHistory:
@@ -17,7 +18,12 @@ class ExecutionHistory:
             folder=self.root/'.relay/checkpoints'/p['id']; folder.mkdir(parents=True,exist_ok=True)
             (folder/(node['id']+'.json')).write_text(blob)
             nodes.append(node); self.save()
-            return node
+            if p.get('status') not in ('discovering', 'drafting', 'investigating') and hasattr(self, 'keys'): self.keys.pop(p['id'], None)
+        return node
+
+    def cfg_for_id(self, pid):
+        """Config for a project: its visitor-supplied key if one is held in memory, else server configuration."""
+        return getattr(self, 'keys', {}).get(pid) or read_config(self.root)
 
     def get_checkpoint(self,project_id,node_id):
         with self.lock:
@@ -42,7 +48,7 @@ class ExecutionHistory:
         hypothesis=str(data.get('hypothesis') or snapshot['hypothesis']).strip()
         if not 10<=len(hypothesis)<=2000: raise RelayError('HYPOTHESIS_REQUIRED','Write a hypothesis between 10 and 2,000 characters.')
         provider=data.get('provider') or snapshot['provider']; model=data.get('model') or snapshot['model']
-        if action!='snapshot' and model not in models(read_config(self.root),provider)['models']:
+        if action!='snapshot' and model not in models(self.cfg_for_id(data.get('id')),provider)['models']:
             raise RelayError('INVALID_MODEL','Choose a currently available provider model.')
         if action in ('synthesize','assess') and not snapshot['papers']: raise RelayError('NO_EVIDENCE','This checkpoint has no papers. Continue with discovery instead.')
         if action=='draft' and not any(x.get('reviewed') for x in snapshot['papers']): raise RelayError('REVIEW_REQUIRED','Select reviewed papers in the branch before drafting.')
@@ -67,6 +73,7 @@ class ExecutionHistory:
                     paper.update(relevance=0,assessmentStale=True,rationale='Hypothesis changed. Reassess this paper for the new question.')
             if action=='search': p.update(papers=[],queries=[],criteria=[])
             if action!='snapshot': p['status']='drafting' if action=='draft' else 'discovering'
+            self.keys[p['id']]=self.cfg_for_id(data['id'])
             self.projects.insert(0,p)
             self.checkpoint(p,'branch','Branched from '+node['label'],details={'sourceProject':data['id'],'sourceNode':node['id'],'next':action,'inheritedRevision':node['revision']})
             self.event(p,'Created an independent branch. The parent checkpoint is unchanged.')

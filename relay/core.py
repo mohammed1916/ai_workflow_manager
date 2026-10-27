@@ -14,7 +14,7 @@ def digest(value):
 def now():
     return datetime.now(timezone.utc).isoformat()
 
-def read_config(root):
+def _read_env_config(root):
     config = dict(os.environ)
     env = root / '.env'
     if env.exists():
@@ -23,6 +23,14 @@ def read_config(root):
                 k, v = line.split('=', 1)
                 config.setdefault(k.strip(), v.strip().strip('"\''))
     return config
+
+def read_config(root):
+    """Configuration from the environment and .env. Hosted mode never uses keys set on the server."""
+    config = _read_env_config(root)
+    if os.environ.get('RELAY_HOSTED') == '1':
+        for field in ('NEBIUS_API_KEY', 'OLLAMA_TEST_API_KEY', 'OLLAMA_API_KEY'): config.pop(field, None)
+    return config
+
 
 def safe_name(name):
     if not isinstance(name, str) or not re.fullmatch(r'[A-Za-z0-9][A-Za-z0-9 _.-]{0,95}\.(md|txt|csv|json)', name):
@@ -92,6 +100,7 @@ class Store:
         self.token = secrets.token_urlsafe(32)
         self.pair_token = secrets.token_urlsafe(32)
         self.active = set()
+        self.keys = {}
         for run in self.state['runs']:
             if run['status'] in ('running', 'planning'):
                 run['status'] = 'interrupted'
@@ -138,18 +147,19 @@ class Store:
     def event(self, run, title, detail='', kind='info'):
         run['events'].append({'at':now(), 'title':title, 'detail':detail, 'kind':kind})
 
-    def create(self, goal, source_ids, mode, recipe='brief', feedback='', provider='nebius', model=None):
+    def create(self, goal, source_ids, mode, recipe='brief', feedback='', provider='nebius', model=None, key=None):
         if not isinstance(goal,str) or not 3<=len(goal.strip())<=3000:
             raise RelayError('INVALID_GOAL','Describe a task in 3–3,000 characters.')
         if mode not in ('demo','live'): raise RelayError('INVALID_MODE','Choose demo or live mode.')
         if not isinstance(source_ids,list) or not 1<=len(source_ids)<=8 or any(not isinstance(s,str) for s in source_ids):
             raise RelayError('SOURCE_REQUIRED','Select 1–8 sources for this workflow.')
-        from .providers import settings, models
-        config=settings(read_config(self.root),provider)
+        from .providers import settings, models, with_key
+        cfg=with_key(read_config(self.root),provider,key)
+        config=settings(cfg,provider)
         if mode=='live':
             if not config['key']: raise RelayError('KEY_REQUIRED','Configure OLLAMA_TEST_API_KEY or NEBIUS_API_KEY for the selected provider.')
             model=model or config['model']
-            if model not in models(read_config(self.root),provider)['models']: raise RelayError('INVALID_MODEL','Selected model is not in the provider catalog. Refresh the model list.')
+            if model not in models(cfg,provider)['models']: raise RelayError('INVALID_MODEL','Selected model is not in the provider catalog. Refresh the model list.')
         with self.lock:
             sources = {s['id']:s for s in self.sources()}
             if any(i not in sources for i in source_ids): raise RelayError('STALE_SOURCE','A source is no longer available. Refresh and select it again.',409)
@@ -157,6 +167,7 @@ class Store:
             if sum(len(s['content']) for s in chosen)>60000: raise RelayError('CONTEXT_LIMIT','Selected sources exceed 60,000 characters. Choose fewer sources.')
             if len(self.active)>=2: raise RelayError('BUSY','Two workflows are already active. Wait for one to finish.',409)
             run={'id':secrets.token_hex(8),'goal':goal,'recipe':recipe,'mode':mode,'status':'planning','createdAt':now(),'sources':chosen,'revision':1,'events':[],'outputs':[],'feedback':str(feedback)[:2000],'provider':provider,'selectedModel':model}
+            self.keys[run['id']]=cfg
             self.state['runs'].insert(0,run)
             self.active.add(run['id'])
             self.event(run,'Reading selected sources', f'{len(chosen)} sources captured with content fingerprints.')
@@ -171,7 +182,7 @@ class Store:
                 model='Offline template · no AI call'
                 usage={}
             else:
-                plan,model,usage=generate_plan(self.root,run,lambda title, detail: self._log(run,title,detail))
+                plan,model,usage=generate_plan(self.root,run,lambda title, detail: self._log(run,title,detail),self.keys.get(run['id']))
             validate_plan(plan)
             # Opening invented URLs is not allowed: links must be explicit in the goal or selected context.
             known = run['goal']+'\n'+'\n'.join(s['url']+'\n'+s['content'] for s in run['sources'])
@@ -187,7 +198,7 @@ class Store:
                 run['status']='failed'; run['error']=str(e)
                 self.event(run,'Planning stopped',str(e),'error'); self.save()
         finally:
-            with self.lock: self.active.discard(run['id'])
+            with self.lock: self.active.discard(run['id']); self.keys.pop(run['id'],None)
 
     def _log(self,run,title,detail):
         with self.lock: self.event(run,title,detail); self.save()
@@ -314,8 +325,8 @@ def demo_plan(run):
     return {'title':title,'summary':'Collect your selected sources into an editable brief and a source manifest. This sample runs entirely on your Mac.','steps':[{'kind':'write_file','title':'Prepare the source brief','filename':'research-brief.md','content':doc},{'kind':'write_file','title':'Save the source trail','filename':'sources.json','content':manifest}]}
 
 
-def generate_plan(root,run,log):
-    cfg=read_config(root)
+def generate_plan(root,run,log,cfg=None):
+    cfg=cfg or read_config(root)
     from .providers import settings, complete
     provider=run.get('provider','nebius')
     config=settings(cfg,provider)
