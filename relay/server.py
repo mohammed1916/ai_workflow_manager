@@ -1,5 +1,5 @@
 from __future__ import annotations
-import argparse, json, mimetypes, os, secrets, sys
+import argparse, json, mimetypes, os, re, secrets, sys
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from urllib.parse import urlsplit, unquote
@@ -64,11 +64,20 @@ def make_handler(store,port):
                         text=research.source(paper)
                         self.respond({'text':text,'sha256':digest(text),'url':paper.get('evidenceUrl'),'kind':paper.get('evidenceKind')})
                 elif route=='/README.md': self.respond((ROOT/'README.md').read_bytes(),content_type='text/plain; charset=utf-8')
-                elif route=='/api/research': self.respond(research.state())
+                elif route=='/api/research':
+                    # Only projects the browser names by id are returned; nothing is listed globally.
+                    from urllib.parse import parse_qs
+                    wanted=[x for x in parse_qs(urlsplit(self.path).query).get('ids',[''])[0].split(',') if re.fullmatch(r'[a-f0-9]{16}',x)][:200]
+                    self.respond(research.state(wanted))
                 elif route=='/api/research/checkpoint':
                     from urllib.parse import parse_qs
                     q=parse_qs(urlsplit(self.path).query)
                     self.respond(research.inspect_checkpoint(q.get('id',[''])[0],q.get('node',[''])[0]))
+                elif route=='/api/research/project':
+                    from urllib.parse import parse_qs
+                    pid=parse_qs(urlsplit(self.path).query).get('id',[''])[0]
+                    if not re.fullmatch(r'[a-f0-9]{16}',pid): raise RelayError('NOT_FOUND','Research project not found.',404)
+                    self.respond(research.export_project(pid))
                 elif route.startswith('/api/research/export/'):
                     self.respond(research.bundle(route.split('/')[-1]),content_type='application/zip')
                 elif route.startswith('/api/research/pdf/'):
@@ -94,14 +103,21 @@ def make_handler(store,port):
                 self.guard(True)
                 if 'application/json' not in self.headers.get('Content-Type',''): raise RelayError('INVALID_CONTENT_TYPE','Use JSON.')
                 size=int(self.headers.get('Content-Length',0))
-                if size<1 or size>300000: raise RelayError('BODY_LIMIT','Request body too large or empty.',413)
+                limit=8000000 if self.path=='/api/research/import' else 300000
+                if size<1 or size>limit: raise RelayError('BODY_LIMIT','Request body too large or empty.',413)
                 data=json.loads(self.rfile.read(size))
                 if not isinstance(data,dict): raise RelayError('INVALID_BODY','Use a JSON object.')
                 key=self.headers.get('X-Provider-Key','').strip(); provider=self.headers.get('X-Provider','nebius').strip()
                 if key and (provider not in ('nebius','ollama') or len(key)>400): raise RelayError('INVALID_KEY','Check the provider and key.',400)
-                if key and self.path.startswith('/api/research/'):
-                    if self.path=='/api/research/start': data['providerKey']=key
-                    elif data.get('id'): research.set_key(data['id'],provider,key)
+                tkey=self.headers.get('X-Tavily-Key','').strip()
+                if tkey and len(tkey)>400: raise RelayError('INVALID_KEY','Check the Tavily key.',400)
+                if self.path.startswith('/api/research/'):
+                    if self.path=='/api/research/start':
+                        if key: data['providerKey']=key
+                        if tkey: data['tavilyKey']=tkey
+                    elif data.get('id'):
+                        if key: research.set_key(data['id'],provider,key)
+                        if tkey: research.set_key(data['id'],'tavily',tkey)
                 if self.path=='/api/desk/load':
                     from .desk import load_study, load_discovery
                     result=load_discovery(store.root,research) if data.get('study')=='discovery' else load_study(store.root,research)
@@ -109,6 +125,7 @@ def make_handler(store,port):
                 elif self.path=='/api/research/branch': result=research.branch(data)
                 elif self.path=='/api/research/update': result=research.update(data)
                 elif self.path=='/api/research/draft': result=research.draft(data)
+                elif self.path=='/api/research/import': result=research.import_project(data)
                 elif self.path=='/api/research/investigate': result=research.investigate(data)
                 elif self.path=='/api/research/regenerate': result=research.regenerate(data)
                 elif self.path=='/api/research/compile': result=research.compile(data)

@@ -8,7 +8,7 @@ def key_message():
     return 'Configure OLLAMA_TEST_API_KEY or NEBIUS_API_KEY for the selected provider.'
 
 
-KEY_FIELDS = {'nebius': 'NEBIUS_API_KEY', 'ollama': 'OLLAMA_TEST_API_KEY'}
+KEY_FIELDS = {'nebius': 'NEBIUS_API_KEY', 'ollama': 'OLLAMA_TEST_API_KEY', 'tavily': 'TAVILY_API_KEY'}
 
 
 def with_key(cfg, provider, key):

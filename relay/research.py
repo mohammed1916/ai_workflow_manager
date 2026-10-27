@@ -472,12 +472,47 @@ class Research(ExecutionHistory):
                 if digest(text) == ref: return text
         return paper.get('evidence', '')
 
-    def state(self):
+    def state(self, ids=None):
+        """Projects named by id (None means all, for local use only)."""
         with self.lock:
-            data = copy.deepcopy(self.projects)
+            data = copy.deepcopy([p for p in self.projects if ids is None or p['id'] in ids])
             for p in data:
                 for paper in p['papers']: paper.pop('evidence', None)
             return {'projects': data, 'compiler': bool((self.root / '.relay/bin/tectonic').exists() or shutil.which('tectonic') or __import__('os').path.exists('/opt/homebrew/bin/tectonic'))}
+
+    def export_project(self, pid):
+        """A portable copy for the browser: the project with its source text, without keys or server-only state."""
+        with self.lock:
+            p = copy.deepcopy(self.get(pid))
+            for paper in p['papers']:
+                paper['evidence'] = self.source(paper)
+            for k in ('execution', 'events', 'activeStep', 'error', 'compile', 'calls'): p.pop(k, None)
+            return {'format': 'relay-research/1', 'project': p}
+
+    def import_project(self, doc):
+        """Restore a project from a browser copy. Existing ids are never overwritten."""
+        if not isinstance(doc, dict) or doc.get('format') != 'relay-research/1' or not isinstance(doc.get('project'), dict):
+            raise RelayError('INVALID_PROJECT', 'This file is not a Relay Research project.')
+        p = copy.deepcopy(doc['project'])
+        if not re.fullmatch(r'[a-f0-9]{16}', str(p.get('id', ''))): raise RelayError('INVALID_PROJECT', 'The project id is not valid.')
+        if not isinstance(p.get('hypothesis'), str) or not 10 <= len(p['hypothesis']) <= 2000: raise RelayError('INVALID_PROJECT', 'The hypothesis is not valid.')
+        if not isinstance(p.get('papers'), list) or len(p['papers']) > 20: raise RelayError('INVALID_PROJECT', 'The paper list is not valid.')
+        with self.lock:
+            if any(x['id'] == p['id'] for x in self.projects): return {'ok': True, 'existing': True}
+            for paper in p['papers']:
+                if not isinstance(paper, dict) or not isinstance(paper.get('id'), str): raise RelayError('INVALID_PROJECT', 'A paper in the file is not valid.')
+                text = paper.pop('evidence', '')
+                if isinstance(text, str) and text:
+                    paper['_full'] = text[:SOURCE_LIMIT]; self.store_source(paper)
+                paper.pop('_full', None)
+            for k in ('calls', 'events', 'execution'): p.pop(k, None)
+            p.setdefault('events', []); p.setdefault('calls', []); p.setdefault('tokens', 0); p.setdefault('proposals', []); p.setdefault('corrections', [])
+            p.setdefault('suggestions', []); p.setdefault('revision', 1); p.setdefault('tex', ''); p.setdefault('bib', '')
+            if p.get('status') in BUSY or not p.get('status'): p['status'] = 'interrupted'; p['error'] = 'Restored from your browser copy. Continue from a checkpoint or re-run.'
+            self.projects.insert(0, p)
+            self.checkpoint(p, 'import', 'Restored from a browser copy', details={'note': 'Earlier checkpoints remain on the server that first ran this project.'})
+            self.save()
+            return {'ok': True, 'existing': False}
 
     def get(self, id):
         p = next((p for p in self.projects if p['id'] == id), None)
