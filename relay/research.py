@@ -3,6 +3,7 @@ import concurrent.futures, copy, io, json, re, secrets, shutil, subprocess, thre
 import xml.etree.ElementTree as ET
 from .core import RelayError, read_config, now, digest
 from .providers import complete, models, with_key
+from . import tavily
 from .evidence import (FIELDS, LABELS, check_metric, compare as compare_results, html_to_text, known, norm, passages, cell_context, mentions, window, table_notes, split_key, split_supported,
                        repository_links, code_passages, REPO_FILES, supports, short_id, provenance_key, metric_key)
 
@@ -549,8 +550,10 @@ class Research(ExecutionHistory):
         hypothesis = data.get('hypothesis', '').strip()
         if not 10 <= len(hypothesis) <= 2000: raise RelayError('HYPOTHESIS_REQUIRED', 'Write a hypothesis between 10 and 2,000 characters.')
         key = data.pop('providerKey', None)
+        tavily_key = data.pop('tavilyKey', None)
         provider = data.get('provider') or ('nebius' if (read_config(self.root).get('NEBIUS_API_KEY') or key) else 'ollama')
         cfg = with_key(read_config(self.root), provider, key)
+        cfg = with_key(cfg, 'tavily', tavily_key if isinstance(tavily_key, str) else None)
         model = data.get('model') or (cfg.get('NEBIUS_MODEL', 'nvidia/nemotron-3-super-120b-a12b') if provider == 'nebius' else 'gpt-oss:120b')
         limit = data.get('paperLimit', 12)
         if not isinstance(limit, int) or isinstance(limit, bool) or not 2 <= limit <= 12: raise RelayError('INVALID_LIMIT', 'Choose between 2 and 12 papers per discovery run.')
@@ -676,8 +679,31 @@ class Research(ExecutionHistory):
         threading.Thread(target=self.run_investigation, args=(p, targets, bool(data.get('repository', True)), data.get('pair')), daemon=True).start()
         return {'ok': True}
 
+    def web_step(self, p, paper, m, fields, state):
+        """Optional web search for fields the paper and code did not settle. Returns (web passages, checkpoint detail).
+        Runs only with a Tavily key held for this project; `state` keeps the no-key hint to once per investigation."""
+        key = self.cfg_for_id(p['id']).get('TAVILY_API_KEY')
+        if not key:
+            if not state.get('hinted'):
+                state['hinted'] = True
+                self.event(p, 'Add a Tavily key in Model settings to let Relay search the web for missing protocol details.')
+            return [], None
+        labels = ', '.join(LABELS.get(f, f) for f in fields)
+        dataset = m.get('dataset') if known(m.get('dataset')) else ''
+        method = m.get('method') if known(m.get('method')) else ''
+        query = squash(f"{paper['title']} {method} {dataset} evaluation protocol {labels}")[:300]
+        self.event(p, 'Searching the web (Tavily) for the missing protocol details: ' + labels)
+        try:
+            results = tavily.search(key, query)
+        except Exception as e:
+            reason = str(e)[:100]
+            self.event(p, 'Web search failed; continuing with the paper and code. ' + reason)
+            return [], {'query': query, 'results': 0, 'error': reason}
+        return results, {'query': query, 'results': len(results)}
+
     def run_investigation(self, p, targets, use_repository, pair_id):
         created = 0
+        state = {}
         try:
             for paper_id, metric_id, fields in targets:
                 paper = self.paper(p, paper_id); m = self.metric(paper, metric_id)
@@ -695,8 +721,18 @@ class Research(ExecutionHistory):
                         except Exception as e:
                             repo_note = {'url': links[0]['url'], 'error': str(e)[:160]}
                             self.event(p, 'Repository retrieval failed; continuing with paper text. ' + str(e)[:100])
-                proposals, unresolved, found = investigate_metric(lambda system, payload, kind: self.llm(p, system, payload, kind, 8000), paper['title'], source, m, fields, repo)
-                if not proposals and not found and not repo:
+                ask = lambda system, payload, kind: self.llm(p, system, payload, kind, 8000)
+                proposals, unresolved, found = investigate_metric(ask, paper['title'], source, m, fields, repo)
+                web_fields = [f for f in fields if f not in {x['field'] for x in proposals}][:4]
+                web, web_detail = self.web_step(p, paper, m, web_fields, state) if web_fields else ([], None)
+                if web:
+                    web_props, web_unresolved, _ = investigate_metric(ask, paper['title'], source, m, web_fields, (repo or []) + web)
+                    # Web text does not get the paper-only split check inside investigate_metric, so apply it here.
+                    web_props = [x for x in web_props if not (x['origin'] == 'web' and x['field'] == 'split' and not split_supported(x['value'], x['quote']))]
+                    resolved = {x['field'] for x in web_props}
+                    unresolved = [u for u in unresolved if u.get('field') not in resolved] + web_unresolved
+                    proposals = proposals + web_props
+                if not proposals and not found and not repo and not web:
                     self.event(p, 'No relevant passages were found for these fields.'); continue
                 with self.lock:
                     for prop in proposals:
@@ -706,7 +742,8 @@ class Research(ExecutionHistory):
                         created += 1
                     p['revision'] += 1
                     self.checkpoint(p, 'investigation', f"Investigated {m['method']} ({paper['title'][:50]})", details={'paper': paper['id'], 'metric': m['id'], 'fields': fields,
-                                    'paperPassages': len(found), 'repository': repo_note, 'proposals': created, 'unresolved': unresolved})
+                                    'paperPassages': len(found), 'repository': repo_note, 'proposals': created, 'unresolved': unresolved,
+                                    **({'web': web_detail} if web_detail else {})})
             with self.lock:
                 p['status'] = 'review'; p['revision'] += 1; self.save()
             self.event(p, f'Investigation finished with {created} proposed correction{"s" if created != 1 else ""} awaiting your review.' if created else 'Investigation finished. The sources did not state the missing context; the comparison stays insufficient.')

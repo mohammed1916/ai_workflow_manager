@@ -219,6 +219,12 @@ Then choose **Experiment & manuscript → Compile PDF**. macOS compilation uses 
 
 All documentation is in this README. LICENSE is the software license. `.env` is local configuration and must remain private.
 
+## Your data and optional web search
+
+Projects are saved in your browser, the way Excalidraw and Obsidian keep your work on your own machine. There is no account and no sign-in. Use **Your projects** to export a `.relay-research.json` file for a backup or to move a project to another computer, or to import one. Removing a project deletes only this browser's copy. The hosted server keeps working copies while it runs, and Relay restores them from your browser copy after a restart.
+
+Keys are never saved in the browser's storage or in files. Your model key and optional Tavily key stay in this browser tab only and are sent with each request. Tavily is optional: when a paper leaves out a detail such as its evaluation protocol, Relay can search the web for it. Web passages are labelled as web sources with their links, and you still accept or reject every proposal. Without a Tavily key, Relay tells you once that the search is available.
+
 ## Hosting and judge access
 
 `render.yaml` is an optional hosting blueprint. It requires persistent storage and a service hostname. In hosted mode, server-side provider keys are ignored and visitors bring their own key through the model menu. This build is a shared workspace; it has no multi-user account isolation. Deploy a dedicated judge/test instance rather than storing confidential research in a public instance.

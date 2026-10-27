@@ -1,5 +1,6 @@
 import {executionUI} from '/execution.js';
 import {researchDesk} from '/desk.js';
+import * as store from '/store.js';
 const $=s=>document.querySelector(s), esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const initialRoute=new URLSearchParams(location.hash.slice(1));
 let screen=initialRoute.get('screen')||(!location.hash?'desk':'project');
@@ -10,24 +11,24 @@ const BUSY=['discovering','drafting','investigating'];
 let serverKeys={},hostedMode=false;
 const cleanKey=v=>String(v||'').replace(/[^\x21-\x7E]/g,'');
 const keyFor=p=>cleanKey(sessionStorage.getItem('relay-key-'+p));
-function keyHeaders(p=provider){const k=keyFor(p);return k?{'X-Provider-Key':k,'X-Provider':p}:{}}
+function keyHeaders(p=provider,path='research'){const h={},k=keyFor(p);if(k){h['X-Provider-Key']=k;h['X-Provider']=p}const t=keyFor('tavily');if(t&&path.startsWith('research'))h['X-Tavily-Key']=t;return h}
 const current=()=>projects.find(p=>p.id===active), busy=p=>BUSY.includes(p.status);
 const FIELD_LABELS={method:'Model',dataset:'Dataset',datasetVersion:'Dataset version',split:'Train/val/test split',horizon:'Forecast horizon',aggregation:'Aggregation',preprocessing:'Preprocessing',metricDefinition:'Metric definition',provenance:'Provenance',citedFrom:'Cited from',locator:'Source location',name:'Metric',value:'Value',unit:'Unit',direction:'Direction'};
 const CONTEXT=['method','dataset','datasetVersion','split','horizon','aggregation','preprocessing','metricDefinition','provenance','citedFrom','locator'];
 const SUPPORT={quoted:['Quoted','In the result quote or a field quote'],nearby:['Near result','Found near the result in the source'],document:['In paper','Found elsewhere in the paper'],derived:['Derived','Derived from the table column'],repository:['Code','From the authors’ repository, accepted by you'],researcher:['You','Your correction'],default:['Default','Paper’s own method'],missing:['Not stated','The source does not state this'],unsupported:['Rejected','The model claimed a value that is not in the source']};
 const OUTCOME={comparable:['Comparable','The context matches'],incompatible:['Incompatible','The settings differ'],insufficient:['Insufficient evidence','Context is not stated']};
 const known=v=>!['','unknown','not reported','not stated','n/a','none','null'].includes(String(v??'').trim().toLowerCase());
-async function api(path,data){const r=await fetch('/api/'+path,{method:data?'POST':'GET',headers:{...(data?{'Content-Type':'application/json','Authorization':'Bearer '+token}:{}),...keyHeaders((path.match(/provider=(\w+)/)||[])[1]||provider)},body:data?JSON.stringify(data):undefined});const x=await r.json();if(!r.ok)throw Error(x.error||'Request failed');return x;}
+async function api(path,data){const r=await fetch('/api/'+path,{method:data?'POST':'GET',headers:{...(data?{'Content-Type':'application/json','Authorization':'Bearer '+token}:{}),...keyHeaders((path.match(/provider=(\w+)/)||[])[1]||provider,path)},body:data?JSON.stringify(data):undefined});const x=await r.json();if(!r.ok)throw Error(x.error||'Request failed');return x;}
 function toast(s){$('#toast').textContent=s;$('#toast').hidden=false;clearTimeout(toast.t);toast.t=setTimeout(()=>$('#toast').hidden=true,6000)}
 function modal(html){$('#dialog-content').innerHTML=html;if(!$('#dialog').open)$('#dialog').showModal()}
 $('.close').onclick=()=>$('#dialog').close();
-async function refresh(force=false){try{const s=await api('research');projects=s.projects;const sig=JSON.stringify(projects);sidebar();if((force||sig!==signature)&&!dirty){signature=sig;const y=window.scrollY;render();requestAnimationFrame(()=>window.scrollTo(0,y))}}catch(e){toast(e.message)}}
+async function refresh(force=false){try{await loadProjects();local.down=false;await restoreMissing();syncCopies();const sig=JSON.stringify(projects);sidebar();if((force||sig!==signature)&&!dirty){signature=sig;const y=window.scrollY;render();requestAnimationFrame(()=>window.scrollTo(0,y))}}catch(e){if(isNetworkError(e)){local.down=true;sidebar();return}toast(e.message)}}
 async function beforeNavigate(){if(!dirty)return true;try{await saveEditor();return true}catch(e){toast(e.message);return false}}
 function routeTo(node){const q=new URLSearchParams();if(['history','desk'].includes(screen))q.set('screen',screen);else if(active){q.set('id',active);q.set('view',tab);if(node)q.set('node',node)}else q.set('screen','new');window.history.pushState({},'',location.pathname+'#'+q.toString())}
-async function openProject(id,view='compare',node){if(!await beforeNavigate())return;if(!projects.some(p=>p.id===id))projects=(await api('research')).projects;active=id;screen='project';tab=view;localStorage.setItem('research-project',id);selected.clear();if(node)executions.setNode(node);routeTo(node);render();sidebar()}
+async function openProject(id,view='compare',node){if(!await beforeNavigate())return;if(!projects.some(p=>p.id===id))await loadProjects([id]);active=id;screen='project';tab=view;localStorage.setItem('research-project',id);selected.clear();if(node)executions.setNode(node);routeTo(node);render();sidebar()}
 async function openTab(view){if(!await beforeNavigate())return;tab=view;routeTo();render()}
 async function showHistory(){if(!await beforeNavigate())return;screen='history';routeTo();render();sidebar()}
-function sidebar(){$('#projects').innerHTML=projects.map(p=>`<button class="project-link ${p.id===active&&screen==='project'?'active':''}" data-project="${p.id}">${p.parentProject?'⑂ ':''}${esc((p.branchName||p.hypothesis).slice(0,90))}<small>${p.papers.length} papers · ${esc(p.status)} · ${(p.proposals||[]).filter(x=>x.status==='pending').length} proposals</small></button>`).join('');document.querySelectorAll('[data-project]').forEach(b=>b.onclick=()=>openProject(b.dataset.project));$('#model-button').textContent=(model||'Choose model')+' ⌄';$('#executions').classList.toggle('active',screen==='history');$('#desk-nav').classList.toggle('active',screen==='desk')}
+function sidebar(){const have=new Set(projects.map(p=>p.id));const notes=[];if(local.down)notes.push(`<p class="side-note warn">Relay's server is not responding. Your saved projects are still here; try again in a moment.</p>`);if(local.restored)notes.push('<button class="side-note ok" id="dismiss-restored">Restored from your browser copy after the server restarted.</button>');const waiting=local.copies.filter(c=>!have.has(c.id)).map(c=>`<div class="project-link unrestored">${esc(c.hypothesis.slice(0,90))}<small>${esc(local.errors.get(c.id)||(local.down?'Waiting for the server.':'Restoring from your browser copy…'))}</small></div>`);if(!projects.length&&!waiting.length)notes.push(`<p class="side-note">${local.ready?'Start an investigation. It is saved in this browser.':'Start an investigation. This browser window cannot keep it after you close the window.'}</p>`);$('#projects').innerHTML=notes.join('')+projects.map(p=>`<button class="project-link ${p.id===active&&screen==='project'?'active':''}" data-project="${p.id}">${p.parentProject?'⑂ ':''}${esc((p.branchName||p.hypothesis).slice(0,90))}<small>${p.papers.length} papers · ${esc(p.status)} · ${(p.proposals||[]).filter(x=>x.status==='pending').length} proposals</small></button>`).join('');$('#projects').insertAdjacentHTML('beforeend',waiting.join(''));document.querySelectorAll('[data-project]').forEach(b=>b.onclick=()=>openProject(b.dataset.project));if($('#dismiss-restored'))$('#dismiss-restored').onclick=()=>{local.restored=false;sidebar()};$('#model-button').textContent=(model||'Choose model')+' ⌄';$('#executions').classList.toggle('active',screen==='history');$('#desk-nav').classList.toggle('active',screen==='desk')}
 $('#executions').onclick=showHistory;
 $('#desk-nav').onclick=async()=>{if(!await beforeNavigate())return;screen='desk';routeTo();sidebar();render()};
 const closeNavigation=()=>{document.body.classList.remove('nav-open');$('#nav-toggle').setAttribute('aria-expanded','false')};
@@ -48,7 +49,7 @@ function render(){closeNavigation();if(screen==='desk'){$('#crumb').textContent=
 
 function home(){$('#main').innerHTML=`<div class="landing"><div class="hero-intro"><div class="kicker"><span class="signal"></span> CHECK THE COMPARISON BEFORE YOU BUILD ON IT</div><h1>Does that benchmark<br><em>comparison hold?</em></h1><p>Relay investigates published results, exposes missing experimental context,<br>and helps you design the next defensible experiment.</p></div><div class="launch-grid"><div class="launch-main"><form class="hypothesis-box" id="search"><div class="question-heading"><span class="step-label">01 / THE QUESTION</span><span class="private-label">Saved locally</span></div><label for="hypothesis">What comparison do you need to trust?</label><textarea id="hypothesis" required minlength="10" maxlength="2000" placeholder="Which published results can I compare my new method against?"></textarea><label for="seeds" class="seed-label">Papers you are considering as baselines <small>(optional arXiv IDs or links, one per line)</small></label><textarea id="seeds" class="seed-box" placeholder="2101.06861&#10;1906.00121"></textarea><label class="inline-check"><input type="checkbox" id="seed-only"> Only analyze these papers (skip literature search)</label><div class="search-bottom"><span>Public papers and author code · source-checked evidence<br>Your question and retrieved text go to the model you choose.</span><button class="accent" id="discover">Start investigation <span aria-hidden="true">↗</span></button></div></form><div class="example-row"><button class="example" id="baseline-example"><span>BASELINE CHECK</span> GTS, Graph WaveNet, MTGNN, AGCRN, STAEformer <span aria-hidden="true">↗</span></button><button class="example" id="example"><span>OPEN QUESTION</span> Graph networks vs. transformers <span aria-hidden="true">↗</span></button></div><div class="home-history"><span>Pick up where you left off.</span><button id="home-history">Browse executions & branches →</button></div></div><div class="feature-grid" aria-label="Research workflow"><div class="feature"><span class="feature-icon" aria-hidden="true">⌘</span><div><span class="number">01 / EVIDENCE</span><h3>Every number keeps its context.</h3><p>Dataset, split, horizon, aggregation, metric definition, and whether the number was cited or re-run.</p></div></div><div class="feature"><span class="feature-icon" aria-hidden="true">⇄</span><div><span class="number">02 / COMPARE</span><h3>Comparable, incompatible, or unknown.</h3><p>Missing context is never treated as proof of a mismatch. The agent goes looking for it.</p></div></div><div class="feature"><span class="feature-icon" aria-hidden="true">↻</span><div><span class="number">03 / CORRECT</span><h3>Corrections propagate.</h3><p>See which comparisons and manuscript claims change, regenerate them after review, and keep the old state as a branch.</p></div></div></div></div></div>`;
   $('#home-history').onclick=showHistory;$('#example').onclick=()=>{$('#hypothesis').value=example;$('#seeds').value='';$('#seed-only').checked=false;$('#hypothesis').focus()};$('#baseline-example').onclick=()=>{$('#hypothesis').value=baselineExample.q;$('#seeds').value=baselineExample.seeds;$('#seed-only').checked=true;$('#hypothesis').focus()};
-  $('#search').onsubmit=async e=>{e.preventDefault();if(!serverKeys[provider]&&!keyFor(provider)){toast('Add your API key first: open the model menu and paste it.');$('#model-button').click();return}const b=$('#discover');b.disabled=true;b.textContent='Starting…';try{const seeds=$('#seeds').value.split(/[\s,]+/).filter(Boolean);const r=await api('research/start',{hypothesis:$('#hypothesis').value,provider,model,seeds,seedOnly:$('#seed-only').checked});active=r.id;selected.clear();tab='compare';screen='project';localStorage.setItem('research-project',active);routeTo();await refresh(true)}catch(e){toast(e.message);b.disabled=false;b.textContent='Start investigation ↗'}}}
+  $('#search').onsubmit=async e=>{e.preventDefault();if(!serverKeys[provider]&&!keyFor(provider)){toast('Add your API key first: open the model menu and paste it.');$('#model-button').click();return}const b=$('#discover');b.disabled=true;b.textContent='Starting…';try{const seeds=$('#seeds').value.split(/[\s,]+/).filter(Boolean);const r=await api('research/start',{hypothesis:$('#hypothesis').value,provider,model,seeds,seedOnly:$('#seed-only').checked});active=r.id;saveCopy(r.id);selected.clear();tab='compare';screen='project';localStorage.setItem('research-project',active);routeTo();await refresh(true)}catch(e){toast(e.message);b.disabled=false;b.textContent='Start investigation ↗'}}}
 
 function events(p){return `<div class="activity">${p.events.slice(-7).map(e=>`<div>${esc(e.message)}</div>`).join('')||'Agent preparing…'}</div>`}
 function tray(p){return `<div class="compare-tray" id="tray"><div class="tray-label">＋ Focus comparisons<small>Drag papers here to limit comparisons to them</small></div>${p.papers.filter(x=>selected.has(x.id)).map(x=>`<div class="chip"><span>${esc(x.title)}</span><button data-remove="${x.id}" aria-label="Remove ${esc(x.title)}">×</button></div>`).join('')}<button class="primary" id="compare-now">${selected.size>=2?`Compare ${selected.size} papers →`:'Compare all papers →'}</button></div>`}
@@ -111,8 +112,119 @@ function draftDialog(p){modal(`<div class="kicker">HUMAN IN THE LOOP</div><h2>Sh
 function executionView(p){executions.graph(p);const calls=p.calls||[];if(!calls.length)return;const ok=calls.filter(c=>c.ok).length,tokens=calls.reduce((n,c)=>n+c.totalTokens,0),ms=calls.reduce((n,c)=>n+(c.ms||0),0),retried=calls.filter(c=>c.attempts>1||c.repaired).length;
   $('#view').insertAdjacentHTML('beforeend',`<section class="side-card calls"><h3>Model calls <span class="badge">${calls.length}</span></h3><p>${ok} succeeded · ${calls.length-ok} failed · ${retried} recovered by retry or JSON repair · ${tokens.toLocaleString()} tokens · ${(ms/1000).toFixed(1)} s of model time. Every call records its model, latency, and token use.</p><div class="table-wrap"><table><thead><tr><th>Step</th><th>Model</th><th>Time</th><th>Tokens</th><th>Attempts</th><th>Result</th></tr></thead><tbody>${calls.slice(-40).reverse().map(c=>`<tr><td>${esc(c.kind)}</td><td>${esc(c.model)}</td><td>${((c.ms||0)/1000).toFixed(1)} s</td><td>${(c.totalTokens||0).toLocaleString()}</td><td>${c.attempts}${c.repaired?' · JSON repaired':''}${c.retries?' · '+esc(c.retries.join(', ')):''}</td><td>${c.ok?'OK':esc(c.error||'failed')}</td></tr>`).join('')}</tbody></table></div></section>`)}
 
-$('#model-button').onclick=()=>{modal(`<div class="kicker">RESEARCH AGENT</div><h2>Choose your model.</h2><p>Models are fetched live from your configured provider. Existing investigations keep the model they started with.</p><label>Provider<select id="provider"><option value="nebius" ${provider==='nebius'?'selected':''}>Nebius Token Factory</option><option value="ollama" ${provider==='ollama'?'selected':''}>Ollama Cloud</option></select></label><label>Your API key <small>(this browser tab only; the server uses it for your requests and never saves it)</small><input type="password" id="api-key" autocomplete="off" placeholder="Paste your key" value="${esc(keyFor(provider))}"></label><label>Model<select id="models"><option>Loading live catalog…</option></select></label><p id="model-info"></p><button class="primary" id="use-model" disabled>Use selected model</button>`);let generation=0;async function load(){const n=++generation;$('#use-model').disabled=true;try{const r=await api('models?provider='+$('#provider').value);if(n!==generation||!$('#models'))return;const want=$('#provider').value===provider&&model?model:r.default;$('#models').innerHTML=r.models.map(m=>`<option ${m===want?'selected':''}>${esc(m)}</option>`).join('');$('#model-info').textContent=r.models.length+' available models · credentials stay on the local companion';$('#use-model').disabled=!r.models.length}catch(e){if($('#model-info'))$('#model-info').textContent=e.message}}$('#provider').onchange=load;load();$('#api-key').oninput=()=>{const k=cleanKey($('#api-key').value);if(k)sessionStorage.setItem('relay-key-'+$('#provider').value,k);clearTimeout(load.t);load.t=setTimeout(load,400)};$('#use-model').onclick=()=>{provider=$('#provider').value;model=$('#models').value;const k=cleanKey($('#api-key').value);if(k)sessionStorage.setItem('relay-key-'+provider,k);localStorage.setItem('relay-provider',provider);localStorage.setItem('relay-model',model);$('#dialog').close();sidebar();toast('Model selected for new investigations.')}};
+$('#model-button').onclick=()=>{modal(`<div class="kicker">RESEARCH AGENT</div><h2>Choose your model.</h2><p>Models are fetched live from your configured provider. Existing investigations keep the model they started with.</p><label>Provider<select id="provider"><option value="nebius" ${provider==='nebius'?'selected':''}>Nebius Token Factory</option><option value="ollama" ${provider==='ollama'?'selected':''}>Ollama Cloud</option></select></label><label>Your API key <small>(this browser tab only; the server uses it for your requests and never saves it)</small><input type="password" id="api-key" autocomplete="off" placeholder="Paste your key" value="${esc(keyFor(provider))}"></label><label>Tavily key (optional: lets Relay search the web when a paper leaves out a detail)<input type="password" id="tavily-key" autocomplete="off" placeholder="Paste your key" value="${esc(keyFor('tavily'))}"></label><label>Model<select id="models"><option>Loading live catalog…</option></select></label><p id="model-info"></p><button class="primary" id="use-model" disabled>Use selected model</button>`);let generation=0;async function load(){const n=++generation;$('#use-model').disabled=true;try{const r=await api('models?provider='+$('#provider').value);if(n!==generation||!$('#models'))return;const want=$('#provider').value===provider&&model?model:r.default;$('#models').innerHTML=r.models.map(m=>`<option ${m===want?'selected':''}>${esc(m)}</option>`).join('');$('#model-info').textContent=r.models.length+' available models · credentials stay on the local companion';$('#use-model').disabled=!r.models.length}catch(e){if($('#model-info'))$('#model-info').textContent=e.message}}$('#provider').onchange=load;load();$('#api-key').oninput=()=>{const k=cleanKey($('#api-key').value);if(k)sessionStorage.setItem('relay-key-'+$('#provider').value,k);clearTimeout(load.t);load.t=setTimeout(load,400)};$('#tavily-key').oninput=()=>{const k=cleanKey($('#tavily-key').value);if(k)sessionStorage.setItem('relay-key-tavily',k);else sessionStorage.removeItem('relay-key-tavily')};$('#use-model').onclick=()=>{provider=$('#provider').value;model=$('#models').value;const k=cleanKey($('#api-key').value);if(k)sessionStorage.setItem('relay-key-'+provider,k);localStorage.setItem('relay-provider',provider);localStorage.setItem('relay-model',model);$('#dialog').close();sidebar();toast('Model selected for new investigations.')}};
 const desk=researchDesk({$,esc,api,toast,modal,openProject,openPaper:async(id,arxiv)=>{await openProject(id,'papers');const paper=current()?.papers.find(p=>p.arxiv===arxiv);if(paper)paperDetail(paper.id)},newStudy:async()=>{await newInvestigation();$('#baseline-example')?.click();if($('#seed-only'))$('#seed-only').checked=false}});
 const executions=executionUI({$,esc,api,modal,toast,getProjects:()=>projects,getCurrent:current,openProject,openTab,refresh});
 if(initialRoute.get('node'))executions.setNode(initialRoute.get('node'));
-try{const boot=await api('state');token=boot.token;serverKeys=boot.providers||{};hostedMode=!!boot.hosted;if(!provider){provider=(boot.providers?.nebius||boot.hosted)?'nebius':'ollama';model=provider==='nebius'?boot.model:'gpt-oss:120b'}await refresh(true)}catch(e){toast(e.message)}setInterval(()=>refresh(),2200);
+// ---- Browser copies: local list, restore, autosave, and the "Your projects" panel ----
+const local={ready:true,copies:[],tried:new Set(),errors:new Map(),status:new Map(),saved:new Map(),saving:new Set(),retryAt:new Map(),restored:false,down:false,warnedSave:false};
+const isNetworkError=e=>e instanceof TypeError;
+const idOK=id=>/^[a-f0-9]{16}$/.test(String(id||''));
+const copyOf=id=>local.copies.some(c=>c.id===id);
+function idsParam(extra=[]){return [...new Set([...local.copies.map(c=>c.id),active,...extra].filter(idOK))].join(',')}
+async function loadProjects(extra=[]){const s=await api('research?ids='+encodeURIComponent(idsParam(extra)));projects=s.projects;return s}
+async function saveCopy(id,{auto=false}={}){
+  if(!local.ready||!idOK(id)||local.saving.has(id))return false;
+  if(auto&&Date.now()<(local.retryAt.get(id)||0))return false;
+  local.saving.add(id);
+  try{
+    const doc=await api('research/project?id='+id);
+    const ok=await store.saveProject(doc);
+    if(ok){local.copies=[{id,hypothesis:doc.project.hypothesis,savedAt:new Date().toISOString()},...local.copies.filter(c=>c.id!==id)];local.saved.set(id,doc.project.revision+':'+doc.project.status)}
+    else{local.retryAt.set(id,Date.now()+30000);if(!local.warnedSave){local.warnedSave=true;toast('This browser could not keep a copy of the project. Export a file to keep it.')}}
+    return ok;
+  }catch(e){local.retryAt.set(id,Date.now()+30000);return false}
+  finally{local.saving.delete(id)}
+}
+// Saves when a project first appears, when a run finishes, or when it reaches review.
+function syncCopies(){
+  for(const p of projects){
+    const prev=local.status.get(p.id);local.status.set(p.id,p.status);
+    const finished=prev!==undefined&&BUSY.includes(prev)&&!busy(p);
+    const reviewed=prev!==undefined&&prev!==p.status&&p.status==='review';
+    if(!copyOf(p.id)||finished||reviewed)saveCopy(p.id,{auto:true});
+  }
+}
+// Every 60 seconds, save open-able projects that are not busy and changed since the last save.
+function autosaveTick(){for(const p of projects)if(!busy(p)&&local.saved.get(p.id)!==p.revision+':'+p.status)saveCopy(p.id,{auto:true})}
+// Projects in this browser that the server does not know (for example after a restart) are sent back once.
+async function restoreMissing(){
+  const have=new Set(projects.map(p=>p.id));
+  for(const id of have){local.tried.delete(id);local.errors.delete(id)}
+  const missing=local.copies.map(c=>c.id).filter(id=>!have.has(id)&&!local.tried.has(id));
+  let restored=false;
+  for(const id of missing){
+    const doc=await store.getProject(id);
+    if(!doc){local.tried.add(id);local.errors.set(id,'This copy could not be read from this browser.');continue}
+    try{
+      const r=await api('research/import',doc);
+      local.tried.add(id);restored=true;
+      if(r.existing)toast('This project is already in Relay, so nothing was replaced.');else local.restored=true;
+    }catch(e){
+      if(isNetworkError(e))return;
+      local.tried.add(id);local.errors.set(id,e.message);
+    }
+  }
+  if(restored)await loadProjects();
+}
+$('#projects-panel').onclick=()=>projectsPanel();
+const panelMsg=t=>{const m=$('#panel-msg');if(m)m.textContent=t};
+const when=iso=>{const d=new Date(iso);return isNaN(d)?'':d.toLocaleDateString(undefined,{year:'numeric',month:'short',day:'numeric'})};
+const fmtBytes=n=>n>=1e6?(n/1e6).toFixed(1)+' MB':Math.round(n/1e3)+' KB';
+const slug=s=>String(s||'').toLowerCase().normalize('NFKD').replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'').slice(0,60).replace(/-+$/,'')||'investigation';
+function checkCopy(text,size){
+  if(size>8000000)throw Error('This file is too large to be a Relay Research project.');
+  let doc;try{doc=JSON.parse(text)}catch{throw Error('This file is not a Relay Research project.')}
+  const p=doc&&doc.project;
+  if(!doc||doc.format!=='relay-research/1'||!p||typeof p!=='object')throw Error('This file is not a Relay Research project.');
+  if(!idOK(p.id))throw Error('The project id in this file is not valid.');
+  if(typeof p.hypothesis!=='string'||p.hypothesis.length<10||p.hypothesis.length>2000)throw Error('The question in this file is not valid.');
+  if(!Array.isArray(p.papers)||p.papers.length>20)throw Error('The paper list in this file is not valid.');
+  return doc;
+}
+async function exportCopy(id){
+  let doc;
+  try{doc=await api('research/project?id='+id)}catch(e){doc=await store.getProject(id);if(!doc)throw e}
+  const name=slug(doc.project.hypothesis)+'.relay-research.json';
+  const url=URL.createObjectURL(new Blob([JSON.stringify(doc,null,2)],{type:'application/json'}));
+  const a=Object.assign(document.createElement('a'),{href:url,download:name});document.body.append(a);a.click();a.remove();
+  setTimeout(()=>URL.revokeObjectURL(url),2000);
+  panelMsg('Exported '+name+'.');
+}
+async function removeCopy(id){
+  if(!confirm('Remove this copy from this browser? Files you exported are not affected. The server copy is removed when the server restarts.'))return;
+  await store.deleteProject(id);
+  local.copies=local.copies.filter(c=>c.id!==id);local.tried.delete(id);local.errors.delete(id);local.saved.delete(id);local.status.delete(id);
+  if(active===id){active=null;localStorage.removeItem('research-project');screen='project';routeTo();render()}
+  sidebar();projectsPanel('Removed from this browser.');
+}
+async function importFile(file){
+  panelMsg('Checking the file…');
+  try{
+    const doc=checkCopy(await file.text(),file.size);
+    const id=doc.project.id;
+    const r=await api('research/import',doc);
+    await saveCopy(id);
+    await loadProjects([id]);
+    $('#dialog').close();
+    toast(r.existing?'This project is already in Relay, so nothing was replaced. Opening it.':'Project imported. Opening it.');
+    await openProject(id,'compare');
+  }catch(e){panelMsg(e.message)}
+}
+function panelHTML(msg=''){
+  const rows=[...local.copies].map(c=>`<article class="copy-row"><div><strong>${esc(c.hypothesis.slice(0,160))}</strong><small>Saved ${esc(when(c.savedAt))}${local.errors.has(c.id)?' · Could not be restored: '+esc(local.errors.get(c.id)):''}</small></div><div class="copy-actions"><button data-export="${esc(c.id)}">Export file</button><button data-remove="${esc(c.id)}">Remove from this browser</button></div></article>`).join('');
+  return `<div class="kicker">YOUR PROJECTS</div><h2>Your projects stay in this browser.</h2><p>Saved in this browser only. No account needed. Export a file to keep a backup or move to another computer.</p>${local.ready?'':'<p class="side-note warn">This browser window cannot keep copies, so projects are lost when you close it. Export a file to keep one.</p>'}<p class="storage-note" id="storage-note">Checking storage…</p><div class="copy-list">${rows||`<p class="empty-copy">${local.ready?'Start an investigation. It is saved in this browser.':'Start an investigation. This browser window cannot keep it after you close the window.'}</p>`}</div><h3>Open a file</h3><p>Import a file you exported earlier (.relay-research.json). A project that already exists is never replaced.</p><input type="file" id="import-file" accept=".relay-research.json,application/json"><p class="panel-msg" id="panel-msg" role="status">${esc(msg)}</p>`;
+}
+async function projectsPanel(msg=''){
+  modal(panelHTML(msg));
+  document.querySelectorAll('[data-export]').forEach(b=>b.onclick=()=>exportCopy(b.dataset.export).catch(e=>panelMsg(e.message)));
+  document.querySelectorAll('[data-remove]').forEach(b=>b.onclick=()=>removeCopy(b.dataset.remove));
+  $('#import-file').onchange=()=>{const f=$('#import-file').files[0];if(f)importFile(f)};
+  const el=$('#storage-note');
+  if(!local.ready){el.textContent='Nothing is kept in this browser window.';return}
+  const e=await store.estimateStorage();
+  if($('#storage-note'))$('#storage-note').textContent=e?`${fmtBytes(e.usage)} used by Relay in this browser`:'Storage use is not reported by this browser.';
+}
+
+local.ready=await store.isAvailable();if(!local.ready)toast('This browser window cannot keep copies of your projects. They are lost when you close it unless you export a file.');local.copies=local.ready?await store.listProjects():[];
+try{const boot=await api('state');token=boot.token;serverKeys=boot.providers||{};hostedMode=!!boot.hosted;if(!provider){provider=(boot.providers?.nebius||boot.hosted)?'nebius':'ollama';model=provider==='nebius'?boot.model:'gpt-oss:120b'}await refresh(true)}catch(e){if(isNetworkError(e)){local.down=true;sidebar()}else toast(e.message)}setInterval(()=>refresh(),2200);setInterval(autosaveTick,60000);
