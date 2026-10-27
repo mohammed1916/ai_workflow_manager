@@ -75,7 +75,8 @@ def make_handler(store,port):
                     from .providers import models
                     from urllib.parse import parse_qs
                     provider=parse_qs(urlsplit(self.path).query).get('provider',['ollama'])[0]
-                    self.respond(models(with_key(read_config(store.root),provider,self.headers.get('X-Provider-Key','').strip() or None),provider))
+                    hk=self.headers.get('X-Provider-Key','').strip() if self.headers.get('X-Provider','')==provider else ''
+                    self.respond(models(with_key(read_config(store.root),provider,hk or None),provider))
                 elif route=='/api/pair': self.respond({'token':store.pair_token,'endpoint':origin})
                 elif route.startswith('/api/output/'):
                     parts=route.split('/')

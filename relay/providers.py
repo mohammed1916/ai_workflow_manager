@@ -2,6 +2,12 @@
 import json, urllib.request, urllib.error
 from urllib.parse import urlparse
 
+def key_message():
+    import os
+    if os.environ.get('RELAY_HOSTED')=='1': return 'Paste your API key in the model menu first. Visitors bring their own key.'
+    return 'Configure OLLAMA_TEST_API_KEY or NEBIUS_API_KEY for the selected provider.'
+
+
 KEY_FIELDS = {'nebius': 'NEBIUS_API_KEY', 'ollama': 'OLLAMA_TEST_API_KEY'}
 
 
@@ -24,7 +30,7 @@ def settings(cfg, provider):
 
 def request(config, path, payload=None, timeout=90):
     from .core import RelayError
-    if not config['key']: raise RelayError('KEY_REQUIRED','Configure OLLAMA_TEST_API_KEY or NEBIUS_API_KEY for the selected provider.')
+    if not config['key']: raise RelayError('KEY_REQUIRED', key_message())
     req=urllib.request.Request(config['base']+path,data=json.dumps(payload).encode() if payload is not None else None,headers={'Authorization':'Bearer '+config['key'],'Content-Type':'application/json'})
     try:
         with urllib.request.urlopen(req,timeout=timeout) as response:return json.loads(response.read(4000000))
