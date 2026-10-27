@@ -1,0 +1,23 @@
+# Render blueprint for Relay Research. Visitors enter their own model API key in the app.
+# The server never uses a key from its own environment in this mode (RELAY_HOSTED=1).
+services:
+  - type: web
+    name: relay-research
+    runtime: python
+    plan: starter            # persistent disks require a paid plan
+    buildCommand: "true"     # no dependencies: standard library only
+    startCommand: python3 -m relay.server
+    healthCheckPath: /api/state
+    envVars:
+      - key: PYTHON_VERSION
+        value: "3.12.4"
+      - key: RELAY_HOSTED
+        value: "1"
+      - key: RELAY_HOST
+        value: "0.0.0.0"
+      - key: RELAY_PUBLIC_HOST          # set to your service hostname, for example relay-research.onrender.com
+        sync: false
+    disk:
+      name: relay-data
+      mountPath: /opt/render/project/src/.relay   # research state, checkpoints, sources; verify the path on first deploy
+      sizeGB: 1

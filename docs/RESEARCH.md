@@ -53,3 +53,9 @@ Limits:
 - Comparisons in this app are only as complete as the papers provided. They are not a systematic review.
 - A "comparable" label means the stated context matches and nothing conflicts. It does not mean the methods are equally well implemented.
 - Every correction and proposal decision is recorded with its source and reason. Accepting a proposal changes the comparison; check the source first.
+
+## Keys and hosting (27 October 2026)
+
+- Hosted mode (`RELAY_HOSTED=1`): visitors enter their own key. It is held in memory only, for their work, and never saved or logged. The server ignores any key in its own environment.
+- Local mode: keys can come from `.env`, as before.
+- The statement "keys stay on the server" no longer applies to hosted mode; the key is sent by the visitor's browser with each request.

@@ -1,9 +1,10 @@
 from __future__ import annotations
-import argparse, json, mimetypes, secrets, subprocess, sys
+import argparse, json, mimetypes, os, secrets, subprocess, sys
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from urllib.parse import urlsplit, unquote
 from .core import Store, RelayError, read_config, digest
+from .providers import with_key
 
 ROOT=Path(__file__).resolve().parent.parent
 
@@ -11,6 +12,10 @@ def make_handler(store,port):
     from .research import Research, compare
     research=Research(store.root)
     origin=f'http://127.0.0.1:{port}'
+    hosts={f'127.0.0.1:{port}', f'localhost:{port}'}
+    origins={f'http://{h}' for h in hosts}
+    public=os.environ.get('RELAY_PUBLIC_HOST','').strip()
+    if public: hosts.add(public); origins.update({f'https://{public}', f'http://{public}'})
     class Handler(BaseHTTPRequestHandler):
         def log_message(self,*args): pass
         def respond(self,data,status=200,content_type='application/json'):
@@ -28,10 +33,10 @@ def make_handler(store,port):
                 self.send_header('Vary','Origin')
             self.end_headers(); self.wfile.write(body)
         def guard(self,mutation=False):
-            if self.headers.get('Host')!=f'127.0.0.1:{port}': raise RelayError('INVALID_HOST','Open Relay at '+origin,403)
+            if self.headers.get('Host') not in hosts: raise RelayError('INVALID_HOST','Open Relay at '+origin,403)
             request_origin=self.headers.get('Origin','')
             extension=self.path=='/api/clips' and request_origin.startswith('chrome-extension://')
-            if request_origin and request_origin!=origin and not extension: raise RelayError('ORIGIN_DENIED','This origin is not allowed.',403)
+            if request_origin and request_origin not in origins and not extension: raise RelayError('ORIGIN_DENIED','This origin is not allowed.',403)
             if self.headers.get('Sec-Fetch-Site')=='cross-site' and not extension and (mutation or self.path.startswith('/api/')): raise RelayError('ORIGIN_DENIED','Cross-site access is not allowed.',403)
             if mutation:
                 token=self.headers.get('Authorization','').removeprefix('Bearer ')
@@ -52,7 +57,7 @@ def make_handler(store,port):
                 if route=='/api/state':
                     with store.lock:
                         cfg=read_config(store.root)
-                        self.respond({'token':store.token,'providers':{'ollama':bool(cfg.get('OLLAMA_TEST_API_KEY') or cfg.get('OLLAMA_API_KEY')),'nebius':bool(cfg.get('NEBIUS_API_KEY'))},'configured':bool(cfg.get('NEBIUS_API_KEY') or cfg.get('OLLAMA_TEST_API_KEY') or cfg.get('OLLAMA_API_KEY')),'model':cfg.get('NEBIUS_MODEL','nvidia/nemotron-3-super-120b-a12b'),'platform':sys.platform,'sources':store.sources(),'runs':store.state['runs']})
+                        self.respond({'token':store.token,'providers':{'ollama':bool(cfg.get('OLLAMA_TEST_API_KEY') or cfg.get('OLLAMA_API_KEY')),'nebius':bool(cfg.get('NEBIUS_API_KEY'))},'configured':bool(cfg.get('NEBIUS_API_KEY') or cfg.get('OLLAMA_TEST_API_KEY') or cfg.get('OLLAMA_API_KEY')),'model':cfg.get('NEBIUS_MODEL','nvidia/nemotron-3-super-120b-a12b'),'platform':sys.platform,'hosted':os.environ.get('RELAY_HOSTED')=='1','sources':store.sources(),'runs':store.state['runs']})
                 elif route=='/api/research': self.respond(research.state())
                 elif route=='/api/research/checkpoint':
                     from urllib.parse import parse_qs
@@ -70,7 +75,7 @@ def make_handler(store,port):
                     from .providers import models
                     from urllib.parse import parse_qs
                     provider=parse_qs(urlsplit(self.path).query).get('provider',['ollama'])[0]
-                    self.respond(models(read_config(store.root),provider))
+                    self.respond(models(with_key(read_config(store.root),provider,self.headers.get('X-Provider-Key','').strip() or None),provider))
                 elif route=='/api/pair': self.respond({'token':store.pair_token,'endpoint':origin})
                 elif route.startswith('/api/output/'):
                     parts=route.split('/')
@@ -95,6 +100,11 @@ def make_handler(store,port):
                 if size<1 or size>300000: raise RelayError('BODY_LIMIT','Request body too large or empty.',413)
                 data=json.loads(self.rfile.read(size))
                 if not isinstance(data,dict): raise RelayError('INVALID_BODY','Use a JSON object.')
+                key=self.headers.get('X-Provider-Key','').strip(); provider=self.headers.get('X-Provider','nebius').strip()
+                if key and (provider not in ('nebius','ollama') or len(key)>400): raise RelayError('INVALID_KEY','Check the provider and key.',400)
+                if key and self.path.startswith('/api/research/'):
+                    if self.path=='/api/research/start': data['providerKey']=key
+                    elif data.get('id'): research.set_key(data['id'],provider,key)
                 if self.path=='/api/research/start': result=research.start(data)
                 elif self.path=='/api/research/branch': result=research.branch(data)
                 elif self.path=='/api/research/update': result=research.update(data)
@@ -110,7 +120,7 @@ def make_handler(store,port):
                 elif self.path=='/api/sources/remove':
                     with store.lock:
                         store.state['clips']=[s for s in store.state['clips'] if s['id']!=data.get('id')]; store.save(); result={'ok':True}
-                elif self.path=='/api/runs': result=store.create(data.get('goal'),data.get('sources'),data.get('mode'),data.get('recipe','brief'),data.get('feedback',''),data.get('provider','nebius'),data.get('model'))
+                elif self.path=='/api/runs': result=store.create(data.get('goal'),data.get('sources'),data.get('mode'),data.get('recipe','brief'),data.get('feedback',''),provider if key else data.get('provider','nebius'),data.get('model'),key or None)
                 elif self.path=='/api/workflow/branch': result=store.branch(data.get('id'),data.get('revision'))
                 elif self.path=='/api/approve': result=store.approve(data.get('id'),data.get('revision'))
                 elif self.path=='/api/edit': result=store.edit(data.get('id'),data.get('revision'),data.get('index'),data.get('content'))
@@ -134,10 +144,10 @@ def make_handler(store,port):
 
 def main():
     parser=argparse.ArgumentParser(description='Relay local workflow companion')
-    parser.add_argument('--port',type=int,default=int(read_config(ROOT).get('RELAY_PORT','4280')))
+    parser.add_argument('--port',type=int,default=int(os.environ.get('PORT') or read_config(ROOT).get('RELAY_PORT','4280')))
     args=parser.parse_args()
     store=Store(ROOT)
-    server=ThreadingHTTPServer(('127.0.0.1',args.port),make_handler(store,args.port))
+    server=ThreadingHTTPServer((os.environ.get('RELAY_HOST','127.0.0.1'),args.port),make_handler(store,args.port))
     print(f'Relay is ready at http://127.0.0.1:{args.port}',flush=True)
     print('Local only. API keys stay on the companion. Ctrl+C to stop.',flush=True)
     try: server.serve_forever()
