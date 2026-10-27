@@ -1,0 +1,4748 @@
+{
+ "when": "20261027-062919",
+ "split": "dev",
+ "provider": "nebius",
+ "model": "nvidia/nemotron-3-super-120b-a12b",
+ "sources": {
+  "1707.01926": "becf6749b4c02d7c3e79365641f50c46201a224fc2b8bac905faacf8ee0e187c",
+  "1906.00121": "9779e1be9de40767c586b25e503e3a4e605873714879c74f3de65f69c1f96924",
+  "2005.11650": "f803c0a452b4ff4e703ba31349d2b2086af0419779a7ad5d87882c75e6846bb9",
+  "1911.08415": "4de6857d8676931dd4e30fcfdb83e4021fe7ad15e3fd0897869810f2eb41dcdf",
+  "2007.02842": "327c42deb615652bebc85b021c2e7d3231200cd7d8126bc468dd3f43be17baf4",
+  "2308.10425": "ad48f2f04b5ce5a34f682705cf670308e267e9401db64bdb1ad14360c5623985",
+  "2301.07945": "52e6ffb823f37fa82f966e8304567d61478347e4bc42cc5d0c3b29171f9db3d1",
+  "2208.05233": "a4ffffaa50b79e90b4b208b27f6f91751daae92ead5309dfe42aeeb8cce83347",
+  "2101.06861": "aef24a36275988d7e7beadccaf5ebeb752e05d29d08c7494afee77621d24c88d",
+  "2206.09113": "3b7a53f00208def20850bc5b9861eb69971587464e351bb2ff125c6eba78b1f8",
+  "2206.09112": "b1c52a944179cbce5e4478884564fb9d5e2db3498f4238064d9f5b62fd339496",
+  "2211.14701": "ca2cf38bb72b178252f5d3c1ee641893c98b4ca7f9291d1d60f8f580c0dd61c2",
+  "2012.09641": "82b9fe4c1f3eebe973309b07ba78789a273c063b3a723d051dd27f2631975736",
+  "1709.04875": "e11d4f81e39b528400a2398066c319cc7ea30353136e95d6cb58bc25504eab7c"
+ },
+ "summary": {
+  "relay": {
+   "cases": 30,
+   "accuracy": 0.633,
+   "comparablePrecision": 1.0,
+   "comparableRecall": 0.471,
+   "incorrectlyAccepted": 0,
+   "goldNotComparable": 13,
+   "coverage": 0.8,
+   "failed": 0,
+   "confusion": {
+    "comparable": {
+     "comparable": 8,
+     "incompatible": 5,
+     "insufficient": 4
+    },
+    "incompatible": {
+     "incompatible": 9
+    },
+    "insufficient": {
+     "incompatible": 2,
+     "insufficient": 2
+    }
+   },
+   "independenceAccuracy": 0.9
+  },
+  "relayExtract": {
+   "cases": 30,
+   "accuracy": 0.633,
+   "comparablePrecision": 1.0,
+   "comparableRecall": 0.412,
+   "incorrectlyAccepted": 0,
+   "goldNotComparable": 13,
+   "coverage": 0.667,
+   "failed": 0,
+   "confusion": {
+    "comparable": {
+     "comparable": 7,
+     "insufficient": 7,
+     "incompatible": 3
+    },
+    "incompatible": {
+     "incompatible": 9
+    },
+    "insufficient": {
+     "incompatible": 1,
+     "insufficient": 3
+    }
+   },
+   "independenceAccuracy": 0.867
+  },
+  "baseline": {
+   "cases": 30,
+   "accuracy": 0.667,
+   "comparablePrecision": 0.75,
+   "comparableRecall": 0.706,
+   "incorrectlyAccepted": 4,
+   "goldNotComparable": 13,
+   "coverage": 0.9,
+   "failed": 0,
+   "confusion": {
+    "comparable": {
+     "comparable": 12,
+     "incompatible": 4,
+     "insufficient": 1
+    },
+    "incompatible": {
+     "comparable": 3,
+     "incompatible": 6
+    },
+    "insufficient": {
+     "incompatible": 1,
+     "comparable": 1,
+     "insufficient": 2
+    }
+   },
+   "independenceAccuracy": 0.9
+  }
+ },
+ "fields": {
+  "relayExtract": {
+   "targets": 35,
+   "accuracy": {
+    "method": 1.0,
+    "dataset": 0.943,
+    "split": 0.914,
+    "horizon": 0.771,
+    "metricDefinition": 0.8,
+    "provenance": 0.943
+   },
+   "hallucinationRate": {
+    "metricDefinition": 0.0,
+    "provenance": 0.0,
+    "horizon": 0.333
+   },
+   "errors": 0
+  },
+  "relay": {
+   "targets": 35,
+   "accuracy": {
+    "method": 1.0,
+    "dataset": 0.943,
+    "split": 0.914,
+    "horizon": 0.829,
+    "metricDefinition": 0.857,
+    "provenance": 0.971
+   },
+   "hallucinationRate": {
+    "metricDefinition": 0.095,
+    "provenance": 0.0,
+    "horizon": 0.333
+   },
+   "errors": 0
+  },
+  "baseline": {
+   "targetInstances": 60,
+   "accuracy": {
+    "method": 1.0,
+    "dataset": 0.95,
+    "split": 0.95,
+    "horizon": 0.9,
+    "metricDefinition": 0.15,
+    "provenance": 0.8
+   },
+   "hallucinationRate": {
+    "metricDefinition": 0.794,
+    "provenance": 0.769,
+    "horizon": 0.25
+   }
+  }
+ },
+ "cost": {
+  "relay": {
+   "calls": 62,
+   "failed": 0,
+   "recovered": 0,
+   "tokens": 221381,
+   "modelSeconds": 321.4
+  },
+  "baseline": {
+   "calls": 30,
+   "failed": 0,
+   "recovered": 0,
+   "tokens": 902769,
+   "modelSeconds": 347.8
+  },
+  "wallSeconds": 173
+ },
+ "cases": [
+  {
+   "case": "C01",
+   "gold": "incompatible",
+   "goldIndependent": true,
+   "heldOut": false,
+   "why": "GTS Table 1 used a non-standard metric calculation (Appendix D).",
+   "relayExtract": "incompatible",
+   "relayExtractIndependent": true,
+   "relayExtractExplanation": [
+    "The source states that one metric was computed differently from the standard protocol: \"non-standard per the paper's later correction: It was brought to our attention recently that this version calculated the evaluation metrics MAE/RMSE/MAPE in a manner slightly different from that used to report the results of DCRNN in the official publication (https://github.\"."
+   ],
+   "relay": "incompatible",
+   "relayIndependent": true,
+   "relayExplanation": [
+    "The source states that one metric was computed differently from the standard protocol: \"non-standard per the paper's later correction: It was brought to our attention recently that this version calculated the evaluation metrics MAE/RMSE/MAPE in a manner slightly different from that used to report the results of DCRNN in the official publication (https://github.\"."
+   ],
+   "baseline": "comparable",
+   "baselineIndependent": true,
+   "baselineExplanation": "Both results are MAE on METR-LA at 60‑minute horizon with identical 70/10/20 train/val/test split and standard (unmasked) metric definition, satisfying all comparability conditions."
+  },
+  {
+   "case": "C02",
+   "gold": "comparable",
+   "goldIndependent": true,
+   "heldOut": false,
+   "why": "Corrected GTS value, same split and horizon.",
+   "relayExtract": "comparable",
+   "relayExtractIndependent": true,
+   "relayExtractExplanation": [
+    "Dataset, split, horizon, and metric match. Extraction is not yet human-verified."
+   ],
+   "relay": "comparable",
+   "relayIndependent": true,
+   "relayExplanation": [
+    "Dataset, split, horizon, and metric match. Extraction is not yet human-verified."
+   ],
+   "baseline": "comparable",
+   "baselineIndependent": true,
+   "baselineExplanation": "Both results are MAE on METR-LA at 60‑minute horizon with identical 70/10/20 split, single‑horizon aggregation, and standard MAE definition; no conflicting details."
+  },
+  {
+   "case": "C03",
+   "gold": "incompatible",
+   "goldIndependent": false,
+   "heldOut": false,
+   "why": "Original vs corrected calculation in one paper.",
+   "relayExtract": "incompatible",
+   "relayExtractIndependent": false,
+   "relayExtractExplanation": [
+    "The source states that one metric was computed differently from the standard protocol: \"non-standard per the paper's later correction: It was brought to our attention recently that this version calculated the evaluation metrics MAE/RMSE/MAPE in a manner slightly different from that used to report the results of DCRNN in the official publication (https://github.\"."
+   ],
+   "relay": "incompatible",
+   "relayIndependent": false,
+   "relayExplanation": [
+    "The source states that one metric was computed differently from the standard protocol: \"non-standard per the paper's later correction: It was brought to our attention recently that this version calculated the evaluation metrics MAE/RMSE/MAPE in a manner slightly different from that used to report the results of DCRNN in the official publication (https://github.\"."
+   ],
+   "baseline": "incompatible",
+   "baselineIndependent": false,
+   "baselineExplanation": "The paper states that the original MAE calculation differed from the official DCRNN computation and was later corrected, indicating a stated conflict in metric computation."
+  },
+  {
+   "case": "C07",
+   "gold": "comparable",
+   "goldIndependent": true,
+   "heldOut": false,
+   "why": "Both 6:2:2 and averaged over 12 horizons; neither paper states the metric definition (caveat). Code shows different masking.",
+   "relayExtract": "insufficient",
+   "relayExtractIndependent": true,
+   "relayExtractExplanation": [
+    "It is not stated whether the result for 2308.10425 is a single horizon or an average over horizons."
+   ],
+   "relay": "incompatible",
+   "relayIndependent": true,
+   "relayExplanation": [
+    "These results use different horizons: average over horizons up to 5 minutes vs average over horizons up to 60 minutes.",
+    "Different metric definitions: Only observed samples are used; missing targets are masked (zero targets are not specifically mentioned). vs MAE computed as the mean absolute error without masking of zero or missing targets."
+   ],
+   "baseline": "comparable",
+   "baselineIndependent": true,
+   "baselineExplanation": "Both results refer to the same dataset (PeMSD4/PEMS04), use the same 6:2:2 train/val/test split, report MAE averaged over the 12 prediction horizons, and use the standard unmasked MAE definition; no conflicting information is stated."
+  },
+  {
+   "case": "C08",
+   "gold": "comparable",
+   "goldIndependent": true,
+   "heldOut": false,
+   "why": "Same method re-run: 19.83 vs 19.36.",
+   "relayExtract": "incompatible",
+   "relayExtractIndependent": true,
+   "relayExtractExplanation": [
+    "These results use different horizons: average over horizons up to 5 minutes vs average over horizons up to 60 minutes."
+   ],
+   "relay": "incompatible",
+   "relayIndependent": true,
+   "relayExplanation": [
+    "These results use different horizons: average over horizons up to 5 minutes vs average over horizons up to 60 minutes."
+   ],
+   "baseline": "incompatible",
+   "baselineIndependent": false,
+   "baselineExplanation": "Dataset names differ (PeMSD4 vs PEMS04), indicating different datasets, so the results cannot be compared."
+  },
+  {
+   "case": "C09",
+   "gold": "incompatible",
+   "goldIndependent": true,
+   "heldOut": false,
+   "why": "Average over horizons vs horizon 12.",
+   "relayExtract": "incompatible",
+   "relayExtractIndependent": true,
+   "relayExtractExplanation": [
+    "These results use different horizon aggregation: average over horizons up to 5 minutes vs single horizon at 60 minutes."
+   ],
+   "relay": "incompatible",
+   "relayIndependent": true,
+   "relayExplanation": [
+    "These results use different horizon aggregation: average over horizons up to 5 minutes vs single horizon at 60 minutes."
+   ],
+   "baseline": "incompatible",
+   "baselineIndependent": true,
+   "baselineExplanation": "Both results use the same dataset and split, but AGCRN reports MAE averaged over all 12 horizons while STID reports MAE at the 12th horizon only; horizon aggregation differs, making them incomparable."
+  },
+  {
+   "case": "C10",
+   "gold": "insufficient",
+   "goldIndependent": true,
+   "heldOut": false,
+   "why": "PDFormer does not state whether PEMS04 results are averaged.",
+   "relayExtract": "incompatible",
+   "relayExtractIndependent": true,
+   "relayExtractExplanation": [
+    "These results use different horizons: average over horizons up to 5 minutes vs average over horizons up to 60 minutes."
+   ],
+   "relay": "incompatible",
+   "relayIndependent": true,
+   "relayExplanation": [
+    "These results use different horizons: average over horizons up to 5 minutes vs average over horizons up to 60 minutes."
+   ],
+   "baseline": "incompatible",
+   "baselineIndependent": true,
+   "baselineExplanation": "The datasets differ (PeMSD4 vs PeMSD04), violating the dataset requirement for comparability."
+  },
+  {
+   "case": "C12",
+   "gold": "comparable",
+   "goldIndependent": true,
+   "heldOut": false,
+   "why": "DCRNN reported as 21.22 and 19.63 under stated-equal protocols.",
+   "relayExtract": "insufficient",
+   "relayExtractIndependent": true,
+   "relayExtractExplanation": [
+    "It is not stated whether the result for 2308.10425 is a single horizon or an average over horizons."
+   ],
+   "relay": "insufficient",
+   "relayIndependent": true,
+   "relayExplanation": [
+    "The horizon length cannot be matched: average over horizons up to 60 minutes vs average over horizons up to unstated length."
+   ],
+   "baseline": "incompatible",
+   "baselineIndependent": true,
+   "baselineExplanation": "Dataset names differ (PeMSD4 vs PEMS04) while split, horizon aggregation, and metric match; this constitutes a stated difference in dataset, making the results incompatible."
+  },
+  {
+   "case": "C13",
+   "gold": "comparable",
+   "goldIndependent": true,
+   "heldOut": false,
+   "why": "",
+   "relayExtract": "comparable",
+   "relayExtractIndependent": true,
+   "relayExtractExplanation": [
+    "Dataset, split, horizon, and metric match. Extraction is not yet human-verified."
+   ],
+   "relay": "comparable",
+   "relayIndependent": true,
+   "relayExplanation": [
+    "Dataset, split, horizon, and metric match. Extraction is not yet human-verified."
+   ],
+   "baseline": "incompatible",
+   "baselineIndependent": true,
+   "baselineExplanation": "Dataset names differ (PeMSD4 vs PEMS04) and the papers do not state they refer to the same data, causing a dataset mismatch."
+  },
+  {
+   "case": "C14",
+   "gold": "insufficient",
+   "goldIndependent": true,
+   "heldOut": false,
+   "why": "",
+   "relayExtract": "insufficient",
+   "relayExtractIndependent": true,
+   "relayExtractExplanation": [
+    "It is not stated whether the result for 2301.07945 is a single horizon or an average over horizons."
+   ],
+   "relay": "insufficient",
+   "relayIndependent": true,
+   "relayExplanation": [
+    "It is not stated whether the result for 2301.07945 is a single horizon or an average over horizons."
+   ],
+   "baseline": "comparable",
+   "baselineIndependent": true,
+   "baselineExplanation": "Both results refer to DCRNN MAE on the same dataset (PeMSD4/PeMS04) with identical 6:2:2 split, multi‑step horizon averaged over 12 steps, and standard MAE definition; no conflicting statements are present."
+  },
+  {
+   "case": "C16",
+   "gold": "insufficient",
+   "goldIndependent": false,
+   "heldOut": false,
+   "why": "AGCRN cites STSGCN's number; PDFormer's is 21.185.",
+   "relayExtract": "insufficient",
+   "relayExtractIndependent": true,
+   "relayExtractExplanation": [
+    "It is not stated whether the result for 2301.07945 is a single horizon or an average over horizons."
+   ],
+   "relay": "insufficient",
+   "relayIndependent": false,
+   "relayExplanation": [
+    "It is not stated whether the result for 2301.07945 is a single horizon or an average over horizons."
+   ],
+   "baseline": "insufficient",
+   "baselineIndependent": true,
+   "baselineExplanation": "Result A states aggregation over horizons, while Result B does not state aggregation; thus dataset, split, horizon match but aggregation is missing for at least one result, making comparison insufficient."
+  },
+  {
+   "case": "C17",
+   "gold": "comparable",
+   "goldIndependent": true,
+   "heldOut": false,
+   "why": "",
+   "relayExtract": "insufficient",
+   "relayExtractIndependent": true,
+   "relayExtractExplanation": [
+    "It is not stated whether the result for 2308.10425 is a single horizon or an average over horizons."
+   ],
+   "relay": "comparable",
+   "relayIndependent": true,
+   "relayExplanation": [
+    "Dataset, split, horizon, and metric match. Extraction is not yet human-verified."
+   ],
+   "baseline": "incompatible",
+   "baselineIndependent": true,
+   "baselineExplanation": "Dataset and split match, but horizon aggregation differs: paperA averages over all 12 horizons while paperB averages over horizons 3, 6, 12, so the results are not comparable."
+  },
+  {
+   "case": "C18",
+   "gold": "insufficient",
+   "goldIndependent": true,
+   "heldOut": false,
+   "why": "",
+   "relayExtract": "insufficient",
+   "relayExtractIndependent": true,
+   "relayExtractExplanation": [
+    "It is not stated whether the result for 2308.10425 is a single horizon or an average over horizons."
+   ],
+   "relay": "incompatible",
+   "relayIndependent": true,
+   "relayExplanation": [
+    "Different metric definitions: MAE computed as the mean absolute error without masking of zero or missing targets vs Missing values are excluded when calculating MAE.."
+   ],
+   "baseline": "insufficient",
+   "baselineIndependent": true,
+   "baselineExplanation": "Both results are on PEMS04 with same 6:2:2 split and MAE metric, but the horizon aggregation (single vs averaged) is not stated for the PDFormer result, preventing comparison."
+  },
+  {
+   "case": "C19",
+   "gold": "comparable",
+   "goldIndependent": true,
+   "heldOut": false,
+   "why": "AGCRN reported as 19.38 by STAEformer and 19.83 by its authors.",
+   "relayExtract": "insufficient",
+   "relayExtractIndependent": true,
+   "relayExtractExplanation": [
+    "It is not stated whether the result for 2308.10425 is a single horizon or an average over horizons."
+   ],
+   "relay": "incompatible",
+   "relayIndependent": true,
+   "relayExplanation": [
+    "These results use different horizons: average over horizons up to 60 minutes vs average over horizons up to 5 minutes."
+   ],
+   "baseline": "comparable",
+   "baselineIndependent": true,
+   "baselineExplanation": "Dataset, split, horizon length, aggregation method, and metric all match; no stated conflict in metric definition"
+  },
+  {
+   "case": "C22",
+   "gold": "comparable",
+   "goldIndependent": true,
+   "heldOut": false,
+   "why": "",
+   "relayExtract": "incompatible",
+   "relayExtractIndependent": true,
+   "relayExtractExplanation": [
+    "These results use different horizons: average over horizons up to 60 minutes vs average over horizons up to 5 minutes."
+   ],
+   "relay": "incompatible",
+   "relayIndependent": true,
+   "relayExplanation": [
+    "These results use different horizons: average over horizons up to 60 minutes vs average over horizons up to 5 minutes."
+   ],
+   "baseline": "comparable",
+   "baselineIndependent": true,
+   "baselineExplanation": "Both results are for the same dataset (PEMS08/PeMSD8), use the same train/val/test split (6:2:2), report MAE averaged over the same 12‑step horizon, and use the standard MAE definition."
+  },
+  {
+   "case": "C23",
+   "gold": "incompatible",
+   "goldIndependent": false,
+   "heldOut": false,
+   "why": "Different datasets.",
+   "relayExtract": "incompatible",
+   "relayExtractIndependent": false,
+   "relayExtractExplanation": [
+    "Different datasets: PeMSD8 vs PeMSD4."
+   ],
+   "relay": "incompatible",
+   "relayIndependent": false,
+   "relayExplanation": [
+    "Different datasets: PeMSD8 vs PeMSD4."
+   ],
+   "baseline": "incompatible",
+   "baselineIndependent": false,
+   "baselineExplanation": "Dataset differs (PeMSD4 vs PeMSD8) while method, split, horizon aggregation, and metric match."
+  },
+  {
+   "case": "C24",
+   "gold": "comparable",
+   "goldIndependent": false,
+   "heldOut": false,
+   "why": "Identical value; the Graph WaveNet row repeats DCRNN's published result.",
+   "relayExtract": "incompatible",
+   "relayExtractIndependent": true,
+   "relayExtractExplanation": [
+    "Different metrics: MAE vs DCRNN."
+   ],
+   "relay": "incompatible",
+   "relayIndependent": true,
+   "relayExplanation": [
+    "Different metrics: MAE vs DCRNN."
+   ],
+   "baseline": "insufficient",
+   "baselineIndependent": false,
+   "baselineExplanation": "Split information is not stated for the result in paperB, making comparison insufficient."
+  },
+  {
+   "case": "C25",
+   "gold": "comparable",
+   "goldIndependent": false,
+   "heldOut": false,
+   "why": "Repeated result with a transcription difference (7.59 vs 7.60).",
+   "relayExtract": "comparable",
+   "relayExtractIndependent": true,
+   "relayExtractExplanation": [
+    "Dataset, split, horizon, and metric match. Extraction is not yet human-verified."
+   ],
+   "relay": "comparable",
+   "relayIndependent": true,
+   "relayExplanation": [
+    "Dataset, split, horizon, and metric match. Extraction is not yet human-verified."
+   ],
+   "baseline": "comparable",
+   "baselineIndependent": false,
+   "baselineExplanation": "Both results refer to DCRNN on METR-LA with identical 70/10/20 split, 1‑hour horizon, single‑horizon aggregation, and masked RMSE definition; no conflicting statements."
+  },
+  {
+   "case": "C26",
+   "gold": "incompatible",
+   "goldIndependent": true,
+   "heldOut": false,
+   "why": "Split stated as 70/10/20 vs 70/20/10 (MTGNN text).",
+   "relayExtract": "incompatible",
+   "relayExtractIndependent": true,
+   "relayExtractExplanation": [
+    "Different splits: 70/10/20 vs 60/20/20 (train/val/test)."
+   ],
+   "relay": "incompatible",
+   "relayIndependent": true,
+   "relayExplanation": [
+    "Different splits: 70/10/20 vs 60/20/20 (train/val/test)."
+   ],
+   "baseline": "comparable",
+   "baselineIndependent": true,
+   "baselineExplanation": "Both results are MAE for 60‑minute ahead prediction on METR‑LA using the same 70/10/20 chronological split, single‑horizon reporting, and standard (unmasked) MAE definition, with no conflicting statements."
+  },
+  {
+   "case": "C27",
+   "gold": "comparable",
+   "goldIndependent": true,
+   "heldOut": false,
+   "why": "",
+   "relayExtract": "comparable",
+   "relayExtractIndependent": true,
+   "relayExtractExplanation": [
+    "Dataset, split, horizon, and metric match. Extraction is not yet human-verified."
+   ],
+   "relay": "comparable",
+   "relayIndependent": true,
+   "relayExplanation": [
+    "Dataset, split, horizon, and metric match. Extraction is not yet human-verified."
+   ],
+   "baseline": "comparable",
+   "baselineIndependent": true,
+   "baselineExplanation": "Both results are MAE on METR-LA at the 60‑minute horizon with identical 70/10/20 train/val/test split and single‑horizon reporting; no conflicting metric definition is stated."
+  },
+  {
+   "case": "C31",
+   "gold": "incompatible",
+   "goldIndependent": false,
+   "heldOut": false,
+   "why": "Horizon 12 vs mean over 12 horizons.",
+   "relayExtract": "incompatible",
+   "relayExtractIndependent": false,
+   "relayExtractExplanation": [
+    "Different metrics: MAE vs Forward-backward-adaptive.",
+    "These results use different horizon aggregation: single horizon at 60 minutes vs average over horizons up to 60 minutes."
+   ],
+   "relay": "incompatible",
+   "relayIndependent": false,
+   "relayExplanation": [
+    "Different metrics: MAE vs Forward-backward-adaptive.",
+    "These results use different horizon aggregation: single horizon at 60 minutes vs average over horizons up to 60 minutes."
+   ],
+   "baseline": "incompatible",
+   "baselineIndependent": false,
+   "baselineExplanation": "Both results are from the same paper and use MAE on METR-LA with the same train/val/test split, but they differ in horizon aggregation: a reports a single 60‑minute horizon MAE, whereas b reports an average MAE across multiple horizons, making them incomparable under the policy."
+  },
+  {
+   "case": "C32",
+   "gold": "incompatible",
+   "goldIndependent": true,
+   "heldOut": false,
+   "why": "15 vs 60 minutes.",
+   "relayExtract": "incompatible",
+   "relayExtractIndependent": true,
+   "relayExtractExplanation": [
+    "These results use different horizons: single horizon at 15 minutes vs single horizon at 60 minutes."
+   ],
+   "relay": "incompatible",
+   "relayIndependent": true,
+   "relayExplanation": [
+    "These results use different horizons: single horizon at 15 minutes vs single horizon at 60 minutes."
+   ],
+   "baseline": "incompatible",
+   "baselineIndependent": true,
+   "baselineExplanation": "Horizon differs (15 min vs 60 min) while dataset, split, and metric match."
+  },
+  {
+   "case": "C33",
+   "gold": "comparable",
+   "goldIndependent": true,
+   "heldOut": false,
+   "why": "DCRNN at 15 minutes: 2.67 re-reported vs 2.77 original.",
+   "relayExtract": "comparable",
+   "relayExtractIndependent": true,
+   "relayExtractExplanation": [
+    "Dataset, split, horizon, and metric match. Extraction is not yet human-verified."
+   ],
+   "relay": "comparable",
+   "relayIndependent": true,
+   "relayExplanation": [
+    "Dataset, split, horizon, and metric match. Extraction is not yet human-verified."
+   ],
+   "baseline": "comparable",
+   "baselineIndependent": false,
+   "baselineExplanation": "Both results report DCRNN MAE on METR-LA at 15‑min horizon with identical train/val/test splits (70/10/20), single‑horizon aggregation, and standard MAE definition; no conflicting metric definition is stated."
+  },
+  {
+   "case": "C34",
+   "gold": "comparable",
+   "goldIndependent": true,
+   "heldOut": false,
+   "why": "\"PeMS\" in GMAN is PEMS-BAY.",
+   "relayExtract": "insufficient",
+   "relayExtractIndependent": true,
+   "relayExtractExplanation": [
+    "The dataset is unknown for 1911.08415."
+   ],
+   "relay": "insufficient",
+   "relayIndependent": true,
+   "relayExplanation": [
+    "The dataset is unknown for 1911.08415."
+   ],
+   "baseline": "comparable",
+   "baselineIndependent": true,
+   "baselineExplanation": "Both results are MAE for 1‑hour ahead prediction on the PeMS dataset with identical train/val/test splits; no conflicting metric definitions are stated."
+  },
+  {
+   "case": "C35",
+   "gold": "comparable",
+   "goldIndependent": true,
+   "heldOut": false,
+   "why": "",
+   "relayExtract": "insufficient",
+   "relayExtractIndependent": true,
+   "relayExtractExplanation": [
+    "The dataset is unknown for 1911.08415."
+   ],
+   "relay": "insufficient",
+   "relayIndependent": true,
+   "relayExplanation": [
+    "The dataset is unknown for 1911.08415."
+   ],
+   "baseline": "comparable",
+   "baselineIndependent": true,
+   "baselineExplanation": "Both results are MAE for 1‑hour ahead prediction on the same PeMS/PEMS‑BAY dataset with identical 70/10/20 split, single‑horizon reporting, and standard MAE metric; no conflicting definitions."
+  },
+  {
+   "case": "C36",
+   "gold": "comparable",
+   "goldIndependent": false,
+   "heldOut": false,
+   "why": "Identical value with unstated provenance.",
+   "relayExtract": "insufficient",
+   "relayExtractIndependent": false,
+   "relayExtractExplanation": [
+    "The dataset is unknown for 1911.08415."
+   ],
+   "relay": "insufficient",
+   "relayIndependent": false,
+   "relayExplanation": [
+    "The dataset is unknown for 1911.08415."
+   ],
+   "baseline": "comparable",
+   "baselineIndependent": false,
+   "baselineExplanation": "Both results are Graph WaveNet MAE on PeMS with identical 70/10/20 split, 1‑hour horizon, single‑horizon aggregation, and standard MAE; paper A cites the value from paper B."
+  },
+  {
+   "case": "C37",
+   "gold": "incompatible",
+   "goldIndependent": true,
+   "heldOut": false,
+   "why": "Split per MTGNN text.",
+   "relayExtract": "incompatible",
+   "relayExtractIndependent": true,
+   "relayExtractExplanation": [
+    "Different splits: 60/20/20 vs 70/10/20 (train/val/test)."
+   ],
+   "relay": "incompatible",
+   "relayIndependent": true,
+   "relayExplanation": [
+    "Different splits: 60/20/20 vs 70/10/20 (train/val/test)."
+   ],
+   "baseline": "incompatible",
+   "baselineIndependent": true,
+   "baselineExplanation": "Dataset, horizon, and metric match but the train/validation/test splits differ (70/20/10 vs 70/10/20), making the results incomparable."
+  },
+  {
+   "case": "C38",
+   "gold": "comparable",
+   "goldIndependent": true,
+   "heldOut": false,
+   "why": "",
+   "relayExtract": "comparable",
+   "relayExtractIndependent": true,
+   "relayExtractExplanation": [
+    "Dataset, split, horizon, and metric match. Extraction is not yet human-verified."
+   ],
+   "relay": "comparable",
+   "relayIndependent": true,
+   "relayExplanation": [
+    "Dataset, split, horizon, and metric match. Extraction is not yet human-verified."
+   ],
+   "baseline": "comparable",
+   "baselineIndependent": true,
+   "baselineExplanation": "Both results are MAE on PEMS-BAY at 60‑minute horizon with identical 70/10/20 split, single‑horizon reporting, and standard (unmasked) MAE definition; no conflicting details."
+  },
+  {
+   "case": "C41",
+   "gold": "incompatible",
+   "goldIndependent": true,
+   "heldOut": false,
+   "why": "Split per MTGNN text.",
+   "relayExtract": "incompatible",
+   "relayExtractIndependent": false,
+   "relayExtractExplanation": [
+    "Different splits: 60/20/20 vs 70/10/20 (train/val/test)."
+   ],
+   "relay": "incompatible",
+   "relayIndependent": false,
+   "relayExplanation": [
+    "Different splits: 60/20/20 vs 70/10/20 (train/val/test)."
+   ],
+   "baseline": "comparable",
+   "baselineIndependent": true,
+   "baselineExplanation": "Both results report DCRNN MAE on METR-LA with identical 70/20/10 split, single‑hour horizon, and standard MAE definition; no conflicting details are stated."
+  },
+  {
+   "case": "C43",
+   "gold": "comparable",
+   "goldIndependent": true,
+   "heldOut": false,
+   "why": "Graph WaveNet re-reported as 3.51 vs 3.53.",
+   "relayExtract": "comparable",
+   "relayExtractIndependent": true,
+   "relayExtractExplanation": [
+    "Dataset, split, horizon, and metric match. Extraction is not yet human-verified."
+   ],
+   "relay": "comparable",
+   "relayIndependent": true,
+   "relayExplanation": [
+    "Dataset, split, horizon, and metric match. Extraction is not yet human-verified."
+   ],
+   "baseline": "comparable",
+   "baselineIndependent": true,
+   "baselineExplanation": "Both results refer to MAE on METR-LA with the same 70/10/20 split, single 60‑minute horizon, and no differing metric definitions; all required fields match and no conflict is stated."
+  }
+ ],
+ "targets": [
+  {
+   "target": "agcrn_dcrnn_p4",
+   "fields": {
+    "method": true,
+    "dataset": true,
+    "split": true,
+    "horizon": true,
+    "metricDefinition": true,
+    "provenance": false
+   },
+   "hallucinated": {
+    "metricDefinition": false
+   },
+   "pred": {
+    "method": "DCRNN [2]",
+    "dataset": "PeMSD4",
+    "split": "60% train, 20% val, 20% test",
+    "horizon": "average over 12 horizons (each 5‑minute step, total 60 minutes)",
+    "aggregation": "average over 12 prediction horizons",
+    "metricDefinition": "unknown",
+    "provenance": "unknown"
+   },
+   "gold": {
+    "method": "DCRNN",
+    "dataset": "pems04",
+    "split": [
+     60,
+     20,
+     20
+    ],
+    "horizon": {
+     "mode": "average",
+     "minutes": 60
+    },
+    "metricDefinition": null,
+    "provenance": "reproduced"
+   },
+   "cell": "DCRNN [2] / PeMSD4 / MAE",
+   "proposals": []
+  },
+  {
+   "target": "agcrn_p4",
+   "fields": {
+    "method": true,
+    "dataset": true,
+    "split": true,
+    "horizon": false,
+    "metricDefinition": false,
+    "provenance": true
+   },
+   "hallucinated": {
+    "metricDefinition": true
+   },
+   "pred": {
+    "method": "AGCRN (ours)",
+    "dataset": "PeMSD4",
+    "split": "train:60%, val:20%, test:20%",
+    "horizon": "12 horizons (each 5 minutes, 1 step)",
+    "aggregation": "average over 12 horizons",
+    "metricDefinition": "Only observed samples are used; missing targets are masked (zero targets are not specifically mentioned).",
+    "provenance": "own"
+   },
+   "gold": {
+    "method": "AGCRN",
+    "dataset": "pems04",
+    "split": [
+     60,
+     20,
+     20
+    ],
+    "horizon": {
+     "mode": "average",
+     "minutes": 60
+    },
+    "metricDefinition": null,
+    "provenance": "own"
+   },
+   "cell": "AGCRN (ours) / PeMSD4 / MAE",
+   "proposals": [
+    {
+     "field": "metricDefinition",
+     "value": "Only observed samples are used; missing targets are masked (zero targets are not specifically mentioned).",
+     "quote": "Let 𝑿:,𝒊∈RN×1 be the ground truth traffic of all nodes at time step i, 𝑿:,𝒊′∈RN×1 be the predicted values, and Ω be indices of observed samples. The metrics are defined as follows."
+    }
+   ]
+  },
+  {
+   "target": "agcrn_p8",
+   "fields": {
+    "method": true,
+    "dataset": true,
+    "split": true,
+    "horizon": false,
+    "metricDefinition": true,
+    "provenance": true
+   },
+   "hallucinated": {
+    "metricDefinition": false
+   },
+   "pred": {
+    "method": "AGCRN (ours)",
+    "dataset": "PeMSD8",
+    "split": "train:60%, val:20%, test:20%",
+    "horizon": "average over 12 horizons (each 5 minutes, 1 step)",
+    "aggregation": "average over 12 horizons",
+    "metricDefinition": "unknown",
+    "provenance": "own"
+   },
+   "gold": {
+    "method": "AGCRN",
+    "dataset": "pems08",
+    "split": [
+     60,
+     20,
+     20
+    ],
+    "horizon": {
+     "mode": "average",
+     "minutes": 60
+    },
+    "metricDefinition": null,
+    "provenance": "own"
+   },
+   "cell": "AGCRN (ours) / PeMSD8 / MAE",
+   "proposals": []
+  },
+  {
+   "target": "agcrn_stsgcn_p4",
+   "fields": {
+    "method": true,
+    "dataset": true,
+    "split": true,
+    "horizon": false,
+    "metricDefinition": true,
+    "provenance": true
+   },
+   "hallucinated": {
+    "metricDefinition": false
+   },
+   "pred": {
+    "method": "STSGCN",
+    "dataset": "PeMSD4",
+    "split": "train:60%,val:20%,test:20%",
+    "horizon": "average over 12 horizons (each 5 minutes, total 60 minutes)",
+    "aggregation": "average over 12 horizons",
+    "metricDefinition": "unknown",
+    "provenance": "Results reused from the original STSGCN paper ([11]) as stated in Appendix A"
+   },
+   "gold": {
+    "method": "STSGCN",
+    "dataset": "pems04",
+    "split": [
+     60,
+     20,
+     20
+    ],
+    "horizon": {
+     "mode": "average",
+     "minutes": 60
+    },
+    "metricDefinition": null,
+    "provenance": "cited"
+   },
+   "cell": "STSGCN [11] / PeMSD4 / MAE",
+   "proposals": [
+    {
+     "field": "provenance",
+     "value": "Results reused from the original STSGCN paper ([11]) as stated in Appendix A",
+     "quote": "STSGCN: We reuse the results reported in the original paper directly for our overall comparison as it conducts experiments on the PeMSD4 and PeMSD8 datasets with the same evaluation metrics."
+    }
+   ]
+  },
+  {
+   "target": "dcrnn_bay_60",
+   "fields": {
+    "method": true,
+    "dataset": true,
+    "split": true,
+    "horizon": true,
+    "metricDefinition": true,
+    "provenance": true
+   },
+   "hallucinated": {},
+   "pred": {
+    "method": "DCRNN",
+    "dataset": "PEMS-BAY",
+    "split": "train:70%, val:10%, test:20%",
+    "horizon": "60 minutes (12 steps)",
+    "aggregation": "single horizon",
+    "metricDefinition": "MAE calculated as mean of absolute errors, with missing values excluded (see Appendix E.2)",
+    "provenance": "own"
+   },
+   "gold": {
+    "method": "DCRNN",
+    "dataset": "pemsbay",
+    "split": [
+     70,
+     10,
+     20
+    ],
+    "horizon": {
+     "mode": "single",
+     "minutes": 60
+    },
+    "metricDefinition": "masked",
+    "provenance": "own"
+   },
+   "cell": "PEMS-BAY / 1 hour / MAE / DCRNN",
+   "proposals": []
+  },
+  {
+   "target": "dcrnn_mla_15",
+   "fields": {
+    "method": true,
+    "dataset": true,
+    "split": true,
+    "horizon": true,
+    "metricDefinition": true,
+    "provenance": true
+   },
+   "hallucinated": {},
+   "pred": {
+    "method": "DCRNN",
+    "dataset": "METR-LA",
+    "split": "train:70%, val:10%, test:20%",
+    "horizon": "15 minutes (3 steps)",
+    "aggregation": "single horizon",
+    "metricDefinition": "Mean Absolute Error (MAE) computed as the mean of absolute errors, with missing values excluded",
+    "provenance": "own"
+   },
+   "gold": {
+    "method": "DCRNN",
+    "dataset": "metrla",
+    "split": [
+     70,
+     10,
+     20
+    ],
+    "horizon": {
+     "mode": "single",
+     "minutes": 15
+    },
+    "metricDefinition": "masked",
+    "provenance": "own"
+   },
+   "cell": "METR-LA / 15 min / MAE / DCRNN",
+   "proposals": []
+  },
+  {
+   "target": "dcrnn_mla_60",
+   "fields": {
+    "method": true,
+    "dataset": true,
+    "split": true,
+    "horizon": true,
+    "metricDefinition": true,
+    "provenance": true
+   },
+   "hallucinated": {},
+   "pred": {
+    "method": "DCRNN",
+    "dataset": "METR-LA",
+    "split": "train:70%, val:10%, test:20%",
+    "horizon": "60 minutes (12 steps)",
+    "aggregation": "single horizon",
+    "metricDefinition": "Mean Absolute Error (MAE) computed as average of absolute differences between predicted and true speed, with missing values excluded.",
+    "provenance": "own"
+   },
+   "gold": {
+    "method": "DCRNN",
+    "dataset": "metrla",
+    "split": [
+     70,
+     10,
+     20
+    ],
+    "horizon": {
+     "mode": "single",
+     "minutes": 60
+    },
+    "metricDefinition": "masked",
+    "provenance": "own"
+   },
+   "cell": "METR-LA / 1 hour / MAE / DCRNN",
+   "proposals": []
+  },
+  {
+   "target": "dcrnn_mla_60_rmse",
+   "fields": {
+    "method": true,
+    "dataset": true,
+    "split": true,
+    "horizon": true,
+    "metricDefinition": true,
+    "provenance": true
+   },
+   "hallucinated": {},
+   "pred": {
+    "method": "DCRNN",
+    "dataset": "METR-LA",
+    "split": "train:70%, val:10%, test:20%",
+    "horizon": "60 minutes (12 steps)",
+    "aggregation": "single horizon",
+    "metricDefinition": "Missing values are excluded in calculating RMSE.",
+    "provenance": "own"
+   },
+   "gold": {
+    "method": "DCRNN",
+    "dataset": "metrla",
+    "split": [
+     70,
+     10,
+     20
+    ],
+    "horizon": {
+     "mode": "single",
+     "minutes": 60
+    },
+    "metricDefinition": "masked",
+    "provenance": "own"
+   },
+   "cell": "METR-LA / 1 hour / RMSE / DCRNN",
+   "proposals": []
+  },
+  {
+   "target": "gman_bay_60",
+   "fields": {
+    "method": true,
+    "dataset": false,
+    "split": true,
+    "horizon": true,
+    "metricDefinition": true,
+    "provenance": true
+   },
+   "hallucinated": {
+    "metricDefinition": false
+   },
+   "pred": {
+    "method": "GMAN",
+    "dataset": "unknown",
+    "split": "70/10/20",
+    "horizon": "60 minutes, 12 steps",
+    "aggregation": "single horizon",
+    "metricDefinition": "unknown",
+    "provenance": "own"
+   },
+   "gold": {
+    "method": "GMAN",
+    "dataset": "pemsbay",
+    "split": [
+     70,
+     10,
+     20
+    ],
+    "horizon": {
+     "mode": "single",
+     "minutes": 60
+    },
+    "metricDefinition": null,
+    "provenance": "own"
+   },
+   "cell": "PeMS / GMAN / 1 hour / MAE",
+   "proposals": []
+  },
+  {
+   "target": "gman_gwn_bay_60",
+   "fields": {
+    "method": true,
+    "dataset": false,
+    "split": true,
+    "horizon": true,
+    "metricDefinition": true,
+    "provenance": true
+   },
+   "hallucinated": {
+    "metricDefinition": false,
+    "provenance": false
+   },
+   "pred": {
+    "method": "Graph WaveNet",
+    "dataset": "unknown",
+    "split": "70/10/20",
+    "horizon": "60 minutes, 12 steps",
+    "aggregation": "single horizon",
+    "metricDefinition": "unknown",
+    "provenance": "unknown"
+   },
+   "gold": {
+    "method": "Graph WaveNet",
+    "dataset": "pemsbay",
+    "split": [
+     70,
+     10,
+     20
+    ],
+    "horizon": {
+     "mode": "single",
+     "minutes": 60
+    },
+    "metricDefinition": null,
+    "provenance": "unknown"
+   },
+   "cell": "PeMS / Graph WaveNet / 1 hour / MAE",
+   "proposals": []
+  },
+  {
+   "target": "gts_mla_60_t1",
+   "fields": {
+    "method": true,
+    "dataset": true,
+    "split": true,
+    "horizon": true,
+    "metricDefinition": true,
+    "provenance": true
+   },
+   "hallucinated": {},
+   "pred": {
+    "method": "GTS",
+    "dataset": "METR-LA",
+    "split": "70/10/20",
+    "horizon": "60 minutes 12 steps",
+    "aggregation": "single horizon",
+    "metricDefinition": "non-standard per the paper's later correction: It was brought to our attention recently that this version calculated the evaluation metrics MAE/RMSE/MAPE in a manner slightly different from that used to report the results of DCRNN in the official publication (https://github.",
+    "provenance": "own"
+   },
+   "gold": {
+    "method": "GTS",
+    "dataset": "metrla",
+    "split": [
+     70,
+     10,
+     20
+    ],
+    "horizon": {
+     "mode": "single",
+     "minutes": 60
+    },
+    "metricDefinition": "nonstandard",
+    "provenance": "own"
+   },
+   "cell": "60 min / MAE / GTS",
+   "proposals": []
+  },
+  {
+   "target": "gts_mla_60_t4",
+   "fields": {
+    "method": true,
+    "dataset": true,
+    "split": true,
+    "horizon": true,
+    "metricDefinition": true,
+    "provenance": true
+   },
+   "hallucinated": {
+    "metricDefinition": false
+   },
+   "pred": {
+    "method": "GTS",
+    "dataset": "METR-LA",
+    "split": "70/10/20",
+    "horizon": "60 min (12 steps)",
+    "aggregation": "single horizon",
+    "metricDefinition": "MAE, RMSE, MAPE recalculated to be consistent with official DCRNN results (Appendix D)",
+    "provenance": "own"
+   },
+   "gold": {
+    "method": "GTS",
+    "dataset": "metrla",
+    "split": [
+     70,
+     10,
+     20
+    ],
+    "horizon": {
+     "mode": "single",
+     "minutes": 60
+    },
+    "metricDefinition": null,
+    "provenance": "own"
+   },
+   "cell": "60 min / MAE / GTS",
+   "proposals": []
+  },
+  {
+   "target": "gwn_bay_60",
+   "fields": {
+    "method": true,
+    "dataset": true,
+    "split": true,
+    "horizon": true,
+    "metricDefinition": true,
+    "provenance": true
+   },
+   "hallucinated": {},
+   "pred": {
+    "method": "Graph WaveNet",
+    "dataset": "PEMS-BAY",
+    "split": "70% train, 10% val, 20% test",
+    "horizon": "60 minutes (12 steps)",
+    "aggregation": "single horizon",
+    "metricDefinition": "Missing targets are masked (excluded) when computing MAE.",
+    "provenance": "own"
+   },
+   "gold": {
+    "method": "Graph WaveNet",
+    "dataset": "pemsbay",
+    "split": [
+     70,
+     10,
+     20
+    ],
+    "horizon": {
+     "mode": "single",
+     "minutes": 60
+    },
+    "metricDefinition": "masked",
+    "provenance": "own"
+   },
+   "cell": "Graph WaveNet / 60 min / MAE",
+   "proposals": [
+    {
+     "field": "metricDefinition",
+     "value": "Missing targets are masked (excluded) when computing MAE.",
+     "quote": "Missing values are excluded both from training and testing."
+    }
+   ]
+  },
+  {
+   "target": "gwn_dcrnn_mla_60",
+   "fields": {
+    "method": true,
+    "dataset": true,
+    "split": true,
+    "horizon": true,
+    "metricDefinition": false,
+    "provenance": true
+   },
+   "hallucinated": {
+    "provenance": false
+   },
+   "pred": {
+    "method": "DCRNN Li et al. (2018b)",
+    "dataset": "METR-LA",
+    "split": "train 70%, val 10%, test 20%",
+    "horizon": "60 minutes 12 steps",
+    "aggregation": "single horizon",
+    "metricDefinition": "Mean Absolute Error (MAE): average of absolute differences between predicted and true traffic speed values, computed over non‑missing test samples.",
+    "provenance": "unknown"
+   },
+   "gold": {
+    "method": "DCRNN",
+    "dataset": "metrla",
+    "split": [
+     70,
+     10,
+     20
+    ],
+    "horizon": {
+     "mode": "single",
+     "minutes": 60
+    },
+    "metricDefinition": "masked",
+    "provenance": "unknown"
+   },
+   "cell": "METR-LA / DCRNN Li et al. (2018b) / 60 min / MAE",
+   "proposals": []
+  },
+  {
+   "target": "gwn_dcrnn_mla_60_rmse",
+   "fields": {
+    "method": true,
+    "dataset": true,
+    "split": true,
+    "horizon": true,
+    "metricDefinition": true,
+    "provenance": true
+   },
+   "hallucinated": {
+    "provenance": false
+   },
+   "pred": {
+    "method": "DCRNN Li et al. (2018b)",
+    "dataset": "METR-LA",
+    "split": "70% train, 10% val, 20% test",
+    "horizon": "60 minutes (12 steps)",
+    "aggregation": "single horizon",
+    "metricDefinition": "RMSE is calculated after masking out missing values (missing targets are excluded from the error computation).",
+    "provenance": "unknown"
+   },
+   "gold": {
+    "method": "DCRNN",
+    "dataset": "metrla",
+    "split": [
+     70,
+     10,
+     20
+    ],
+    "horizon": {
+     "mode": "single",
+     "minutes": 60
+    },
+    "metricDefinition": "masked",
+    "provenance": "unknown"
+   },
+   "cell": "METR-LA / DCRNN Li et al. (2018b) / 60 min / RMSE",
+   "proposals": [
+    {
+     "field": "metricDefinition",
+     "value": "RMSE is calculated after masking out missing values (missing targets are excluded from the error computation).",
+     "quote": "Missing values are excluded both from training and testing."
+    }
+   ]
+  },
+  {
+   "target": "gwn_mla_15",
+   "fields": {
+    "method": true,
+    "dataset": true,
+    "split": true,
+    "horizon": true,
+    "metricDefinition": true,
+    "provenance": true
+   },
+   "hallucinated": {},
+   "pred": {
+    "method": "Graph WaveNet",
+    "dataset": "METR-LA",
+    "split": "train:70%,val:10%,test:20%",
+    "horizon": "15 minutes (3 steps)",
+    "aggregation": "single horizon",
+    "metricDefinition": "Missing values are masked (excluded) from MAE calculation; zero targets are not specially masked.",
+    "provenance": "own"
+   },
+   "gold": {
+    "method": "Graph WaveNet",
+    "dataset": "metrla",
+    "split": [
+     70,
+     10,
+     20
+    ],
+    "horizon": {
+     "mode": "single",
+     "minutes": 15
+    },
+    "metricDefinition": "masked",
+    "provenance": "own"
+   },
+   "cell": "Graph WaveNet / 15 min / MAE",
+   "proposals": [
+    {
+     "field": "metricDefinition",
+     "value": "Missing values are masked (excluded) from MAE calculation; zero targets are not specially masked.",
+     "quote": "Missing values are excluded both from training and testing."
+    }
+   ]
+  },
+  {
+   "target": "gwn_mla_60",
+   "fields": {
+    "method": true,
+    "dataset": true,
+    "split": true,
+    "horizon": true,
+    "metricDefinition": false,
+    "provenance": true
+   },
+   "hallucinated": {},
+   "pred": {
+    "method": "Graph WaveNet",
+    "dataset": "METR-LA",
+    "split": "train:70%,val:10%,test:20%",
+    "horizon": "60 minutes (12 steps)",
+    "aggregation": "single horizon",
+    "metricDefinition": "Missing target values are excluded/masked when computing MAE; zero values are not masked.",
+    "provenance": "own"
+   },
+   "gold": {
+    "method": "Graph WaveNet",
+    "dataset": "metrla",
+    "split": [
+     70,
+     10,
+     20
+    ],
+    "horizon": {
+     "mode": "single",
+     "minutes": 60
+    },
+    "metricDefinition": "masked",
+    "provenance": "own"
+   },
+   "cell": "Graph WaveNet / 60 min / MAE",
+   "proposals": [
+    {
+     "field": "metricDefinition",
+     "value": "Missing target values are excluded/masked when computing MAE; zero values are not masked.",
+     "quote": "Missing values are excluded both from training and testing."
+    }
+   ]
+  },
+  {
+   "target": "gwn_mla_mean",
+   "fields": {
+    "method": true,
+    "dataset": true,
+    "split": true,
+    "horizon": true,
+    "metricDefinition": false,
+    "provenance": true
+   },
+   "hallucinated": {},
+   "pred": {
+    "method": "Graph WaveNet",
+    "dataset": "METR- LR",
+    "split": "70/10/20",
+    "horizon": "average over 12 prediction horizons",
+    "aggregation": "average over 12 horizons",
+    "metricDefinition": "unknown",
+    "provenance": "own"
+   },
+   "gold": {
+    "method": "Graph WaveNet",
+    "dataset": "metrla",
+    "split": [
+     70,
+     10,
+     20
+    ],
+    "horizon": {
+     "mode": "average",
+     "minutes": 60
+    },
+    "metricDefinition": "masked",
+    "provenance": "own"
+   },
+   "cell": "METR- LR / Forward-backward-adaptive / [𝐏f, 𝐏b, 𝐀~a​d​p ] / Mean MAE",
+   "proposals": []
+  },
+  {
+   "target": "mtgnn_bay_12",
+   "fields": {
+    "method": true,
+    "dataset": true,
+    "split": false,
+    "horizon": true,
+    "metricDefinition": true,
+    "provenance": true
+   },
+   "hallucinated": {
+    "metricDefinition": false
+   },
+   "pred": {
+    "method": "MTGNN",
+    "dataset": "PEMS-BAY",
+    "split": "train 60%, val 20%, test 20%",
+    "horizon": "12 steps",
+    "aggregation": "single horizon",
+    "metricDefinition": "unknown",
+    "provenance": "own"
+   },
+   "gold": {
+    "method": "MTGNN",
+    "dataset": "pemsbay",
+    "split": [
+     70,
+     20,
+     10
+    ],
+    "horizon": {
+     "mode": "single",
+     "minutes": 60
+    },
+    "metricDefinition": null,
+    "provenance": "own"
+   },
+   "cell": "MTGNN / Horizon 12 / MAE",
+   "proposals": []
+  },
+  {
+   "target": "mtgnn_dcrnn_mla_12",
+   "fields": {
+    "method": true,
+    "dataset": true,
+    "split": false,
+    "horizon": true,
+    "metricDefinition": true,
+    "provenance": true
+   },
+   "hallucinated": {
+    "metricDefinition": false,
+    "provenance": false
+   },
+   "pred": {
+    "method": "DCRNN",
+    "dataset": "METR-LA",
+    "split": "train:60%, val:20%, test:20%",
+    "horizon": "12 steps",
+    "aggregation": "single_horizon",
+    "metricDefinition": "unknown",
+    "provenance": "unknown"
+   },
+   "gold": {
+    "method": "DCRNN",
+    "dataset": "metrla",
+    "split": [
+     70,
+     20,
+     10
+    ],
+    "horizon": {
+     "mode": "single",
+     "minutes": 60
+    },
+    "metricDefinition": null,
+    "provenance": "unknown"
+   },
+   "cell": "DCRNN / Horizon 12 / MAE",
+   "proposals": []
+  },
+  {
+   "target": "mtgnn_mla_12",
+   "fields": {
+    "method": true,
+    "dataset": true,
+    "split": false,
+    "horizon": false,
+    "metricDefinition": true,
+    "provenance": true
+   },
+   "hallucinated": {
+    "metricDefinition": false
+   },
+   "pred": {
+    "method": "MTGNN",
+    "dataset": "METR-LA",
+    "split": "train 60%, val 20%, test 20%",
+    "horizon": "12 steps",
+    "aggregation": "averaged over 10 runs",
+    "metricDefinition": "unknown",
+    "provenance": "own"
+   },
+   "gold": {
+    "method": "MTGNN",
+    "dataset": "metrla",
+    "split": [
+     70,
+     20,
+     10
+    ],
+    "horizon": {
+     "mode": "single",
+     "minutes": 60
+    },
+    "metricDefinition": null,
+    "provenance": "own"
+   },
+   "cell": "MTGNN / Horizon 12 / MAE",
+   "proposals": [
+    {
+     "field": "aggregation",
+     "value": "averaged over 10 runs",
+     "quote": "We repeat the experiment 10 times and report the average value of evaluation metrics."
+    }
+   ]
+  },
+  {
+   "target": "pdf_dcrnn_p4",
+   "fields": {
+    "method": true,
+    "dataset": true,
+    "split": true,
+    "horizon": true,
+    "metricDefinition": true,
+    "provenance": true
+   },
+   "hallucinated": {
+    "horizon": false,
+    "provenance": false
+   },
+   "pred": {
+    "method": "DCRNN",
+    "dataset": "PeMS04",
+    "split": "train:60%,val:20%,test:20%",
+    "horizon": "12 steps (60 minutes)",
+    "aggregation": "averaged over 10 runs",
+    "metricDefinition": "missing targets are masked/excluded; zero targets not mentioned",
+    "provenance": "unknown"
+   },
+   "gold": {
+    "method": "DCRNN",
+    "dataset": "pems04",
+    "split": [
+     60,
+     20,
+     20
+    ],
+    "horizon": {
+     "mode": null,
+     "minutes": 60
+    },
+    "metricDefinition": "masked",
+    "provenance": "unknown"
+   },
+   "cell": "DCRNN / PeMS04 / MAE",
+   "proposals": [
+    {
+     "field": "aggregation",
+     "value": "averaged over 10 runs",
+     "quote": "We repeated all experiments ten times and reported the average results."
+    },
+    {
+     "field": "metricDefinition",
+     "value": "missing targets are masked/excluded; zero targets not mentioned",
+     "quote": "Missing values are excluded when calculating these metrics."
+    }
+   ]
+  },
+  {
+   "target": "pdf_p4",
+   "fields": {
+    "method": true,
+    "dataset": true,
+    "split": true,
+    "horizon": false,
+    "metricDefinition": true,
+    "provenance": true
+   },
+   "hallucinated": {
+    "horizon": true
+   },
+   "pred": {
+    "method": "PDFormer",
+    "dataset": "PeMS04",
+    "split": "train 60%, val 20%, test 20%",
+    "horizon": "60 minutes, 12 steps",
+    "aggregation": "average over 12 horizons and over 10 runs",
+    "metricDefinition": "Missing values are excluded when calculating MAE.",
+    "provenance": "own"
+   },
+   "gold": {
+    "method": "PDFormer",
+    "dataset": "pems04",
+    "split": [
+     60,
+     20,
+     20
+    ],
+    "horizon": {
+     "mode": null,
+     "minutes": 60
+    },
+    "metricDefinition": "masked",
+    "provenance": "own"
+   },
+   "cell": "PDFormer / PeMS04 / MAE",
+   "proposals": []
+  },
+  {
+   "target": "pdf_stsgcn_p4",
+   "fields": {
+    "method": true,
+    "dataset": true,
+    "split": true,
+    "horizon": true,
+    "metricDefinition": true,
+    "provenance": true
+   },
+   "hallucinated": {
+    "horizon": false,
+    "provenance": false
+   },
+   "pred": {
+    "method": "STSGCN",
+    "dataset": "PeMS04",
+    "split": "train:60%,val:20%,test:20%",
+    "horizon": "12 steps (60 minutes)",
+    "aggregation": "average over 10 runs",
+    "metricDefinition": "Mean Absolute Error (MAE) computed as average of absolute differences between predictions and ground truth, excluding missing values.",
+    "provenance": "unknown"
+   },
+   "gold": {
+    "method": "STSGCN",
+    "dataset": "pems04",
+    "split": [
+     60,
+     20,
+     20
+    ],
+    "horizon": {
+     "mode": null,
+     "minutes": 60
+    },
+    "metricDefinition": "masked",
+    "provenance": "unknown"
+   },
+   "cell": "STSGCN / PeMS04 / MAE",
+   "proposals": [
+    {
+     "field": "aggregation",
+     "value": "average over 10 runs",
+     "quote": "We repeated all experiments ten times and reported the average results."
+    }
+   ]
+  },
+  {
+   "target": "stae_agcrn_p4",
+   "fields": {
+    "method": true,
+    "dataset": true,
+    "split": true,
+    "horizon": true,
+    "metricDefinition": true,
+    "provenance": true
+   },
+   "hallucinated": {
+    "metricDefinition": false,
+    "provenance": false
+   },
+   "pred": {
+    "method": "AGCRN",
+    "dataset": "PEMS04",
+    "split": "train:60%, val:20%, test:20%",
+    "horizon": "12 horizons (5‑minute steps, total 60 min)",
+    "aggregation": "average over all predicted 12 horizons (mean across horizons)",
+    "metricDefinition": "unknown",
+    "provenance": "unknown"
+   },
+   "gold": {
+    "method": "AGCRN",
+    "dataset": "pems04",
+    "split": [
+     60,
+     20,
+     20
+    ],
+    "horizon": {
+     "mode": "average",
+     "minutes": 60
+    },
+    "metricDefinition": null,
+    "provenance": "unknown"
+   },
+   "cell": "AGCRN / PEMS04 / MAE",
+   "proposals": [
+    {
+     "field": "aggregation",
+     "value": "average over all predicted 12 horizons (mean across horizons)",
+     "quote": "Following previous work, we select the average performance of all predicted 12 horizons on the PEMS03, PEMS04, PEMS07 and PEMS08 datasets."
+    }
+   ]
+  },
+  {
+   "target": "stae_dcrnn_mla_3",
+   "fields": {
+    "method": true,
+    "dataset": true,
+    "split": true,
+    "horizon": true,
+    "metricDefinition": true,
+    "provenance": true
+   },
+   "hallucinated": {
+    "metricDefinition": false,
+    "provenance": false
+   },
+   "pred": {
+    "method": "DCRNN",
+    "dataset": "METR-LA",
+    "split": "train:70%, val:10%, test:20%",
+    "horizon": "15 minutes (3 steps)",
+    "aggregation": "single horizon",
+    "metricDefinition": "unknown",
+    "provenance": "unknown"
+   },
+   "gold": {
+    "method": "DCRNN",
+    "dataset": "metrla",
+    "split": [
+     70,
+     10,
+     20
+    ],
+    "horizon": {
+     "mode": "single",
+     "minutes": 15
+    },
+    "metricDefinition": null,
+    "provenance": "unknown"
+   },
+   "cell": "METR-LA / Horizon 3 (15 min) / MAE / DCRNN",
+   "proposals": []
+  },
+  {
+   "target": "stae_dcrnn_p4",
+   "fields": {
+    "method": true,
+    "dataset": true,
+    "split": true,
+    "horizon": false,
+    "metricDefinition": true,
+    "provenance": true
+   },
+   "hallucinated": {
+    "metricDefinition": false,
+    "provenance": false
+   },
+   "pred": {
+    "method": "DCRNN",
+    "dataset": "PEMS04",
+    "split": "train 60% / val 20% / test 20%",
+    "horizon": "unknown",
+    "aggregation": "average over horizons",
+    "metricDefinition": "unknown",
+    "provenance": "unknown"
+   },
+   "gold": {
+    "method": "DCRNN",
+    "dataset": "pems04",
+    "split": [
+     60,
+     20,
+     20
+    ],
+    "horizon": {
+     "mode": "average",
+     "minutes": 60
+    },
+    "metricDefinition": null,
+    "provenance": "unknown"
+   },
+   "cell": "DCRNN / PEMS04 / MAE",
+   "proposals": [
+    {
+     "field": "aggregation",
+     "value": "average over horizons",
+     "quote": "Following previous work, we select the average performance of all predicted 12 horizons on the PEMS03, PEMS04, PEMS07 and PEMS08 datasets."
+    }
+   ]
+  },
+  {
+   "target": "stae_gwn_mla_12",
+   "fields": {
+    "method": true,
+    "dataset": true,
+    "split": true,
+    "horizon": true,
+    "metricDefinition": true,
+    "provenance": true
+   },
+   "hallucinated": {
+    "metricDefinition": false,
+    "provenance": false
+   },
+   "pred": {
+    "method": "GWNet",
+    "dataset": "METR-LA",
+    "split": "70/10/20",
+    "horizon": "60 minutes, 12 steps",
+    "aggregation": "single horizon",
+    "metricDefinition": "unknown",
+    "provenance": "unknown"
+   },
+   "gold": {
+    "method": "GWNet",
+    "dataset": "metrla",
+    "split": [
+     70,
+     10,
+     20
+    ],
+    "horizon": {
+     "mode": "single",
+     "minutes": 60
+    },
+    "metricDefinition": null,
+    "provenance": "unknown"
+   },
+   "cell": "Horizon 12 (60 min) / MAE / GWNet",
+   "proposals": []
+  },
+  {
+   "target": "stae_mla_12",
+   "fields": {
+    "method": true,
+    "dataset": true,
+    "split": true,
+    "horizon": true,
+    "metricDefinition": true,
+    "provenance": true
+   },
+   "hallucinated": {
+    "metricDefinition": false
+   },
+   "pred": {
+    "method": "STAEformer",
+    "dataset": "METR-LA",
+    "split": "train:70%, val:10%, test:20%",
+    "horizon": "60 minutes, 12 steps",
+    "aggregation": "single horizon",
+    "metricDefinition": "unknown",
+    "provenance": "own"
+   },
+   "gold": {
+    "method": "STAEformer",
+    "dataset": "metrla",
+    "split": [
+     70,
+     10,
+     20
+    ],
+    "horizon": {
+     "mode": "single",
+     "minutes": 60
+    },
+    "metricDefinition": null,
+    "provenance": "own"
+   },
+   "cell": "Horizon 12 (60 min) / MAE / STAEformer",
+   "proposals": []
+  },
+  {
+   "target": "stae_p4",
+   "fields": {
+    "method": true,
+    "dataset": true,
+    "split": true,
+    "horizon": true,
+    "metricDefinition": false,
+    "provenance": true
+   },
+   "hallucinated": {
+    "metricDefinition": true
+   },
+   "pred": {
+    "method": "STAEformer",
+    "dataset": "PEMS04",
+    "split": "train:60%, val:20%, test:20%",
+    "horizon": "12",
+    "aggregation": "average over all predicted horizons (mean across the 12 horizons)",
+    "metricDefinition": "MAE computed as the mean absolute error without masking of zero or missing targets",
+    "provenance": "own"
+   },
+   "gold": {
+    "method": "STAEformer",
+    "dataset": "pems04",
+    "split": [
+     60,
+     20,
+     20
+    ],
+    "horizon": {
+     "mode": "average",
+     "minutes": 60
+    },
+    "metricDefinition": null,
+    "provenance": "own"
+   },
+   "cell": "STAEformer / PEMS04 / MAE",
+   "proposals": [
+    {
+     "field": "horizon",
+     "value": "12",
+     "quote": "We set the input and prediction length to be 1 hour, namely, T=T′=12."
+    },
+    {
+     "field": "aggregation",
+     "value": "average over all predicted horizons (mean across the 12 horizons)",
+     "quote": "Following previous work, we select the average performance of all predicted 12 horizons on the PEMS03, PEMS04, PEMS07 and PEMS08 datasets."
+    },
+    {
+     "field": "metricDefinition",
+     "value": "MAE computed as the mean absolute error without masking of zero or missing targets",
+     "quote": "Metrics. We use three widely used metrics for traffic forecasting task, i.e, MAE, RMSE and MAPE."
+    }
+   ]
+  },
+  {
+   "target": "stid_agcrn_p4_avg",
+   "fields": {
+    "method": true,
+    "dataset": true,
+    "split": true,
+    "horizon": true,
+    "metricDefinition": true,
+    "provenance": true
+   },
+   "hallucinated": {
+    "metricDefinition": false,
+    "provenance": false
+   },
+   "pred": {
+    "method": "AGCRN",
+    "dataset": "PEMS04",
+    "split": "6:2:2 (training:validation:test)",
+    "horizon": "average over 3rd, 6th, and 12th time slots (steps)",
+    "aggregation": "average of the @3, @6, @12 columns",
+    "metricDefinition": "unknown",
+    "provenance": "unknown"
+   },
+   "gold": {
+    "method": "AGCRN",
+    "dataset": "pems04",
+    "split": [
+     60,
+     20,
+     20
+    ],
+    "horizon": {
+     "mode": "average",
+     "minutes": 60
+    },
+    "metricDefinition": null,
+    "provenance": "unknown"
+   },
+   "cell": "AGCRN / MAE / PEMS04 / Avg.",
+   "proposals": []
+  },
+  {
+   "target": "stid_bay_12",
+   "fields": {
+    "method": true,
+    "dataset": true,
+    "split": true,
+    "horizon": true,
+    "metricDefinition": true,
+    "provenance": true
+   },
+   "hallucinated": {
+    "metricDefinition": false
+   },
+   "pred": {
+    "method": "STID",
+    "dataset": "PEMS-BAY",
+    "split": "70%/10%/20%",
+    "horizon": "12 steps",
+    "aggregation": "single horizon",
+    "metricDefinition": "unknown",
+    "provenance": "own"
+   },
+   "gold": {
+    "method": "STID",
+    "dataset": "pemsbay",
+    "split": [
+     70,
+     10,
+     20
+    ],
+    "horizon": {
+     "mode": "single",
+     "minutes": 60
+    },
+    "metricDefinition": null,
+    "provenance": "own"
+   },
+   "cell": "STID / MAE / PEMS-BAY / @12",
+   "proposals": []
+  },
+  {
+   "target": "stid_dcrnn_p4_avg",
+   "fields": {
+    "method": true,
+    "dataset": true,
+    "split": true,
+    "horizon": true,
+    "metricDefinition": true,
+    "provenance": true
+   },
+   "hallucinated": {
+    "metricDefinition": false,
+    "provenance": false
+   },
+   "pred": {
+    "method": "DCRNN",
+    "dataset": "PEMS04",
+    "split": "train 60%, val 20%, test 20%",
+    "horizon": "average over 3,6,12 steps",
+    "aggregation": "average over @3,@6,@12 horizons",
+    "metricDefinition": "unknown",
+    "provenance": "unknown"
+   },
+   "gold": {
+    "method": "DCRNN",
+    "dataset": "pems04",
+    "split": [
+     60,
+     20,
+     20
+    ],
+    "horizon": {
+     "mode": "average",
+     "minutes": 60
+    },
+    "metricDefinition": null,
+    "provenance": "unknown"
+   },
+   "cell": "DCRNN / MAE / PEMS04 / Avg.",
+   "proposals": []
+  },
+  {
+   "target": "stid_p4_12",
+   "fields": {
+    "method": true,
+    "dataset": true,
+    "split": true,
+    "horizon": true,
+    "metricDefinition": true,
+    "provenance": true
+   },
+   "hallucinated": {
+    "metricDefinition": false
+   },
+   "pred": {
+    "method": "STID",
+    "dataset": "PEMS04",
+    "split": "train 60%, val 20%, test 20%",
+    "horizon": "12 steps",
+    "aggregation": "single horizon",
+    "metricDefinition": "unknown",
+    "provenance": "own"
+   },
+   "gold": {
+    "method": "STID",
+    "dataset": "pems04",
+    "split": [
+     60,
+     20,
+     20
+    ],
+    "horizon": {
+     "mode": "single",
+     "minutes": 60
+    },
+    "metricDefinition": null,
+    "provenance": "own"
+   },
+   "cell": "STID / MAE / PEMS04 / @12",
+   "proposals": []
+  },
+  {
+   "target": "stid_p8_avg",
+   "fields": {
+    "method": true,
+    "dataset": true,
+    "split": true,
+    "horizon": true,
+    "metricDefinition": true,
+    "provenance": true
+   },
+   "hallucinated": {
+    "metricDefinition": false
+   },
+   "pred": {
+    "method": "STID",
+    "dataset": "PEMS08",
+    "split": "6:2:2 (train:val:test)",
+    "horizon": "average over 12 steps",
+    "aggregation": "average over 12 horizons",
+    "metricDefinition": "unknown",
+    "provenance": "own"
+   },
+   "gold": {
+    "method": "STID",
+    "dataset": "pems08",
+    "split": [
+     60,
+     20,
+     20
+    ],
+    "horizon": {
+     "mode": "average",
+     "minutes": 60
+    },
+    "metricDefinition": null,
+    "provenance": "own"
+   },
+   "cell": "STID / MAE / PEMS08 / Avg.",
+   "proposals": []
+  }
+ ],
+ "relayRaw": {
+  "agcrn_p8": {
+   "extract": {
+    "method": "AGCRN (ours)",
+    "name": "MAE",
+    "value": "15.95",
+    "unit": "unknown",
+    "direction": "lower",
+    "dataset": "PeMSD8",
+    "datasetVersion": "unknown",
+    "split": "train:60%, val:20%, test:20%",
+    "horizon": "average over 12 horizons (each 5 minutes, 1 step)",
+    "aggregation": "average over 12 horizons",
+    "preprocessing": "linear interpolation for missing values, aggregation into 5‑minute windows, standard normalization (z‑score)",
+    "metricDefinition": "unknown",
+    "provenance": "own",
+    "citedFrom": "Table 1",
+    "locator": "row AGCRN (ours), column PeMSD8 MAE",
+    "quote": "| AGCRN (ours) | AGCRN (ours) | 19.83 | 32.26 | 12.97% | 15.95 | 25.22 | 10.09%",
+    "cellHorizon": ""
+   },
+   "cell": "AGCRN (ours) / PeMSD8 / MAE",
+   "rejected": {},
+   "proposals": [],
+   "final": {
+    "method": "AGCRN (ours)",
+    "name": "MAE",
+    "value": "15.95",
+    "unit": "unknown",
+    "direction": "lower",
+    "dataset": "PeMSD8",
+    "datasetVersion": "unknown",
+    "split": "train:60%, val:20%, test:20%",
+    "horizon": "average over 12 horizons (each 5 minutes, 1 step)",
+    "aggregation": "average over 12 horizons",
+    "preprocessing": "linear interpolation for missing values, aggregation into 5‑minute windows, standard normalization (z‑score)",
+    "metricDefinition": "unknown",
+    "provenance": "own",
+    "citedFrom": "Table 1",
+    "locator": "row AGCRN (ours), column PeMSD8 MAE",
+    "quote": "| AGCRN (ours) | AGCRN (ours) | 19.83 | 32.26 | 12.97% | 15.95 | 25.22 | 10.09%",
+    "cellHorizon": ""
+   },
+   "seconds": 10.7
+  },
+  "agcrn_p4": {
+   "extract": {
+    "method": "AGCRN (ours)",
+    "name": "MAE",
+    "value": "19.83",
+    "unit": "unknown",
+    "direction": "lower",
+    "dataset": "PeMSD4",
+    "datasetVersion": "unknown",
+    "split": "train:60%, val:20%, test:20%",
+    "horizon": "12 horizons (each 5 minutes, 1 step)",
+    "aggregation": "average over 12 horizons",
+    "preprocessing": "missing values filled by linear interpolation; aggregated into 5‑minute windows; standardized normalization",
+    "metricDefinition": "unknown",
+    "provenance": "own",
+    "citedFrom": "unknown",
+    "locator": "Table 1, row AGCRN (ours), column PeMSD4 MAE",
+    "quote": "| AGCRN (ours) | AGCRN (ours) | 19.83 | 32.26 | 12.97% | 15.95 | 25.22 | 10.09%",
+    "cellHorizon": ""
+   },
+   "cell": "AGCRN (ours) / PeMSD4 / MAE",
+   "rejected": {},
+   "proposals": [
+    {
+     "field": "metricDefinition",
+     "value": "Only observed samples are used; missing targets are masked (zero targets are not specifically mentioned).",
+     "quote": "Let 𝑿:,𝒊∈RN×1 be the ground truth traffic of all nodes at time step i, 𝑿:,𝒊′∈RN×1 be the predicted values, and Ω be indices of observed samples. The metrics are defined as follows."
+    }
+   ],
+   "final": {
+    "method": "AGCRN (ours)",
+    "name": "MAE",
+    "value": "19.83",
+    "unit": "unknown",
+    "direction": "lower",
+    "dataset": "PeMSD4",
+    "datasetVersion": "unknown",
+    "split": "train:60%, val:20%, test:20%",
+    "horizon": "12 horizons (each 5 minutes, 1 step)",
+    "aggregation": "average over 12 horizons",
+    "preprocessing": "missing values filled by linear interpolation; aggregated into 5‑minute windows; standardized normalization",
+    "metricDefinition": "Only observed samples are used; missing targets are masked (zero targets are not specifically mentioned).",
+    "provenance": "own",
+    "citedFrom": "unknown",
+    "locator": "Table 1, row AGCRN (ours), column PeMSD4 MAE",
+    "quote": "| AGCRN (ours) | AGCRN (ours) | 19.83 | 32.26 | 12.97% | 15.95 | 25.22 | 10.09%",
+    "cellHorizon": ""
+   },
+   "seconds": 10.7
+  },
+  "agcrn_stsgcn_p4": {
+   "extract": {
+    "method": "STSGCN",
+    "name": "MAE",
+    "value": "21.19",
+    "unit": "unknown",
+    "direction": "lower",
+    "dataset": "PeMSD4",
+    "datasetVersion": "unknown",
+    "split": "train:60%,val:20%,test:20%",
+    "horizon": "average over 12 horizons (each 5 minutes, total 60 minutes)",
+    "aggregation": "average over 12 horizons",
+    "preprocessing": "missing values filled by linear interpolation; aggregated into 5-minute windows; standardized normalization",
+    "metricDefinition": "unknown",
+    "provenance": "unknown",
+    "citedFrom": "P2",
+    "locator": "Table 1, row STSGCN [11], column PeMSD4 MAE",
+    "quote": "| STSGCN [11] | STSGCN [11] | 21.19* | 33.65* | 13.90%* | 17.13* | 26.86* | 10.96%*",
+    "cellHorizon": ""
+   },
+   "cell": "STSGCN [11] / PeMSD4 / MAE",
+   "rejected": {
+    "provenance": {
+     "value": "cited",
+     "reason": "No source quote says how this number was obtained."
+    }
+   },
+   "proposals": [
+    {
+     "field": "provenance",
+     "value": "Results reused from the original STSGCN paper ([11]) as stated in Appendix A",
+     "quote": "STSGCN: We reuse the results reported in the original paper directly for our overall comparison as it conducts experiments on the PeMSD4 and PeMSD8 datasets with the same evaluation metrics."
+    }
+   ],
+   "final": {
+    "method": "STSGCN",
+    "name": "MAE",
+    "value": "21.19",
+    "unit": "unknown",
+    "direction": "lower",
+    "dataset": "PeMSD4",
+    "datasetVersion": "unknown",
+    "split": "train:60%,val:20%,test:20%",
+    "horizon": "average over 12 horizons (each 5 minutes, total 60 minutes)",
+    "aggregation": "average over 12 horizons",
+    "preprocessing": "missing values filled by linear interpolation; aggregated into 5-minute windows; standardized normalization",
+    "metricDefinition": "unknown",
+    "provenance": "Results reused from the original STSGCN paper ([11]) as stated in Appendix A",
+    "citedFrom": "P2",
+    "locator": "Table 1, row STSGCN [11], column PeMSD4 MAE",
+    "quote": "| STSGCN [11] | STSGCN [11] | 21.19* | 33.65* | 13.90%* | 17.13* | 26.86* | 10.96%*",
+    "cellHorizon": ""
+   },
+   "seconds": 11.2
+  },
+  "agcrn_dcrnn_p4": {
+   "extract": {
+    "method": "DCRNN [2]",
+    "name": "MAE",
+    "value": "21.22",
+    "unit": "unknown",
+    "direction": "lower",
+    "dataset": "PeMSD4",
+    "datasetVersion": "unknown",
+    "split": "60% train, 20% val, 20% test",
+    "horizon": "average over 12 horizons (each 5‑minute step, total 60 minutes)",
+    "aggregation": "average over 12 prediction horizons",
+    "preprocessing": "missing values filled by linear interpolation; data aggregated into 5‑minute windows; standardized normalization",
+    "metricDefinition": "unknown",
+    "provenance": "unknown",
+    "citedFrom": "Table 1",
+    "locator": "row DCRNN [2], column PeMSD4 MAE",
+    "quote": "| DCRNN [2] | DCRNN [2] | 21.22 | 33.44 | 14.17% | 16.82 | 26.36 | 10.92%",
+    "cellHorizon": ""
+   },
+   "cell": "DCRNN [2] / PeMSD4 / MAE",
+   "rejected": {
+    "metricDefinition": {
+     "value": "Mean Absolute Error (MAE): average of absolute differences between predicted and ground‑truth traffic values across all nodes and time steps.",
+     "reason": "Generic metric formula without protocol detail."
+    },
+    "provenance": {
+     "value": "reproduced",
+     "reason": "No source quote says how this number was obtained."
+    }
+   },
+   "proposals": [],
+   "final": {
+    "method": "DCRNN [2]",
+    "name": "MAE",
+    "value": "21.22",
+    "unit": "unknown",
+    "direction": "lower",
+    "dataset": "PeMSD4",
+    "datasetVersion": "unknown",
+    "split": "60% train, 20% val, 20% test",
+    "horizon": "average over 12 horizons (each 5‑minute step, total 60 minutes)",
+    "aggregation": "average over 12 prediction horizons",
+    "preprocessing": "missing values filled by linear interpolation; data aggregated into 5‑minute windows; standardized normalization",
+    "metricDefinition": "unknown",
+    "provenance": "unknown",
+    "citedFrom": "Table 1",
+    "locator": "row DCRNN [2], column PeMSD4 MAE",
+    "quote": "| DCRNN [2] | DCRNN [2] | 21.22 | 33.44 | 14.17% | 16.82 | 26.36 | 10.92%",
+    "cellHorizon": ""
+   },
+   "seconds": 11.5
+  },
+  "dcrnn_bay_60": {
+   "extract": {
+    "method": "DCRNN",
+    "name": "MAE",
+    "value": "2.07",
+    "unit": "unknown",
+    "direction": "lower",
+    "dataset": "PEMS-BAY",
+    "datasetVersion": "unknown",
+    "split": "train:70%, val:10%, test:20%",
+    "horizon": "60 minutes (12 steps)",
+    "aggregation": "single horizon",
+    "preprocessing": "5-minute window aggregation, Z-score normalization, missing values excluded",
+    "metricDefinition": "MAE calculated as mean of absolute errors, with missing values excluded (see Appendix E.2)",
+    "provenance": "own",
+    "citedFrom": "Table 1",
+    "locator": "row PEMS-BAY, 1 hour, MAE, column DCRNN",
+    "quote": "| PEMS-BAY | 1 hour | MAE | 2.88 | 3.38 | 2.93 | 3.28 | 2.46 | 2.37 | 2.07",
+    "cellHorizon": "1 hour"
+   },
+   "cell": "PEMS-BAY / 1 hour / MAE / DCRNN",
+   "rejected": {},
+   "final": {
+    "method": "DCRNN",
+    "name": "MAE",
+    "value": "2.07",
+    "unit": "unknown",
+    "direction": "lower",
+    "dataset": "PEMS-BAY",
+    "datasetVersion": "unknown",
+    "split": "train:70%, val:10%, test:20%",
+    "horizon": "60 minutes (12 steps)",
+    "aggregation": "single horizon",
+    "preprocessing": "5-minute window aggregation, Z-score normalization, missing values excluded",
+    "metricDefinition": "MAE calculated as mean of absolute errors, with missing values excluded (see Appendix E.2)",
+    "provenance": "own",
+    "citedFrom": "Table 1",
+    "locator": "row PEMS-BAY, 1 hour, MAE, column DCRNN",
+    "quote": "| PEMS-BAY | 1 hour | MAE | 2.88 | 3.38 | 2.93 | 3.28 | 2.46 | 2.37 | 2.07",
+    "cellHorizon": "1 hour"
+   },
+   "seconds": 5.2
+  },
+  "dcrnn_mla_15": {
+   "extract": {
+    "method": "DCRNN",
+    "name": "MAE",
+    "value": "2.77",
+    "unit": "unknown",
+    "direction": "lower",
+    "dataset": "METR-LA",
+    "datasetVersion": "unknown",
+    "split": "train:70%, val:10%, test:20%",
+    "horizon": "15 minutes (3 steps)",
+    "aggregation": "single horizon",
+    "preprocessing": "5-minute window aggregation, Z-score normalization",
+    "metricDefinition": "Mean Absolute Error (MAE) computed as the mean of absolute errors, with missing values excluded",
+    "provenance": "own",
+    "citedFrom": "P5",
+    "locator": "Table 1, METR-LA row, 15 min MAE column, DCRNN",
+    "quote": "| METR-LA | 15 min | MAE | 4.16 | 3.99 | 4.42 | 3.99 | 3.99 | 3.44 | 2.77",
+    "cellHorizon": "15 min"
+   },
+   "cell": "METR-LA / 15 min / MAE / DCRNN",
+   "rejected": {},
+   "final": {
+    "method": "DCRNN",
+    "name": "MAE",
+    "value": "2.77",
+    "unit": "unknown",
+    "direction": "lower",
+    "dataset": "METR-LA",
+    "datasetVersion": "unknown",
+    "split": "train:70%, val:10%, test:20%",
+    "horizon": "15 minutes (3 steps)",
+    "aggregation": "single horizon",
+    "preprocessing": "5-minute window aggregation, Z-score normalization",
+    "metricDefinition": "Mean Absolute Error (MAE) computed as the mean of absolute errors, with missing values excluded",
+    "provenance": "own",
+    "citedFrom": "P5",
+    "locator": "Table 1, METR-LA row, 15 min MAE column, DCRNN",
+    "quote": "| METR-LA | 15 min | MAE | 4.16 | 3.99 | 4.42 | 3.99 | 3.99 | 3.44 | 2.77",
+    "cellHorizon": "15 min"
+   },
+   "seconds": 5.3
+  },
+  "dcrnn_mla_60": {
+   "extract": {
+    "method": "DCRNN",
+    "name": "MAE",
+    "value": "3.60",
+    "unit": "unknown",
+    "direction": "lower",
+    "dataset": "METR-LA",
+    "datasetVersion": "unknown",
+    "split": "train:70%, val:10%, test:20%",
+    "horizon": "60 minutes (12 steps)",
+    "aggregation": "single horizon",
+    "preprocessing": "5‑minute window aggregation, Z‑Score normalization",
+    "metricDefinition": "Mean Absolute Error (MAE) computed as average of absolute differences between predicted and true speed, with missing values excluded.",
+    "provenance": "own",
+    "citedFrom": "Table 1",
+    "locator": "METR-LA / 1 hour / MAE / DCRNN",
+    "quote": "| METR-LA | 1 hour | MAE | 4.16 | 6.90 | 6.52 | 6.72 | 4.49 | 4.37 | 3.60",
+    "cellHorizon": "1 hour"
+   },
+   "cell": "METR-LA / 1 hour / MAE / DCRNN",
+   "rejected": {},
+   "final": {
+    "method": "DCRNN",
+    "name": "MAE",
+    "value": "3.60",
+    "unit": "unknown",
+    "direction": "lower",
+    "dataset": "METR-LA",
+    "datasetVersion": "unknown",
+    "split": "train:70%, val:10%, test:20%",
+    "horizon": "60 minutes (12 steps)",
+    "aggregation": "single horizon",
+    "preprocessing": "5‑minute window aggregation, Z‑Score normalization",
+    "metricDefinition": "Mean Absolute Error (MAE) computed as average of absolute differences between predicted and true speed, with missing values excluded.",
+    "provenance": "own",
+    "citedFrom": "Table 1",
+    "locator": "METR-LA / 1 hour / MAE / DCRNN",
+    "quote": "| METR-LA | 1 hour | MAE | 4.16 | 6.90 | 6.52 | 6.72 | 4.49 | 4.37 | 3.60",
+    "cellHorizon": "1 hour"
+   },
+   "seconds": 6.3
+  },
+  "dcrnn_mla_60_rmse": {
+   "extract": {
+    "method": "DCRNN",
+    "name": "RMSE",
+    "value": "7.59",
+    "unit": "unknown",
+    "direction": "lower",
+    "dataset": "METR-LA",
+    "datasetVersion": "unknown",
+    "split": "train:70%, val:10%, test:20%",
+    "horizon": "60 minutes (12 steps)",
+    "aggregation": "single horizon",
+    "preprocessing": "5-minute window aggregation, Z-score normalization",
+    "metricDefinition": "Missing values are excluded in calculating RMSE.",
+    "provenance": "own",
+    "citedFrom": "Table 1",
+    "locator": "Table 1, row for METR-LA 1 hour RMSE, column DCRNN",
+    "quote": "| METR-LA | 1 hour | RMSE | 7.80 | 13.23 | 10.11 | 13.76 | 8.69 | 8.69 | 7.59",
+    "cellHorizon": "1 hour"
+   },
+   "cell": "METR-LA / 1 hour / RMSE / DCRNN",
+   "rejected": {},
+   "final": {
+    "method": "DCRNN",
+    "name": "RMSE",
+    "value": "7.59",
+    "unit": "unknown",
+    "direction": "lower",
+    "dataset": "METR-LA",
+    "datasetVersion": "unknown",
+    "split": "train:70%, val:10%, test:20%",
+    "horizon": "60 minutes (12 steps)",
+    "aggregation": "single horizon",
+    "preprocessing": "5-minute window aggregation, Z-score normalization",
+    "metricDefinition": "Missing values are excluded in calculating RMSE.",
+    "provenance": "own",
+    "citedFrom": "Table 1",
+    "locator": "Table 1, row for METR-LA 1 hour RMSE, column DCRNN",
+    "quote": "| METR-LA | 1 hour | RMSE | 7.80 | 13.23 | 10.11 | 13.76 | 8.69 | 8.69 | 7.59",
+    "cellHorizon": "1 hour"
+   },
+   "seconds": 6.0
+  },
+  "gts_mla_60_t1": {
+   "extract": {
+    "method": "GTS",
+    "name": "MAE",
+    "value": "2.99",
+    "unit": "unknown",
+    "direction": "lower",
+    "dataset": "METR-LA",
+    "datasetVersion": "unknown",
+    "split": "70/10/20",
+    "horizon": "60 minutes 12 steps",
+    "aggregation": "single horizon",
+    "preprocessing": "outlier filtering and missing value imputation with series mean",
+    "metricDefinition": "non-standard per the paper's later correction: It was brought to our attention recently that this version calculated the evaluation metrics MAE/RMSE/MAPE in a manner slightly different from that used to report the results of DCRNN in the official publication (https://github.",
+    "provenance": "own",
+    "citedFrom": "Table 1",
+    "locator": "60 min / MAE / GTS",
+    "quote": "| 60 min | MAE | 4.16 | 6.90 | 6.52 | 6.72 | 4.49 | 4.37 | 3.60 | 3.63 | 3.46 | 2.99",
+    "cellHorizon": "60 min"
+   },
+   "cell": "60 min / MAE / GTS",
+   "rejected": {
+    "metricDefinition": {
+     "value": "MAE calculated according to official DCRNN implementation after correction; see Appendix D Updates of Tables 1, 2, and 3.",
+     "reason": "Superseded by the paper's own correction note."
+    }
+   },
+   "final": {
+    "method": "GTS",
+    "name": "MAE",
+    "value": "2.99",
+    "unit": "unknown",
+    "direction": "lower",
+    "dataset": "METR-LA",
+    "datasetVersion": "unknown",
+    "split": "70/10/20",
+    "horizon": "60 minutes 12 steps",
+    "aggregation": "single horizon",
+    "preprocessing": "outlier filtering and missing value imputation with series mean",
+    "metricDefinition": "non-standard per the paper's later correction: It was brought to our attention recently that this version calculated the evaluation metrics MAE/RMSE/MAPE in a manner slightly different from that used to report the results of DCRNN in the official publication (https://github.",
+    "provenance": "own",
+    "citedFrom": "Table 1",
+    "locator": "60 min / MAE / GTS",
+    "quote": "| 60 min | MAE | 4.16 | 6.90 | 6.52 | 6.72 | 4.49 | 4.37 | 3.60 | 3.63 | 3.46 | 2.99",
+    "cellHorizon": "60 min"
+   },
+   "seconds": 5.5
+  },
+  "gman_gwn_bay_60": {
+   "extract": {
+    "method": "Graph WaveNet",
+    "name": "MAE",
+    "value": "1.95",
+    "unit": "unknown",
+    "direction": "lower",
+    "dataset": "unknown",
+    "datasetVersion": "unknown",
+    "split": "70/10/20",
+    "horizon": "60 minutes, 12 steps",
+    "aggregation": "single horizon",
+    "preprocessing": "unknown",
+    "metricDefinition": "unknown",
+    "provenance": "unknown",
+    "citedFrom": "Table 1",
+    "locator": "PeMS, Graph WaveNet, 1 hour, MAE",
+    "quote": "| PeMS | Graph WaveNet | 1.30 | 2.74 | 2.73% | 1.63 | 3.70 | 3.67% | 1.95 | 4.52 | 4.63%",
+    "cellHorizon": "1 hour"
+   },
+   "cell": "PeMS / Graph WaveNet / 1 hour / MAE",
+   "rejected": {
+    "dataset": {
+     "value": "PEMS-BAY",
+     "reason": "Not found in the retrieved source text."
+    },
+    "split": {
+     "value": "test",
+     "reason": "Not a train/validation/test split."
+    },
+    "provenance": {
+     "value": "own",
+     "reason": "This model is not the paper's proposed method, and the paper does not say how the number was obtained."
+    }
+   },
+   "proposals": [],
+   "final": {
+    "method": "Graph WaveNet",
+    "name": "MAE",
+    "value": "1.95",
+    "unit": "unknown",
+    "direction": "lower",
+    "dataset": "unknown",
+    "datasetVersion": "unknown",
+    "split": "70/10/20",
+    "horizon": "60 minutes, 12 steps",
+    "aggregation": "single horizon",
+    "preprocessing": "unknown",
+    "metricDefinition": "unknown",
+    "provenance": "unknown",
+    "citedFrom": "Table 1",
+    "locator": "PeMS, Graph WaveNet, 1 hour, MAE",
+    "quote": "| PeMS | Graph WaveNet | 1.30 | 2.74 | 2.73% | 1.63 | 3.70 | 3.67% | 1.95 | 4.52 | 4.63%",
+    "cellHorizon": "1 hour"
+   },
+   "seconds": 7.3
+  },
+  "gts_mla_60_t4": {
+   "extract": {
+    "method": "GTS",
+    "name": "MAE",
+    "value": "3.41",
+    "unit": "unknown",
+    "direction": "lower",
+    "dataset": "METR-LA",
+    "datasetVersion": "unknown",
+    "split": "70/10/20",
+    "horizon": "60 min (12 steps)",
+    "aggregation": "single horizon",
+    "preprocessing": "Filtered outliers via lower/upper bounds; missing values imputed with series mean",
+    "metricDefinition": "MAE, RMSE, MAPE recalculated to be consistent with official DCRNN results (Appendix D)",
+    "provenance": "own",
+    "citedFrom": "Table 4",
+    "locator": "row 60 min, column GTS",
+    "quote": "| 60 min | MAE | 4.16 | 6.90 | 6.52 | 6.72 | 4.49 | 4.37 | 3.60 | 3.63 | 3.53 | 3.41",
+    "cellHorizon": "60 min"
+   },
+   "cell": "60 min / MAE / GTS",
+   "rejected": {},
+   "final": {
+    "method": "GTS",
+    "name": "MAE",
+    "value": "3.41",
+    "unit": "unknown",
+    "direction": "lower",
+    "dataset": "METR-LA",
+    "datasetVersion": "unknown",
+    "split": "70/10/20",
+    "horizon": "60 min (12 steps)",
+    "aggregation": "single horizon",
+    "preprocessing": "Filtered outliers via lower/upper bounds; missing values imputed with series mean",
+    "metricDefinition": "MAE, RMSE, MAPE recalculated to be consistent with official DCRNN results (Appendix D)",
+    "provenance": "own",
+    "citedFrom": "Table 4",
+    "locator": "row 60 min, column GTS",
+    "quote": "| 60 min | MAE | 4.16 | 6.90 | 6.52 | 6.72 | 4.49 | 4.37 | 3.60 | 3.63 | 3.53 | 3.41",
+    "cellHorizon": "60 min"
+   },
+   "seconds": 6.4
+  },
+  "gman_bay_60": {
+   "extract": {
+    "method": "GMAN",
+    "name": "MAE",
+    "value": "1.86",
+    "unit": "unknown",
+    "direction": "lower",
+    "dataset": "unknown",
+    "datasetVersion": "unknown",
+    "split": "70/10/20",
+    "horizon": "60 minutes, 12 steps",
+    "aggregation": "single horizon",
+    "preprocessing": "unknown",
+    "metricDefinition": "unknown",
+    "provenance": "own",
+    "citedFrom": "own",
+    "locator": "Table 1, row PeMS-GMAN, column 1 hour MAE",
+    "quote": "| PeMS | GMAN | 1.34 | 2.82 | 2.81% | 1.62 | 3.72 | 3.63% | 1.86 | 4.32 | 4.31%",
+    "cellHorizon": "1 hour"
+   },
+   "cell": "PeMS / GMAN / 1 hour / MAE",
+   "rejected": {
+    "dataset": {
+     "value": "PEMS-BAY",
+     "reason": "Not found in the retrieved source text."
+    }
+   },
+   "proposals": [],
+   "final": {
+    "method": "GMAN",
+    "name": "MAE",
+    "value": "1.86",
+    "unit": "unknown",
+    "direction": "lower",
+    "dataset": "unknown",
+    "datasetVersion": "unknown",
+    "split": "70/10/20",
+    "horizon": "60 minutes, 12 steps",
+    "aggregation": "single horizon",
+    "preprocessing": "unknown",
+    "metricDefinition": "unknown",
+    "provenance": "own",
+    "citedFrom": "own",
+    "locator": "Table 1, row PeMS-GMAN, column 1 hour MAE",
+    "quote": "| PeMS | GMAN | 1.34 | 2.82 | 2.81% | 1.62 | 3.72 | 3.63% | 1.86 | 4.32 | 4.31%",
+    "cellHorizon": "1 hour"
+   },
+   "seconds": 10.4
+  },
+  "gwn_dcrnn_mla_60": {
+   "extract": {
+    "method": "DCRNN Li et al. (2018b)",
+    "name": "DCRNN",
+    "value": "3.60",
+    "unit": "unknown",
+    "direction": "lower",
+    "dataset": "METR-LA",
+    "datasetVersion": "unknown",
+    "split": "train 70%, val 10%, test 20%",
+    "horizon": "60 minutes 12 steps",
+    "aggregation": "single horizon",
+    "preprocessing": "unknown",
+    "metricDefinition": "Mean Absolute Error (MAE): average of absolute differences between predicted and true traffic speed values, computed over non‑missing test samples.",
+    "provenance": "unknown",
+    "citedFrom": "Li et al. (2018b)",
+    "locator": "Table 2, row METR-LA / DCRNN Li et al. (2018b), column 60 min MAE",
+    "quote": "| METR-LA | DCRNN Li et al. (2018b) | 2.77 | 5.38 | 7.30% | 3.15 | 6.45 | 8.80% | 3.60 | 7.60 | 10.50%",
+    "cellHorizon": "60 min"
+   },
+   "cell": "METR-LA / DCRNN Li et al. (2018b) / 60 min / MAE",
+   "rejected": {
+    "provenance": {
+     "value": "reproduced",
+     "reason": "No source quote says how this number was obtained."
+    }
+   },
+   "proposals": [],
+   "final": {
+    "method": "DCRNN Li et al. (2018b)",
+    "name": "DCRNN",
+    "value": "3.60",
+    "unit": "unknown",
+    "direction": "lower",
+    "dataset": "METR-LA",
+    "datasetVersion": "unknown",
+    "split": "train 70%, val 10%, test 20%",
+    "horizon": "60 minutes 12 steps",
+    "aggregation": "single horizon",
+    "preprocessing": "unknown",
+    "metricDefinition": "Mean Absolute Error (MAE): average of absolute differences between predicted and true traffic speed values, computed over non‑missing test samples.",
+    "provenance": "unknown",
+    "citedFrom": "Li et al. (2018b)",
+    "locator": "Table 2, row METR-LA / DCRNN Li et al. (2018b), column 60 min MAE",
+    "quote": "| METR-LA | DCRNN Li et al. (2018b) | 2.77 | 5.38 | 7.30% | 3.15 | 6.45 | 8.80% | 3.60 | 7.60 | 10.50%",
+    "cellHorizon": "60 min"
+   },
+   "seconds": 7.4
+  },
+  "gwn_dcrnn_mla_60_rmse": {
+   "extract": {
+    "method": "DCRNN Li et al. (2018b)",
+    "name": "RMSE",
+    "value": "7.60",
+    "unit": "unknown",
+    "direction": "lower",
+    "dataset": "METR-LA",
+    "datasetVersion": "unknown",
+    "split": "70% train, 10% val, 20% test",
+    "horizon": "60 minutes (12 steps)",
+    "aggregation": "single horizon",
+    "preprocessing": "sensor readings aggregated into 5‑minute windows; z‑score normalization applied to inputs; missing values excluded from training and testing",
+    "metricDefinition": "unknown",
+    "provenance": "unknown",
+    "citedFrom": "Table 2",
+    "locator": "row METR-LA DCRNN Li et al. (2018b), column 60 min RMSE",
+    "quote": "| METR-LA | DCRNN Li et al. (2018b) | 2.77 | 5.38 | 7.30% | 3.15 | 6.45 | 8.80% | 3.60 | 7.60 | 10.50%",
+    "cellHorizon": "60 min"
+   },
+   "cell": "METR-LA / DCRNN Li et al. (2018b) / 60 min / RMSE",
+   "rejected": {
+    "metricDefinition": {
+     "value": "standard root mean squared error",
+     "reason": "Generic metric formula without protocol detail."
+    },
+    "provenance": {
+     "value": "own",
+     "reason": "This model is not the paper's proposed method, and the paper does not say how the number was obtained."
+    }
+   },
+   "proposals": [
+    {
+     "field": "metricDefinition",
+     "value": "RMSE is calculated after masking out missing values (missing targets are excluded from the error computation).",
+     "quote": "Missing values are excluded both from training and testing."
+    }
+   ],
+   "final": {
+    "method": "DCRNN Li et al. (2018b)",
+    "name": "RMSE",
+    "value": "7.60",
+    "unit": "unknown",
+    "direction": "lower",
+    "dataset": "METR-LA",
+    "datasetVersion": "unknown",
+    "split": "70% train, 10% val, 20% test",
+    "horizon": "60 minutes (12 steps)",
+    "aggregation": "single horizon",
+    "preprocessing": "sensor readings aggregated into 5‑minute windows; z‑score normalization applied to inputs; missing values excluded from training and testing",
+    "metricDefinition": "RMSE is calculated after masking out missing values (missing targets are excluded from the error computation).",
+    "provenance": "unknown",
+    "citedFrom": "Table 2",
+    "locator": "row METR-LA DCRNN Li et al. (2018b), column 60 min RMSE",
+    "quote": "| METR-LA | DCRNN Li et al. (2018b) | 2.77 | 5.38 | 7.30% | 3.15 | 6.45 | 8.80% | 3.60 | 7.60 | 10.50%",
+    "cellHorizon": "60 min"
+   },
+   "seconds": 9.3
+  },
+  "gwn_mla_15": {
+   "extract": {
+    "method": "Graph WaveNet",
+    "name": "MAE",
+    "value": "2.69",
+    "unit": "unknown",
+    "direction": "lower",
+    "dataset": "METR-LA",
+    "datasetVersion": "unknown",
+    "split": "train:70%,val:10%,test:20%",
+    "horizon": "15 minutes (3 steps)",
+    "aggregation": "single horizon",
+    "preprocessing": "5-minute window aggregation, z-score normalization, missing values excluded",
+    "metricDefinition": "unknown",
+    "provenance": "own",
+    "citedFrom": "Table 2",
+    "locator": "Table 2, row Graph WaveNet, column 15 min MAE",
+    "quote": "| | Graph WaveNet | 2.69 | 5.15 | 6.90% | 3.07 | 6.22 | 8.37% | 3.53 | 7.37 | 10.01%",
+    "cellHorizon": "15 min"
+   },
+   "cell": "Graph WaveNet / 15 min / MAE",
+   "rejected": {},
+   "proposals": [
+    {
+     "field": "metricDefinition",
+     "value": "Missing values are masked (excluded) from MAE calculation; zero targets are not specially masked.",
+     "quote": "Missing values are excluded both from training and testing."
+    }
+   ],
+   "final": {
+    "method": "Graph WaveNet",
+    "name": "MAE",
+    "value": "2.69",
+    "unit": "unknown",
+    "direction": "lower",
+    "dataset": "METR-LA",
+    "datasetVersion": "unknown",
+    "split": "train:70%,val:10%,test:20%",
+    "horizon": "15 minutes (3 steps)",
+    "aggregation": "single horizon",
+    "preprocessing": "5-minute window aggregation, z-score normalization, missing values excluded",
+    "metricDefinition": "Missing values are masked (excluded) from MAE calculation; zero targets are not specially masked.",
+    "provenance": "own",
+    "citedFrom": "Table 2",
+    "locator": "Table 2, row Graph WaveNet, column 15 min MAE",
+    "quote": "| | Graph WaveNet | 2.69 | 5.15 | 6.90% | 3.07 | 6.22 | 8.37% | 3.53 | 7.37 | 10.01%",
+    "cellHorizon": "15 min"
+   },
+   "seconds": 7.6
+  },
+  "gwn_bay_60": {
+   "extract": {
+    "method": "Graph WaveNet",
+    "name": "MAE",
+    "value": "1.95",
+    "unit": "unknown",
+    "direction": "lower",
+    "dataset": "PEMS-BAY",
+    "datasetVersion": "unknown",
+    "split": "70% train, 10% val, 20% test",
+    "horizon": "60 minutes (12 steps)",
+    "aggregation": "single horizon",
+    "preprocessing": "5‑minute aggregation, z‑score normalization, missing values excluded",
+    "metricDefinition": "unknown",
+    "provenance": "own",
+    "citedFrom": "Table 2",
+    "locator": "Table 2, PEMS‑BAY row, Graph WaveNet, 60 min MAE column",
+    "quote": "| | Graph WaveNet | 1.30 | 2.74 | 2.73% | 1.63 | 3.70 | 3.67% | 1.95 | 4.52 | 4.63%",
+    "cellHorizon": "60 min"
+   },
+   "cell": "Graph WaveNet / 60 min / MAE",
+   "rejected": {},
+   "proposals": [
+    {
+     "field": "metricDefinition",
+     "value": "Missing targets are masked (excluded) when computing MAE.",
+     "quote": "Missing values are excluded both from training and testing."
+    }
+   ],
+   "final": {
+    "method": "Graph WaveNet",
+    "name": "MAE",
+    "value": "1.95",
+    "unit": "unknown",
+    "direction": "lower",
+    "dataset": "PEMS-BAY",
+    "datasetVersion": "unknown",
+    "split": "70% train, 10% val, 20% test",
+    "horizon": "60 minutes (12 steps)",
+    "aggregation": "single horizon",
+    "preprocessing": "5‑minute aggregation, z‑score normalization, missing values excluded",
+    "metricDefinition": "Missing targets are masked (excluded) when computing MAE.",
+    "provenance": "own",
+    "citedFrom": "Table 2",
+    "locator": "Table 2, PEMS‑BAY row, Graph WaveNet, 60 min MAE column",
+    "quote": "| | Graph WaveNet | 1.30 | 2.74 | 2.73% | 1.63 | 3.70 | 3.67% | 1.95 | 4.52 | 4.63%",
+    "cellHorizon": "60 min"
+   },
+   "seconds": 11.5
+  },
+  "gwn_mla_60": {
+   "extract": {
+    "method": "Graph WaveNet",
+    "name": "MAE",
+    "value": "3.53",
+    "unit": "unknown",
+    "direction": "lower",
+    "dataset": "METR-LA",
+    "datasetVersion": "unknown",
+    "split": "train:70%,val:10%,test:20%",
+    "horizon": "60 minutes (12 steps)",
+    "aggregation": "single horizon",
+    "preprocessing": "readings aggregated into 5‑minute windows; Z‑score normalization applied to inputs; missing values excluded from training and testing",
+    "metricDefinition": "unknown",
+    "provenance": "own",
+    "citedFrom": "unknown",
+    "locator": "Table 2, Graph WaveNet row, 60 min MAE column",
+    "quote": "| | Graph WaveNet | 2.69 | 5.15 | 6.90% | 3.07 | 6.22 | 8.37% | 3.53 | 7.37 | 10.01%",
+    "cellHorizon": "60 min"
+   },
+   "cell": "Graph WaveNet / 60 min / MAE",
+   "rejected": {
+    "metricDefinition": {
+     "value": "Mean Absolute Error (MAE) – average of absolute differences between predicted and true values",
+     "reason": "Generic metric formula without protocol detail."
+    }
+   },
+   "proposals": [
+    {
+     "field": "metricDefinition",
+     "value": "Missing target values are excluded/masked when computing MAE; zero values are not masked.",
+     "quote": "Missing values are excluded both from training and testing."
+    }
+   ],
+   "final": {
+    "method": "Graph WaveNet",
+    "name": "MAE",
+    "value": "3.53",
+    "unit": "unknown",
+    "direction": "lower",
+    "dataset": "METR-LA",
+    "datasetVersion": "unknown",
+    "split": "train:70%,val:10%,test:20%",
+    "horizon": "60 minutes (12 steps)",
+    "aggregation": "single horizon",
+    "preprocessing": "readings aggregated into 5‑minute windows; Z‑score normalization applied to inputs; missing values excluded from training and testing",
+    "metricDefinition": "Missing target values are excluded/masked when computing MAE; zero values are not masked.",
+    "provenance": "own",
+    "citedFrom": "unknown",
+    "locator": "Table 2, Graph WaveNet row, 60 min MAE column",
+    "quote": "| | Graph WaveNet | 2.69 | 5.15 | 6.90% | 3.07 | 6.22 | 8.37% | 3.53 | 7.37 | 10.01%",
+    "cellHorizon": "60 min"
+   },
+   "seconds": 11.3
+  },
+  "gwn_mla_mean": {
+   "extract": {
+    "method": "Graph WaveNet",
+    "name": "Forward-backward-adaptive",
+    "value": "3.04",
+    "unit": "unknown",
+    "direction": "lower",
+    "dataset": "METR- LR",
+    "datasetVersion": "unknown",
+    "split": "70/10/20",
+    "horizon": "average over 12 prediction horizons",
+    "aggregation": "average over 12 horizons",
+    "preprocessing": "readings aggregated into 5-minute windows; Z-score normalization applied to inputs; missing values excluded from training and testing",
+    "metricDefinition": "unknown",
+    "provenance": "own",
+    "citedFrom": "Table 3",
+    "locator": "row: METR- LR, Forward-backward-adaptive; column: Mean MAE",
+    "quote": "| METR- LR | Forward-backward-adaptive | [𝐏f, 𝐏b, 𝐀~a​d​p ] | 3.04 | 6.09 | 8.23%",
+    "cellHorizon": "Mean"
+   },
+   "cell": "METR- LR / Forward-backward-adaptive / [𝐏f, 𝐏b, 𝐀~a​d​p ] / Mean MAE",
+   "rejected": {},
+   "proposals": [],
+   "final": {
+    "method": "Graph WaveNet",
+    "name": "Forward-backward-adaptive",
+    "value": "3.04",
+    "unit": "unknown",
+    "direction": "lower",
+    "dataset": "METR- LR",
+    "datasetVersion": "unknown",
+    "split": "70/10/20",
+    "horizon": "average over 12 prediction horizons",
+    "aggregation": "average over 12 horizons",
+    "preprocessing": "readings aggregated into 5-minute windows; Z-score normalization applied to inputs; missing values excluded from training and testing",
+    "metricDefinition": "unknown",
+    "provenance": "own",
+    "citedFrom": "Table 3",
+    "locator": "row: METR- LR, Forward-backward-adaptive; column: Mean MAE",
+    "quote": "| METR- LR | Forward-backward-adaptive | [𝐏f, 𝐏b, 𝐀~a​d​p ] | 3.04 | 6.09 | 8.23%",
+    "cellHorizon": "Mean"
+   },
+   "seconds": 9.2
+  },
+  "mtgnn_bay_12": {
+   "extract": {
+    "method": "MTGNN",
+    "name": "MAE",
+    "value": "1.94",
+    "unit": "unknown",
+    "direction": "lower",
+    "dataset": "PEMS-BAY",
+    "datasetVersion": "unknown",
+    "split": "train 60%, val 20%, test 20%",
+    "horizon": "12 steps",
+    "aggregation": "single horizon",
+    "preprocessing": "unknown",
+    "metricDefinition": "unknown",
+    "provenance": "own",
+    "citedFrom": "Table 3. Baseline comparison under multi-step forecasting for spatial-temporal graph neural networks.",
+    "locator": "row MTGNN, column Horizon 12 MAE",
+    "quote": "| MTGNN | 1.32 | 2.79 | 2.77% | 1.65 | 3.74 | 3.69% | 1.94 | 4.49 | 4.53%",
+    "cellHorizon": "Horizon 12"
+   },
+   "cell": "MTGNN / Horizon 12 / MAE",
+   "rejected": {},
+   "proposals": [],
+   "final": {
+    "method": "MTGNN",
+    "name": "MAE",
+    "value": "1.94",
+    "unit": "unknown",
+    "direction": "lower",
+    "dataset": "PEMS-BAY",
+    "datasetVersion": "unknown",
+    "split": "train 60%, val 20%, test 20%",
+    "horizon": "12 steps",
+    "aggregation": "single horizon",
+    "preprocessing": "unknown",
+    "metricDefinition": "unknown",
+    "provenance": "own",
+    "citedFrom": "Table 3. Baseline comparison under multi-step forecasting for spatial-temporal graph neural networks.",
+    "locator": "row MTGNN, column Horizon 12 MAE",
+    "quote": "| MTGNN | 1.32 | 2.79 | 2.77% | 1.65 | 3.74 | 3.69% | 1.94 | 4.49 | 4.53%",
+    "cellHorizon": "Horizon 12"
+   },
+   "seconds": 10.1
+  },
+  "mtgnn_dcrnn_mla_12": {
+   "extract": {
+    "method": "DCRNN",
+    "name": "MAE",
+    "value": "3.60",
+    "unit": "unknown",
+    "direction": "lower",
+    "dataset": "METR-LA",
+    "datasetVersion": "unknown",
+    "split": "train:60%, val:20%, test:20%",
+    "horizon": "12 steps",
+    "aggregation": "single_horizon",
+    "preprocessing": "unknown",
+    "metricDefinition": "unknown",
+    "provenance": "unknown",
+    "citedFrom": "self",
+    "locator": "Table 3, row DCRNN, column Horizon 12 MAE",
+    "quote": "| DCRNN | 2.77 | 5.38 | 7.30% | 3.15 | 6.45 | 8.80% | 3.60 | 7.60 | 10.50%",
+    "cellHorizon": "Horizon 12"
+   },
+   "cell": "DCRNN / Horizon 12 / MAE",
+   "rejected": {
+    "provenance": {
+     "value": "own",
+     "reason": "This model is not the paper's proposed method, and the paper does not say how the number was obtained."
+    }
+   },
+   "proposals": [],
+   "final": {
+    "method": "DCRNN",
+    "name": "MAE",
+    "value": "3.60",
+    "unit": "unknown",
+    "direction": "lower",
+    "dataset": "METR-LA",
+    "datasetVersion": "unknown",
+    "split": "train:60%, val:20%, test:20%",
+    "horizon": "12 steps",
+    "aggregation": "single_horizon",
+    "preprocessing": "unknown",
+    "metricDefinition": "unknown",
+    "provenance": "unknown",
+    "citedFrom": "self",
+    "locator": "Table 3, row DCRNN, column Horizon 12 MAE",
+    "quote": "| DCRNN | 2.77 | 5.38 | 7.30% | 3.15 | 6.45 | 8.80% | 3.60 | 7.60 | 10.50%",
+    "cellHorizon": "Horizon 12"
+   },
+   "seconds": 10.4
+  },
+  "mtgnn_mla_12": {
+   "extract": {
+    "method": "MTGNN",
+    "name": "MAE",
+    "value": "3.49",
+    "unit": "unknown",
+    "direction": "lower",
+    "dataset": "METR-LA",
+    "datasetVersion": "unknown",
+    "split": "train 60%, val 20%, test 20%",
+    "horizon": "12 steps",
+    "aggregation": "unknown",
+    "preprocessing": "unknown",
+    "metricDefinition": "unknown",
+    "provenance": "own",
+    "citedFrom": "Table 3",
+    "locator": "row MTGNN, column Horizon 12 MAE",
+    "quote": "| MTGNN | 2.69 | 5.18 | 6.86% | 3.05 | 6.17 | 8.19% | 3.49 | 7.23 | 9.87%",
+    "cellHorizon": "Horizon 12"
+   },
+   "cell": "MTGNN / Horizon 12 / MAE",
+   "rejected": {
+    "aggregation": {
+     "value": "average over 10 runs",
+     "reason": "The quote does not mention repeated runs."
+    }
+   },
+   "proposals": [
+    {
+     "field": "aggregation",
+     "value": "averaged over 10 runs",
+     "quote": "We repeat the experiment 10 times and report the average value of evaluation metrics."
+    }
+   ],
+   "final": {
+    "method": "MTGNN",
+    "name": "MAE",
+    "value": "3.49",
+    "unit": "unknown",
+    "direction": "lower",
+    "dataset": "METR-LA",
+    "datasetVersion": "unknown",
+    "split": "train 60%, val 20%, test 20%",
+    "horizon": "12 steps",
+    "aggregation": "averaged over 10 runs",
+    "preprocessing": "unknown",
+    "metricDefinition": "unknown",
+    "provenance": "own",
+    "citedFrom": "Table 3",
+    "locator": "row MTGNN, column Horizon 12 MAE",
+    "quote": "| MTGNN | 2.69 | 5.18 | 6.86% | 3.05 | 6.17 | 8.19% | 3.49 | 7.23 | 9.87%",
+    "cellHorizon": "Horizon 12"
+   },
+   "seconds": 8.5
+  },
+  "pdf_dcrnn_p4": {
+   "extract": {
+    "method": "DCRNN",
+    "name": "MAE",
+    "value": "22.737",
+    "unit": "unknown",
+    "direction": "lower",
+    "dataset": "PeMS04",
+    "datasetVersion": "unknown",
+    "split": "train:60%,val:20%,test:20%",
+    "horizon": "12 steps (60 minutes)",
+    "aggregation": "unknown",
+    "preprocessing": "missing values excluded when computing metrics",
+    "metricDefinition": "unknown",
+    "provenance": "unknown",
+    "citedFrom": "Table 2",
+    "locator": "DCRNN row, PeMS04 MAE column",
+    "quote": "| DCRNN | 22.737 | 14.751 | 36.575 | 23.634 | 12.281 | 36.514 | 18.185 | 11.235 | 28.176",
+    "cellHorizon": ""
+   },
+   "cell": "DCRNN / PeMS04 / MAE",
+   "rejected": {
+    "aggregation": {
+     "value": "average over 10 runs (single horizon)",
+     "reason": "The quote does not mention repeated runs."
+    },
+    "provenance": {
+     "value": "own",
+     "reason": "This model is not the paper's proposed method, and the paper does not say how the number was obtained."
+    }
+   },
+   "proposals": [
+    {
+     "field": "aggregation",
+     "value": "averaged over 10 runs",
+     "quote": "We repeated all experiments ten times and reported the average results."
+    },
+    {
+     "field": "metricDefinition",
+     "value": "missing targets are masked/excluded; zero targets not mentioned",
+     "quote": "Missing values are excluded when calculating these metrics."
+    }
+   ],
+   "final": {
+    "method": "DCRNN",
+    "name": "MAE",
+    "value": "22.737",
+    "unit": "unknown",
+    "direction": "lower",
+    "dataset": "PeMS04",
+    "datasetVersion": "unknown",
+    "split": "train:60%,val:20%,test:20%",
+    "horizon": "12 steps (60 minutes)",
+    "aggregation": "averaged over 10 runs",
+    "preprocessing": "missing values excluded when computing metrics",
+    "metricDefinition": "missing targets are masked/excluded; zero targets not mentioned",
+    "provenance": "unknown",
+    "citedFrom": "Table 2",
+    "locator": "DCRNN row, PeMS04 MAE column",
+    "quote": "| DCRNN | 22.737 | 14.751 | 36.575 | 23.634 | 12.281 | 36.514 | 18.185 | 11.235 | 28.176",
+    "cellHorizon": ""
+   },
+   "seconds": 11.2
+  },
+  "pdf_p4": {
+   "extract": {
+    "method": "PDFormer",
+    "name": "MAE",
+    "value": "18.321",
+    "unit": "unknown",
+    "direction": "lower",
+    "dataset": "PeMS04",
+    "datasetVersion": "unknown",
+    "split": "train 60%, val 20%, test 20%",
+    "horizon": "60 minutes, 12 steps",
+    "aggregation": "average over 12 horizons and over 10 runs",
+    "preprocessing": "unknown",
+    "metricDefinition": "Missing values are excluded when calculating MAE.",
+    "provenance": "own",
+    "citedFrom": "Table 2: Performance on Graph-based Datasets.",
+    "locator": "Table 2, column PeMS04 MAE, row PDFormer",
+    "quote": "| PDFormer | 18.321 | 12.103 | 29.965 | 19.832 | 8.529 | 32.870 | 13.583 | 9.046 | 23.505",
+    "cellHorizon": ""
+   },
+   "cell": "PDFormer / PeMS04 / MAE",
+   "rejected": {},
+   "final": {
+    "method": "PDFormer",
+    "name": "MAE",
+    "value": "18.321",
+    "unit": "unknown",
+    "direction": "lower",
+    "dataset": "PeMS04",
+    "datasetVersion": "unknown",
+    "split": "train 60%, val 20%, test 20%",
+    "horizon": "60 minutes, 12 steps",
+    "aggregation": "average over 12 horizons and over 10 runs",
+    "preprocessing": "unknown",
+    "metricDefinition": "Missing values are excluded when calculating MAE.",
+    "provenance": "own",
+    "citedFrom": "Table 2: Performance on Graph-based Datasets.",
+    "locator": "Table 2, column PeMS04 MAE, row PDFormer",
+    "quote": "| PDFormer | 18.321 | 12.103 | 29.965 | 19.832 | 8.529 | 32.870 | 13.583 | 9.046 | 23.505",
+    "cellHorizon": ""
+   },
+   "seconds": 10.2
+  },
+  "pdf_stsgcn_p4": {
+   "extract": {
+    "method": "STSGCN",
+    "name": "MAE",
+    "value": "21.185",
+    "unit": "unknown",
+    "direction": "lower",
+    "dataset": "PeMS04",
+    "datasetVersion": "unknown",
+    "split": "train:60%,val:20%,test:20%",
+    "horizon": "12 steps (60 minutes)",
+    "aggregation": "unknown",
+    "preprocessing": "missing values excluded when calculating metrics",
+    "metricDefinition": "Mean Absolute Error (MAE) computed as average of absolute differences between predictions and ground truth, excluding missing values.",
+    "provenance": "unknown",
+    "citedFrom": "Table 2",
+    "locator": "STSGCN / PeMS04 / MAE",
+    "quote": "| STSGCN | 21.185 | 13.882 | 33.649 | 24.264 | 10.204 | 39.034 | 17.133 | 10.961 | 26.785",
+    "cellHorizon": ""
+   },
+   "cell": "STSGCN / PeMS04 / MAE",
+   "rejected": {
+    "aggregation": {
+     "value": "average over 12-step prediction horizon; results averaged over 10 runs",
+     "reason": "The quote does not mention repeated runs."
+    },
+    "provenance": {
+     "value": "own",
+     "reason": "This model is not the paper's proposed method, and the paper does not say how the number was obtained."
+    }
+   },
+   "proposals": [
+    {
+     "field": "aggregation",
+     "value": "average over 10 runs",
+     "quote": "We repeated all experiments ten times and reported the average results."
+    }
+   ],
+   "final": {
+    "method": "STSGCN",
+    "name": "MAE",
+    "value": "21.185",
+    "unit": "unknown",
+    "direction": "lower",
+    "dataset": "PeMS04",
+    "datasetVersion": "unknown",
+    "split": "train:60%,val:20%,test:20%",
+    "horizon": "12 steps (60 minutes)",
+    "aggregation": "average over 10 runs",
+    "preprocessing": "missing values excluded when calculating metrics",
+    "metricDefinition": "Mean Absolute Error (MAE) computed as average of absolute differences between predictions and ground truth, excluding missing values.",
+    "provenance": "unknown",
+    "citedFrom": "Table 2",
+    "locator": "STSGCN / PeMS04 / MAE",
+    "quote": "| STSGCN | 21.185 | 13.882 | 33.649 | 24.264 | 10.204 | 39.034 | 17.133 | 10.961 | 26.785",
+    "cellHorizon": ""
+   },
+   "seconds": 14.3
+  },
+  "stae_dcrnn_mla_3": {
+   "extract": {
+    "method": "DCRNN",
+    "name": "MAE",
+    "value": "2.67",
+    "unit": "unknown",
+    "direction": "lower",
+    "dataset": "METR-LA",
+    "datasetVersion": "unknown",
+    "split": "train:70%, val:10%, test:20%",
+    "horizon": "15 minutes (3 steps)",
+    "aggregation": "single horizon",
+    "preprocessing": "unknown",
+    "metricDefinition": "unknown",
+    "provenance": "unknown",
+    "citedFrom": "Table 1",
+    "locator": "row: METR-LA, Horizon 3 (15 min), MAE; column: DCRNN",
+    "quote": "| METR-LA | Horizon 3 (15 min) | MAE | 6.80 | 2.69 | 2.67 | 2.85 | 2.75 | 2.75 | 2.69 | 2.81 | 2.80 | 2.83 | 2.82 | 2.65",
+    "cellHorizon": "Horizon 3 (15 min)"
+   },
+   "cell": "METR-LA / Horizon 3 (15 min) / MAE / DCRNN",
+   "rejected": {
+    "provenance": {
+     "value": "own",
+     "reason": "This model is not the paper's proposed method, and the paper does not say how the number was obtained."
+    }
+   },
+   "proposals": [],
+   "final": {
+    "method": "DCRNN",
+    "name": "MAE",
+    "value": "2.67",
+    "unit": "unknown",
+    "direction": "lower",
+    "dataset": "METR-LA",
+    "datasetVersion": "unknown",
+    "split": "train:70%, val:10%, test:20%",
+    "horizon": "15 minutes (3 steps)",
+    "aggregation": "single horizon",
+    "preprocessing": "unknown",
+    "metricDefinition": "unknown",
+    "provenance": "unknown",
+    "citedFrom": "Table 1",
+    "locator": "row: METR-LA, Horizon 3 (15 min), MAE; column: DCRNN",
+    "quote": "| METR-LA | Horizon 3 (15 min) | MAE | 6.80 | 2.69 | 2.67 | 2.85 | 2.75 | 2.75 | 2.69 | 2.81 | 2.80 | 2.83 | 2.82 | 2.65",
+    "cellHorizon": "Horizon 3 (15 min)"
+   },
+   "seconds": 9.3
+  },
+  "stae_agcrn_p4": {
+   "extract": {
+    "method": "AGCRN",
+    "name": "MAE",
+    "value": "19.38",
+    "unit": "unknown",
+    "direction": "lower",
+    "dataset": "PEMS04",
+    "datasetVersion": "unknown",
+    "split": "train:60%, val:20%, test:20%",
+    "horizon": "12 horizons (5‑minute steps, total 60 min)",
+    "aggregation": "unknown",
+    "preprocessing": "unknown",
+    "metricDefinition": "unknown",
+    "provenance": "unknown",
+    "citedFrom": "Table 3",
+    "locator": "Table 3, row AGCRN, column PEMS04 MAE",
+    "quote": "| AGCRN | 15.24 | 26.65 | 15.89% | 19.38 | 31.25 | 13.40% | 20.57 | 34.40 | 8.74% | 15.32 | 24.41 | 10.03%",
+    "cellHorizon": ""
+   },
+   "cell": "AGCRN / PEMS04 / MAE",
+   "rejected": {
+    "aggregation": {
+     "value": "average over 12 horizons",
+     "reason": "The source does not say these results are averaged over horizons."
+    },
+    "provenance": {
+     "value": "own",
+     "reason": "This model is not the paper's proposed method, and the paper does not say how the number was obtained."
+    }
+   },
+   "proposals": [
+    {
+     "field": "aggregation",
+     "value": "average over all predicted 12 horizons (mean across horizons)",
+     "quote": "Following previous work, we select the average performance of all predicted 12 horizons on the PEMS03, PEMS04, PEMS07 and PEMS08 datasets."
+    }
+   ],
+   "final": {
+    "method": "AGCRN",
+    "name": "MAE",
+    "value": "19.38",
+    "unit": "unknown",
+    "direction": "lower",
+    "dataset": "PEMS04",
+    "datasetVersion": "unknown",
+    "split": "train:60%, val:20%, test:20%",
+    "horizon": "12 horizons (5‑minute steps, total 60 min)",
+    "aggregation": "average over all predicted 12 horizons (mean across horizons)",
+    "preprocessing": "unknown",
+    "metricDefinition": "unknown",
+    "provenance": "unknown",
+    "citedFrom": "Table 3",
+    "locator": "Table 3, row AGCRN, column PEMS04 MAE",
+    "quote": "| AGCRN | 15.24 | 26.65 | 15.89% | 19.38 | 31.25 | 13.40% | 20.57 | 34.40 | 8.74% | 15.32 | 24.41 | 10.03%",
+    "cellHorizon": ""
+   },
+   "seconds": 12.6
+  },
+  "stae_gwn_mla_12": {
+   "extract": {
+    "method": "GWNet",
+    "name": "MAE",
+    "value": "3.51",
+    "unit": "unknown",
+    "direction": "lower",
+    "dataset": "METR-LA",
+    "datasetVersion": "unknown",
+    "split": "70/10/20",
+    "horizon": "60 minutes, 12 steps",
+    "aggregation": "single horizon",
+    "preprocessing": "none",
+    "metricDefinition": "unknown",
+    "provenance": "unknown",
+    "citedFrom": "Table 1",
+    "locator": "Table 1, METR-LA, Horizon 12 (60 min), MAE, GWNet",
+    "quote": "| | Horizon 12 (60 min) | MAE | 6.80 | 3.51 | 3.54 | 3.59 | 3.60 | 3.59 | 3.47 | 3.57 | 3.44 | 3.62 | 3.55 | 3.34",
+    "cellHorizon": "Horizon 12 (60 min)"
+   },
+   "cell": "Horizon 12 (60 min) / MAE / GWNet",
+   "rejected": {
+    "split": {
+     "value": "test",
+     "reason": "Not a train/validation/test split."
+    },
+    "provenance": {
+     "value": "own",
+     "reason": "This model is not the paper's proposed method, and the paper does not say how the number was obtained."
+    }
+   },
+   "proposals": [],
+   "final": {
+    "method": "GWNet",
+    "name": "MAE",
+    "value": "3.51",
+    "unit": "unknown",
+    "direction": "lower",
+    "dataset": "METR-LA",
+    "datasetVersion": "unknown",
+    "split": "70/10/20",
+    "horizon": "60 minutes, 12 steps",
+    "aggregation": "single horizon",
+    "preprocessing": "none",
+    "metricDefinition": "unknown",
+    "provenance": "unknown",
+    "citedFrom": "Table 1",
+    "locator": "Table 1, METR-LA, Horizon 12 (60 min), MAE, GWNet",
+    "quote": "| | Horizon 12 (60 min) | MAE | 6.80 | 3.51 | 3.54 | 3.59 | 3.60 | 3.59 | 3.47 | 3.57 | 3.44 | 3.62 | 3.55 | 3.34",
+    "cellHorizon": "Horizon 12 (60 min)"
+   },
+   "seconds": 7.1
+  },
+  "stae_dcrnn_p4": {
+   "extract": {
+    "method": "DCRNN",
+    "name": "MAE",
+    "value": "19.63",
+    "unit": "unknown",
+    "direction": "lower",
+    "dataset": "PEMS04",
+    "datasetVersion": "unknown",
+    "split": "train 60% / val 20% / test 20%",
+    "horizon": "unknown",
+    "aggregation": "unknown",
+    "preprocessing": "unknown",
+    "metricDefinition": "unknown",
+    "provenance": "unknown",
+    "citedFrom": "Table 3",
+    "locator": "Table 3, row DCRNN, column PEMS04 MAE",
+    "quote": "| DCRNN | 15.54 | 27.18 | 15.62% | 19.63 | 31.26 | 13.59% | 21.16 | 34.14 | 9.02% | 15.22 | 24.17 | 10.21%",
+    "cellHorizon": ""
+   },
+   "cell": "DCRNN / PEMS04 / MAE",
+   "rejected": {
+    "metricDefinition": {
+     "value": "Average MAE over all 12 prediction horizons (each 5 min, total 60 min)",
+     "reason": "Generic metric formula without protocol detail."
+    },
+    "horizon": {
+     "value": "average over 12 horizons (each 5 min, total 60 min)",
+     "reason": "The source does not say these results are averaged over horizons."
+    },
+    "aggregation": {
+     "value": "average over 12 horizons",
+     "reason": "The source does not say these results are averaged over horizons."
+    },
+    "provenance": {
+     "value": "own",
+     "reason": "This model is not the paper's proposed method, and the paper does not say how the number was obtained."
+    }
+   },
+   "proposals": [
+    {
+     "field": "aggregation",
+     "value": "average over horizons",
+     "quote": "Following previous work, we select the average performance of all predicted 12 horizons on the PEMS03, PEMS04, PEMS07 and PEMS08 datasets."
+    }
+   ],
+   "final": {
+    "method": "DCRNN",
+    "name": "MAE",
+    "value": "19.63",
+    "unit": "unknown",
+    "direction": "lower",
+    "dataset": "PEMS04",
+    "datasetVersion": "unknown",
+    "split": "train 60% / val 20% / test 20%",
+    "horizon": "unknown",
+    "aggregation": "average over horizons",
+    "preprocessing": "unknown",
+    "metricDefinition": "unknown",
+    "provenance": "unknown",
+    "citedFrom": "Table 3",
+    "locator": "Table 3, row DCRNN, column PEMS04 MAE",
+    "quote": "| DCRNN | 15.54 | 27.18 | 15.62% | 19.63 | 31.26 | 13.59% | 21.16 | 34.14 | 9.02% | 15.22 | 24.17 | 10.21%",
+    "cellHorizon": ""
+   },
+   "seconds": 12.7
+  },
+  "stae_mla_12": {
+   "extract": {
+    "method": "STAEformer",
+    "name": "MAE",
+    "value": "3.34",
+    "unit": "unknown",
+    "direction": "lower",
+    "dataset": "METR-LA",
+    "datasetVersion": "unknown",
+    "split": "train:70%, val:10%, test:20%",
+    "horizon": "60 minutes, 12 steps",
+    "aggregation": "single horizon",
+    "preprocessing": "unknown",
+    "metricDefinition": "unknown",
+    "provenance": "own",
+    "citedFrom": "Table 1",
+    "locator": "Horizon 12 (60 min) / MAE / STAEformer cell",
+    "quote": "| | Horizon 12 (60 min) | MAE | 6.80 | 3.51 | 3.54 | 3.59 | 3.60 | 3.59 | 3.47 | 3.57 | 3.44 | 3.62 | 3.55 | 3.34",
+    "cellHorizon": "Horizon 12 (60 min)"
+   },
+   "cell": "Horizon 12 (60 min) / MAE / STAEformer",
+   "rejected": {
+    "metricDefinition": {
+     "value": "standard Mean Absolute Error (average of absolute differences between predicted and true values)",
+     "reason": "Not found in the retrieved source text."
+    }
+   },
+   "proposals": [],
+   "final": {
+    "method": "STAEformer",
+    "name": "MAE",
+    "value": "3.34",
+    "unit": "unknown",
+    "direction": "lower",
+    "dataset": "METR-LA",
+    "datasetVersion": "unknown",
+    "split": "train:70%, val:10%, test:20%",
+    "horizon": "60 minutes, 12 steps",
+    "aggregation": "single horizon",
+    "preprocessing": "unknown",
+    "metricDefinition": "unknown",
+    "provenance": "own",
+    "citedFrom": "Table 1",
+    "locator": "Horizon 12 (60 min) / MAE / STAEformer cell",
+    "quote": "| | Horizon 12 (60 min) | MAE | 6.80 | 3.51 | 3.54 | 3.59 | 3.60 | 3.59 | 3.47 | 3.57 | 3.44 | 3.62 | 3.55 | 3.34",
+    "cellHorizon": "Horizon 12 (60 min)"
+   },
+   "seconds": 6.8
+  },
+  "stae_p4": {
+   "extract": {
+    "method": "STAEformer",
+    "name": "MAE",
+    "value": "18.22",
+    "unit": "unknown",
+    "direction": "lower",
+    "dataset": "PEMS04",
+    "datasetVersion": "unknown",
+    "split": "train:60%, val:20%, test:20%",
+    "horizon": "unknown",
+    "aggregation": "unknown",
+    "preprocessing": "unknown",
+    "metricDefinition": "unknown",
+    "provenance": "own",
+    "citedFrom": "Table 3. Performance on PEMS03, 04, 07, and 08.",
+    "locator": "Table 3, STAEformer row, PEMS04 MAE column",
+    "quote": "| STAEformer | 15.35 | 27.55 | 15.18% | 18.22 | 30.18 | 11.98% | 19.14 | 32.60 | 8.01% | 13.46 | 23.25 | 8.88%",
+    "cellHorizon": ""
+   },
+   "cell": "STAEformer / PEMS04 / MAE",
+   "rejected": {
+    "horizon": {
+     "value": "average over 12 horizons (5‑min steps, 0‑60 min)",
+     "reason": "The source does not say these results are averaged over horizons."
+    },
+    "aggregation": {
+     "value": "average over 12 horizons",
+     "reason": "The source does not say these results are averaged over horizons."
+    }
+   },
+   "proposals": [
+    {
+     "field": "horizon",
+     "value": "12",
+     "quote": "We set the input and prediction length to be 1 hour, namely, T=T′=12."
+    },
+    {
+     "field": "aggregation",
+     "value": "average over all predicted horizons (mean across the 12 horizons)",
+     "quote": "Following previous work, we select the average performance of all predicted 12 horizons on the PEMS03, PEMS04, PEMS07 and PEMS08 datasets."
+    },
+    {
+     "field": "metricDefinition",
+     "value": "MAE computed as the mean absolute error without masking of zero or missing targets",
+     "quote": "Metrics. We use three widely used metrics for traffic forecasting task, i.e, MAE, RMSE and MAPE."
+    }
+   ],
+   "final": {
+    "method": "STAEformer",
+    "name": "MAE",
+    "value": "18.22",
+    "unit": "unknown",
+    "direction": "lower",
+    "dataset": "PEMS04",
+    "datasetVersion": "unknown",
+    "split": "train:60%, val:20%, test:20%",
+    "horizon": "12",
+    "aggregation": "average over all predicted horizons (mean across the 12 horizons)",
+    "preprocessing": "unknown",
+    "metricDefinition": "MAE computed as the mean absolute error without masking of zero or missing targets",
+    "provenance": "own",
+    "citedFrom": "Table 3. Performance on PEMS03, 04, 07, and 08.",
+    "locator": "Table 3, STAEformer row, PEMS04 MAE column",
+    "quote": "| STAEformer | 15.35 | 27.55 | 15.18% | 18.22 | 30.18 | 11.98% | 19.14 | 32.60 | 8.01% | 13.46 | 23.25 | 8.88%",
+    "cellHorizon": ""
+   },
+   "seconds": 11.4
+  },
+  "stid_bay_12": {
+   "extract": {
+    "method": "STID",
+    "name": "MAE",
+    "value": "1.89",
+    "unit": "unknown",
+    "direction": "lower",
+    "dataset": "PEMS-BAY",
+    "datasetVersion": "unknown",
+    "split": "70%/10%/20%",
+    "horizon": "12 steps",
+    "aggregation": "single horizon",
+    "preprocessing": "unknown",
+    "metricDefinition": "unknown",
+    "provenance": "own",
+    "citedFrom": "Table 3",
+    "locator": "Table 3, row STID, column @12 (MAE)",
+    "quote": "| STID | MAE | 17.51 | 18.29 | 19.58 | 18.29 | 18.31 | 19.59 | 21.52 | 19.54 | 13.28 | 14.21 | 15.58 | 14.20 | 1.30 | 1.62 | 1.89 | 1.55 | 16.08 | 17.87 | 19.25 | 17.39",
+    "cellHorizon": "@12"
+   },
+   "cell": "STID / MAE / PEMS-BAY / @12",
+   "rejected": {},
+   "proposals": [],
+   "final": {
+    "method": "STID",
+    "name": "MAE",
+    "value": "1.89",
+    "unit": "unknown",
+    "direction": "lower",
+    "dataset": "PEMS-BAY",
+    "datasetVersion": "unknown",
+    "split": "70%/10%/20%",
+    "horizon": "12 steps",
+    "aggregation": "single horizon",
+    "preprocessing": "unknown",
+    "metricDefinition": "unknown",
+    "provenance": "own",
+    "citedFrom": "Table 3",
+    "locator": "Table 3, row STID, column @12 (MAE)",
+    "quote": "| STID | MAE | 17.51 | 18.29 | 19.58 | 18.29 | 18.31 | 19.59 | 21.52 | 19.54 | 13.28 | 14.21 | 15.58 | 14.20 | 1.30 | 1.62 | 1.89 | 1.55 | 16.08 | 17.87 | 19.25 | 17.39",
+    "cellHorizon": "@12"
+   },
+   "seconds": 7.7
+  },
+  "stid_agcrn_p4_avg": {
+   "extract": {
+    "method": "AGCRN",
+    "name": "MAE",
+    "value": "19.36",
+    "unit": "unknown",
+    "direction": "lower",
+    "dataset": "PEMS04",
+    "datasetVersion": "unknown",
+    "split": "6:2:2 (training:validation:test)",
+    "horizon": "average over 3rd, 6th, and 12th time slots (steps)",
+    "aggregation": "average of the @3, @6, @12 columns",
+    "preprocessing": "unknown",
+    "metricDefinition": "unknown",
+    "provenance": "unknown",
+    "citedFrom": "Table 3. Multivariate time series forecasting on the PEMS04, PEMS07, PEMS08, PEMS-BAY, and Electricity datasets.",
+    "locator": "Table 3: row \"| AGCRN | MAE | 18.52 | 19.45 | 20.64 | 19.36 | ...\", column headers \"| Method | Metric | @3 | @6 | @12 | Avg. | ...\"",
+    "quote": "| AGCRN | MAE | 18.52 | 19.45 | 20.64 | 19.36 | 19.31 | 20.70 | 22.74 | 20.64 | 14.51 | 15.66 | 17.49 | 15.65 | 1.37 | 1.70 | 1.99 | 1.63 | 22.88 | 24.47 | 27.24 | 23.88",
+    "cellHorizon": "Avg."
+   },
+   "cell": "AGCRN / MAE / PEMS04 / Avg.",
+   "rejected": {
+    "provenance": {
+     "value": "own",
+     "reason": "This model is not the paper's proposed method, and the paper does not say how the number was obtained."
+    }
+   },
+   "proposals": [],
+   "final": {
+    "method": "AGCRN",
+    "name": "MAE",
+    "value": "19.36",
+    "unit": "unknown",
+    "direction": "lower",
+    "dataset": "PEMS04",
+    "datasetVersion": "unknown",
+    "split": "6:2:2 (training:validation:test)",
+    "horizon": "average over 3rd, 6th, and 12th time slots (steps)",
+    "aggregation": "average of the @3, @6, @12 columns",
+    "preprocessing": "unknown",
+    "metricDefinition": "unknown",
+    "provenance": "unknown",
+    "citedFrom": "Table 3. Multivariate time series forecasting on the PEMS04, PEMS07, PEMS08, PEMS-BAY, and Electricity datasets.",
+    "locator": "Table 3: row \"| AGCRN | MAE | 18.52 | 19.45 | 20.64 | 19.36 | ...\", column headers \"| Method | Metric | @3 | @6 | @12 | Avg. | ...\"",
+    "quote": "| AGCRN | MAE | 18.52 | 19.45 | 20.64 | 19.36 | 19.31 | 20.70 | 22.74 | 20.64 | 14.51 | 15.66 | 17.49 | 15.65 | 1.37 | 1.70 | 1.99 | 1.63 | 22.88 | 24.47 | 27.24 | 23.88",
+    "cellHorizon": "Avg."
+   },
+   "seconds": 12.2
+  },
+  "stid_dcrnn_p4_avg": {
+   "extract": {
+    "method": "DCRNN",
+    "name": "MAE",
+    "value": "19.71",
+    "unit": "unknown",
+    "direction": "lower",
+    "dataset": "PEMS04",
+    "datasetVersion": "unknown",
+    "split": "train 60%, val 20%, test 20%",
+    "horizon": "average over 3,6,12 steps",
+    "aggregation": "average over @3,@6,@12 horizons",
+    "preprocessing": "unknown",
+    "metricDefinition": "unknown",
+    "provenance": "unknown",
+    "citedFrom": "Table 3",
+    "locator": "DCRNN row, MAE metric, PEMS04 Avg column",
+    "quote": "| DCRNN | MAE | 18.53 | 19.65 | 21.67 | 19.71 | 19.45 | 21.18 | 24.14 | 21.20 | 14.16 | 15.24 | 17.70 | 15.26 | 1.31 | 1.67 | 1.99 | 1.62 | | N/A | N/A |",
+    "cellHorizon": "Avg."
+   },
+   "cell": "DCRNN / MAE / PEMS04 / Avg.",
+   "rejected": {
+    "provenance": {
+     "value": "own",
+     "reason": "This model is not the paper's proposed method, and the paper does not say how the number was obtained."
+    }
+   },
+   "proposals": [],
+   "final": {
+    "method": "DCRNN",
+    "name": "MAE",
+    "value": "19.71",
+    "unit": "unknown",
+    "direction": "lower",
+    "dataset": "PEMS04",
+    "datasetVersion": "unknown",
+    "split": "train 60%, val 20%, test 20%",
+    "horizon": "average over 3,6,12 steps",
+    "aggregation": "average over @3,@6,@12 horizons",
+    "preprocessing": "unknown",
+    "metricDefinition": "unknown",
+    "provenance": "unknown",
+    "citedFrom": "Table 3",
+    "locator": "DCRNN row, MAE metric, PEMS04 Avg column",
+    "quote": "| DCRNN | MAE | 18.53 | 19.65 | 21.67 | 19.71 | 19.45 | 21.18 | 24.14 | 21.20 | 14.16 | 15.24 | 17.70 | 15.26 | 1.31 | 1.67 | 1.99 | 1.62 | | N/A | N/A |",
+    "cellHorizon": "Avg."
+   },
+   "seconds": 9.4
+  },
+  "stid_p4_12": {
+   "extract": {
+    "method": "STID",
+    "name": "MAE",
+    "value": "19.58",
+    "unit": "unknown",
+    "direction": "lower",
+    "dataset": "PEMS04",
+    "datasetVersion": "unknown",
+    "split": "train 60%, val 20%, test 20%",
+    "horizon": "12 steps",
+    "aggregation": "single horizon",
+    "preprocessing": "unknown",
+    "metricDefinition": "unknown",
+    "provenance": "own",
+    "citedFrom": "Table 3",
+    "locator": "PEMS04 @12",
+    "quote": "| STID | MAE | 17.51 | 18.29 | 19.58 | 18.29 | 18.31 | 19.59 | 21.52 | 19.54 | 13.28 | 14.21 | 15.58 | 14.20 | 1.30 | 1.62 | 1.89 | 1.55 | 16.08 | 17.87 | 19.25 | 17.39",
+    "cellHorizon": "@12"
+   },
+   "cell": "STID / MAE / PEMS04 / @12",
+   "rejected": {},
+   "proposals": [],
+   "final": {
+    "method": "STID",
+    "name": "MAE",
+    "value": "19.58",
+    "unit": "unknown",
+    "direction": "lower",
+    "dataset": "PEMS04",
+    "datasetVersion": "unknown",
+    "split": "train 60%, val 20%, test 20%",
+    "horizon": "12 steps",
+    "aggregation": "single horizon",
+    "preprocessing": "unknown",
+    "metricDefinition": "unknown",
+    "provenance": "own",
+    "citedFrom": "Table 3",
+    "locator": "PEMS04 @12",
+    "quote": "| STID | MAE | 17.51 | 18.29 | 19.58 | 18.29 | 18.31 | 19.59 | 21.52 | 19.54 | 13.28 | 14.21 | 15.58 | 14.20 | 1.30 | 1.62 | 1.89 | 1.55 | 16.08 | 17.87 | 19.25 | 17.39",
+    "cellHorizon": "@12"
+   },
+   "seconds": 8.1
+  },
+  "stid_p8_avg": {
+   "extract": {
+    "method": "STID",
+    "name": "MAE",
+    "value": "14.20",
+    "unit": "unknown",
+    "direction": "lower",
+    "dataset": "PEMS08",
+    "datasetVersion": "unknown",
+    "split": "6:2:2 (train:val:test)",
+    "horizon": "average over 12 steps",
+    "aggregation": "average over 12 horizons",
+    "preprocessing": "unknown",
+    "metricDefinition": "unknown",
+    "provenance": "own",
+    "citedFrom": "STID",
+    "locator": "Table 3",
+    "quote": "| STID | MAE | 17.51 | 18.29 | 19.58 | 18.29 | 18.31 | 19.59 | 21.52 | 19.54 | 13.28 | 14.21 | 15.58 | 14.20 | 1.30 | 1.62 | 1.89 | 1.55 | 16.08 | 17.87 | 19.25 | 17.39",
+    "cellHorizon": "Avg."
+   },
+   "cell": "STID / MAE / PEMS08 / Avg.",
+   "rejected": {},
+   "proposals": [],
+   "final": {
+    "method": "STID",
+    "name": "MAE",
+    "value": "14.20",
+    "unit": "unknown",
+    "direction": "lower",
+    "dataset": "PEMS08",
+    "datasetVersion": "unknown",
+    "split": "6:2:2 (train:val:test)",
+    "horizon": "average over 12 steps",
+    "aggregation": "average over 12 horizons",
+    "preprocessing": "unknown",
+    "metricDefinition": "unknown",
+    "provenance": "own",
+    "citedFrom": "STID",
+    "locator": "Table 3",
+    "quote": "| STID | MAE | 17.51 | 18.29 | 19.58 | 18.29 | 18.31 | 19.59 | 21.52 | 19.54 | 13.28 | 14.21 | 15.58 | 14.20 | 1.30 | 1.62 | 1.89 | 1.55 | 16.08 | 17.87 | 19.25 | 17.39",
+    "cellHorizon": "Avg."
+   },
+   "seconds": 8.6
+  }
+ },
+ "baselineRaw": {
+  "C01": {
+   "outcome": "comparable",
+   "independent": true,
+   "a": {
+    "method": "GTS",
+    "dataset": "METR-LA",
+    "split": "70/10/20",
+    "horizon": "60 min",
+    "aggregation": "single horizon",
+    "metricDefinition": "unmasked",
+    "provenance": "own"
+   },
+   "b": {
+    "method": "Graph WaveNet",
+    "dataset": "METR-LA",
+    "split": "70/10/20",
+    "horizon": "60 min",
+    "aggregation": "single horizon",
+    "metricDefinition": "unmasked",
+    "provenance": "own"
+   },
+   "explanation": "Both results are MAE on METR-LA at 60‑minute horizon with identical 70/10/20 train/val/test split and standard (unmasked) metric definition, satisfying all comparability conditions.",
+   "seconds": 7.3
+  },
+  "C02": {
+   "outcome": "comparable",
+   "independent": true,
+   "a": {
+    "method": "GTS",
+    "dataset": "METR-LA",
+    "split": "70/10/20",
+    "horizon": "60 min",
+    "aggregation": "single horizon",
+    "metricDefinition": "null",
+    "provenance": "own"
+   },
+   "b": {
+    "method": "Graph WaveNet",
+    "dataset": "METR-LA",
+    "split": "70/10/20",
+    "horizon": "60 min",
+    "aggregation": "single horizon",
+    "metricDefinition": "null",
+    "provenance": "own"
+   },
+   "explanation": "Both results are MAE on METR-LA at 60‑minute horizon with identical 70/10/20 split, single‑horizon aggregation, and standard MAE definition; no conflicting details.",
+   "seconds": 7.1
+  },
+  "C07": {
+   "outcome": "comparable",
+   "independent": true,
+   "a": {
+    "method": "AGCRN",
+    "dataset": "PeMSD4",
+    "split": "6:2:2",
+    "horizon": "12 horizons (5‑min steps)",
+    "aggregation": "average over horizons",
+    "metricDefinition": "unmasked",
+    "provenance": "own"
+   },
+   "b": {
+    "method": "STAEformer",
+    "dataset": "PEMS04",
+    "split": "6:2:2",
+    "horizon": "12 horizons (5‑min steps)",
+    "aggregation": "average over horizons",
+    "metricDefinition": "unmasked",
+    "provenance": "own"
+   },
+   "explanation": "Both results refer to the same dataset (PeMSD4/PEMS04), use the same 6:2:2 train/val/test split, report MAE averaged over the 12 prediction horizons, and use the standard unmasked MAE definition; no conflicting information is stated.",
+   "seconds": 9.1
+  },
+  "C09": {
+   "outcome": "incompatible",
+   "independent": true,
+   "a": {
+    "method": "AGCRN",
+    "dataset": "PeMSD4",
+    "split": "6:2:2",
+    "horizon": "12 steps",
+    "aggregation": "average over horizons",
+    "metricDefinition": "unmasked",
+    "provenance": "own"
+   },
+   "b": {
+    "method": "STID",
+    "dataset": "PEMS04",
+    "split": "6:2:2",
+    "horizon": "12 steps",
+    "aggregation": "single horizon",
+    "metricDefinition": "unmasked",
+    "provenance": "own"
+   },
+   "explanation": "Both results use the same dataset and split, but AGCRN reports MAE averaged over all 12 horizons while STID reports MAE at the 12th horizon only; horizon aggregation differs, making them incomparable.",
+   "seconds": 6.3
+  },
+  "C08": {
+   "outcome": "incompatible",
+   "independent": false,
+   "a": {
+    "method": "AGCRN",
+    "dataset": "PeMSD4",
+    "split": "6:2:2",
+    "horizon": "12 steps",
+    "aggregation": "average over horizons",
+    "metricDefinition": "unmasked",
+    "provenance": "own"
+   },
+   "b": {
+    "method": "AGCRN",
+    "dataset": "PEMS04",
+    "split": "6:2:2",
+    "horizon": "12 steps",
+    "aggregation": "average over horizons",
+    "metricDefinition": "unmasked",
+    "provenance": "cited"
+   },
+   "explanation": "Dataset names differ (PeMSD4 vs PEMS04), indicating different datasets, so the results cannot be compared.",
+   "seconds": 7.1
+  },
+  "C03": {
+   "outcome": "incompatible",
+   "independent": false,
+   "a": {
+    "method": "GTS",
+    "dataset": "METR-LA",
+    "split": "70/10/20",
+    "horizon": "60 min",
+    "aggregation": "single horizon",
+    "metricDefinition": "MAE (standard/unmasked)",
+    "provenance": "own"
+   },
+   "b": {
+    "method": "GTS",
+    "dataset": "METR-LA",
+    "split": "70/10/20",
+    "horizon": "60 min",
+    "aggregation": "single horizon",
+    "metricDefinition": "MAE (standard/unmasked)",
+    "provenance": "own"
+   },
+   "explanation": "The paper states that the original MAE calculation differed from the official DCRNN computation and was later corrected, indicating a stated conflict in metric computation.",
+   "seconds": 10.5
+  },
+  "C13": {
+   "outcome": "incompatible",
+   "independent": true,
+   "a": {
+    "method": "DCRNN",
+    "dataset": "PeMSD4",
+    "split": "6:2:2",
+    "horizon": "12 steps (5-min each)",
+    "aggregation": "average over horizons",
+    "metricDefinition": "unmasked",
+    "provenance": "own"
+   },
+   "b": {
+    "method": "DCRNN",
+    "dataset": "PEMS04",
+    "split": "6:2:2",
+    "horizon": "12 steps (5-min each)",
+    "aggregation": "average over horizons",
+    "metricDefinition": "unmasked",
+    "provenance": "own"
+   },
+   "explanation": "Dataset names differ (PeMSD4 vs PEMS04) and the papers do not state they refer to the same data, causing a dataset mismatch.",
+   "seconds": 7.8
+  },
+  "C12": {
+   "outcome": "incompatible",
+   "independent": true,
+   "a": {
+    "method": "DCRNN",
+    "dataset": "PeMSD4",
+    "split": "6:2:2",
+    "horizon": "12 steps (60 minutes)",
+    "aggregation": "average over horizons",
+    "metricDefinition": null,
+    "provenance": "own"
+   },
+   "b": {
+    "method": "DCRNN",
+    "dataset": "PEMS04",
+    "split": "6:2:2",
+    "horizon": "12 steps (60 minutes)",
+    "aggregation": "average over horizons",
+    "metricDefinition": null,
+    "provenance": "own"
+   },
+   "explanation": "Dataset names differ (PeMSD4 vs PEMS04) while split, horizon aggregation, and metric match; this constitutes a stated difference in dataset, making the results incompatible.",
+   "seconds": 8.1
+  },
+  "C10": {
+   "outcome": "incompatible",
+   "independent": true,
+   "a": {
+    "method": "AGCRN",
+    "dataset": "PeMSD4",
+    "split": "6:2:2",
+    "horizon": "12 steps (60 minutes)",
+    "aggregation": "average over horizons",
+    "metricDefinition": "unmasked",
+    "provenance": "own"
+   },
+   "b": {
+    "method": "PDFormer",
+    "dataset": "PeMS04",
+    "split": "6:2:2",
+    "horizon": "12 steps (60 minutes)",
+    "aggregation": "unknown",
+    "metricDefinition": "null",
+    "provenance": "own"
+   },
+   "explanation": "The datasets differ (PeMSD4 vs PeMSD04), violating the dataset requirement for comparability.",
+   "seconds": 10.8
+  },
+  "C14": {
+   "outcome": "comparable",
+   "independent": true,
+   "a": {
+    "method": "DCRNN",
+    "dataset": "PeMSD4",
+    "split": "6:2:2",
+    "horizon": "12 steps",
+    "aggregation": "average over horizons",
+    "metricDefinition": "unmasked",
+    "provenance": "reproduced"
+   },
+   "b": {
+    "method": "DCRNN",
+    "dataset": "PeMS04",
+    "split": "6:2:2",
+    "horizon": "12 steps",
+    "aggregation": "average over horizons",
+    "metricDefinition": "unmasked",
+    "provenance": "reproduced"
+   },
+   "explanation": "Both results refer to DCRNN MAE on the same dataset (PeMSD4/PeMS04) with identical 6:2:2 split, multi‑step horizon averaged over 12 steps, and standard MAE definition; no conflicting statements are present.",
+   "seconds": 10.7
+  },
+  "C18": {
+   "outcome": "insufficient",
+   "independent": true,
+   "a": {
+    "method": "STAEformer",
+    "dataset": "PEMS04",
+    "split": "6:2:2",
+    "horizon": "average over horizons (12 steps, 5-min each)",
+    "aggregation": "average over horizons",
+    "metricDefinition": "unmasked",
+    "provenance": "own"
+   },
+   "b": {
+    "method": "PDFormer",
+    "dataset": "PEMS04",
+    "split": "6:2:2",
+    "horizon": "unknown",
+    "aggregation": "unknown",
+    "metricDefinition": "unmasked",
+    "provenance": "own"
+   },
+   "explanation": "Both results are on PEMS04 with same 6:2:2 split and MAE metric, but the horizon aggregation (single vs averaged) is not stated for the PDFormer result, preventing comparison.",
+   "seconds": 12.1
+  },
+  "C16": {
+   "outcome": "insufficient",
+   "independent": true,
+   "a": {
+    "method": "STSGCN",
+    "dataset": "PeMSD4",
+    "split": "6:2:2",
+    "horizon": "12 steps",
+    "aggregation": "average over horizons",
+    "metricDefinition": "unmasked",
+    "provenance": "cited"
+   },
+   "b": {
+    "method": "STSGCN",
+    "dataset": "PeMS04",
+    "split": "6:2:2",
+    "horizon": "12 steps",
+    "aggregation": "unknown",
+    "metricDefinition": "unmasked",
+    "provenance": "cited"
+   },
+   "explanation": "Result A states aggregation over horizons, while Result B does not state aggregation; thus dataset, split, horizon match but aggregation is missing for at least one result, making comparison insufficient.",
+   "seconds": 15.4
+  },
+  "C17": {
+   "outcome": "incompatible",
+   "independent": true,
+   "a": {
+    "method": "STAEformer",
+    "dataset": "PEMS04",
+    "split": "6:2:2",
+    "horizon": "average over 12 horizons (each 5 minutes)",
+    "aggregation": "average over horizons",
+    "metricDefinition": "unmasked",
+    "provenance": "own"
+   },
+   "b": {
+    "method": "AGCRN",
+    "dataset": "PEMS04",
+    "split": "6:2:2",
+    "horizon": "average over horizons 3, 6, 12 (each 5 minutes)",
+    "aggregation": "average over horizons",
+    "metricDefinition": "unmasked",
+    "provenance": "own"
+   },
+   "explanation": "Dataset and split match, but horizon aggregation differs: paperA averages over all 12 horizons while paperB averages over horizons 3, 6, 12, so the results are not comparable.",
+   "seconds": 19.7
+  },
+  "C22": {
+   "outcome": "comparable",
+   "independent": true,
+   "a": {
+    "method": "STID",
+    "dataset": "PEMS08",
+    "split": "6:2:2",
+    "horizon": "12 steps",
+    "aggregation": "average",
+    "metricDefinition": "unmasked",
+    "provenance": "own"
+   },
+   "b": {
+    "method": "AGCRN",
+    "dataset": "PeMSD8",
+    "split": "6:2:2",
+    "horizon": "12 steps",
+    "aggregation": "average",
+    "metricDefinition": "unmasked",
+    "provenance": "own"
+   },
+   "explanation": "Both results are for the same dataset (PEMS08/PeMSD8), use the same train/val/test split (6:2:2), report MAE averaged over the same 12‑step horizon, and use the standard MAE definition.",
+   "seconds": 6.7
+  },
+  "C23": {
+   "outcome": "incompatible",
+   "independent": false,
+   "a": {
+    "method": "AGCRN",
+    "dataset": "PeMSD8",
+    "split": "train/val/test 6:2:2",
+    "horizon": "12 steps (5‑min each)",
+    "aggregation": "average over horizons",
+    "metricDefinition": "unmasked",
+    "provenance": "own"
+   },
+   "b": {
+    "method": "AGCRN",
+    "dataset": "PeMSD4",
+    "split": "train/val/test 6:2:2",
+    "horizon": "12 steps (5‑min each)",
+    "aggregation": "average over horizons",
+    "metricDefinition": "unmasked",
+    "provenance": "own"
+   },
+   "explanation": "Dataset differs (PeMSD4 vs PeMSD8) while method, split, horizon aggregation, and metric match.",
+   "seconds": 8.5
+  },
+  "C25": {
+   "outcome": "comparable",
+   "independent": false,
+   "a": {
+    "method": "DCRNN",
+    "dataset": "METR-LA",
+    "split": "70/10/20",
+    "horizon": "1 hour",
+    "aggregation": "single horizon",
+    "metricDefinition": "masked",
+    "provenance": "own"
+   },
+   "b": {
+    "method": "DCRNN",
+    "dataset": "METR-LA",
+    "split": "70/10/20",
+    "horizon": "1 hour",
+    "aggregation": "single horizon",
+    "metricDefinition": "masked",
+    "provenance": "cited"
+   },
+   "explanation": "Both results refer to DCRNN on METR-LA with identical 70/10/20 split, 1‑hour horizon, single‑horizon aggregation, and masked RMSE definition; no conflicting statements.",
+   "seconds": 8.7
+  },
+  "C26": {
+   "outcome": "comparable",
+   "independent": true,
+   "a": {
+    "method": "Graph WaveNet",
+    "dataset": "METR-LA",
+    "split": "70% train, 10% validation, 20% test",
+    "horizon": "60 minutes",
+    "aggregation": "single horizon",
+    "metricDefinition": "unmasked",
+    "provenance": "own"
+   },
+   "b": {
+    "method": "MTGNN",
+    "dataset": "METR-LA",
+    "split": "70% train, 10% validation, 20% test",
+    "horizon": "60 minutes",
+    "aggregation": "single horizon",
+    "metricDefinition": "unmasked",
+    "provenance": "own"
+   },
+   "explanation": "Both results are MAE for 60‑minute ahead prediction on METR‑LA using the same 70/10/20 chronological split, single‑horizon reporting, and standard (unmasked) MAE definition, with no conflicting statements.",
+   "seconds": 7.5
+  },
+  "C24": {
+   "outcome": "insufficient",
+   "independent": false,
+   "a": {
+    "method": "DCRNN",
+    "dataset": "METR-LA",
+    "split": "70/10/20",
+    "horizon": "1 hour",
+    "aggregation": "single horizon",
+    "metricDefinition": "unmasked",
+    "provenance": "own"
+   },
+   "b": {
+    "method": "DCRNN",
+    "dataset": "METR-LA",
+    "split": "unknown",
+    "horizon": "1 hour",
+    "aggregation": "single horizon",
+    "metricDefinition": "unmasked",
+    "provenance": "cited"
+   },
+   "explanation": "Split information is not stated for the result in paperB, making comparison insufficient.",
+   "seconds": 17.5
+  },
+  "C27": {
+   "outcome": "comparable",
+   "independent": true,
+   "a": {
+    "method": "Graph WaveNet",
+    "dataset": "METR-LA",
+    "split": "70% train, 10% val, 20% test",
+    "horizon": "60 min",
+    "aggregation": "single horizon",
+    "metricDefinition": "unmasked",
+    "provenance": "own"
+   },
+   "b": {
+    "method": "STAEformer",
+    "dataset": "METR-LA",
+    "split": "70% train, 10% val, 20% test",
+    "horizon": "60 min",
+    "aggregation": "single horizon",
+    "metricDefinition": "unmasked",
+    "provenance": "own"
+   },
+   "explanation": "Both results are MAE on METR-LA at the 60‑minute horizon with identical 70/10/20 train/val/test split and single‑horizon reporting; no conflicting metric definition is stated.",
+   "seconds": 7.9
+  },
+  "C31": {
+   "outcome": "incompatible",
+   "independent": false,
+   "a": {
+    "method": "Graph WaveNet",
+    "dataset": "METR-LA",
+    "split": "70/10/20",
+    "horizon": "60 minutes",
+    "aggregation": "single horizon",
+    "metricDefinition": "standard MAE (as defined in Eq 10)",
+    "provenance": "own"
+   },
+   "b": {
+    "method": "Graph WaveNet (forward-backward-adaptive adjacency matrix)",
+    "dataset": "METR-LA",
+    "split": "70/10/20",
+    "horizon": "average over 12 prediction horizons",
+    "aggregation": "averaged over horizons",
+    "metricDefinition": "standard MAE",
+    "provenance": "own"
+   },
+   "explanation": "Both results are from the same paper and use MAE on METR-LA with the same train/val/test split, but they differ in horizon aggregation: a reports a single 60‑minute horizon MAE, whereas b reports an average MAE across multiple horizons, making them incomparable under the policy.",
+   "seconds": 11.7
+  },
+  "C32": {
+   "outcome": "incompatible",
+   "independent": true,
+   "a": {
+    "method": "Graph WaveNet",
+    "dataset": "METR-LA",
+    "split": "70/10/20",
+    "horizon": "15 min",
+    "aggregation": "single",
+    "metricDefinition": "unmasked",
+    "provenance": "own"
+   },
+   "b": {
+    "method": "DCRNN",
+    "dataset": "METR-LA",
+    "split": "70/10/20",
+    "horizon": "60 min",
+    "aggregation": "single",
+    "metricDefinition": "unmasked",
+    "provenance": "own"
+   },
+   "explanation": "Horizon differs (15 min vs 60 min) while dataset, split, and metric match.",
+   "seconds": 7.4
+  },
+  "C33": {
+   "outcome": "comparable",
+   "independent": false,
+   "a": {
+    "method": "DCRNN",
+    "dataset": "METR-LA",
+    "split": "70/10/20",
+    "horizon": "15 min",
+    "aggregation": "single horizon",
+    "metricDefinition": "unmasked",
+    "provenance": "cited"
+   },
+   "b": {
+    "method": "DCRNN",
+    "dataset": "METR-LA",
+    "split": "70/10/20",
+    "horizon": "15 min",
+    "aggregation": "single horizon",
+    "metricDefinition": "unmasked",
+    "provenance": "own"
+   },
+   "explanation": "Both results report DCRNN MAE on METR-LA at 15‑min horizon with identical train/val/test splits (70/10/20), single‑horizon aggregation, and standard MAE definition; no conflicting metric definition is stated.",
+   "seconds": 10.0
+  },
+  "C34": {
+   "outcome": "comparable",
+   "independent": true,
+   "a": {
+    "method": "GMAN",
+    "dataset": "PeMS",
+    "split": "70% train, 10% val, 20% test",
+    "horizon": "1 hour ahead",
+    "aggregation": "single horizon",
+    "metricDefinition": "MAE",
+    "provenance": "own"
+   },
+   "b": {
+    "method": "DCRNN",
+    "dataset": "PEMS-BAY",
+    "split": "70% train, 10% val, 20% test",
+    "horizon": "1 hour ahead",
+    "aggregation": "single horizon",
+    "metricDefinition": "MAE",
+    "provenance": "own"
+   },
+   "explanation": "Both results are MAE for 1‑hour ahead prediction on the PeMS dataset with identical train/val/test splits; no conflicting metric definitions are stated.",
+   "seconds": 5.6
+  },
+  "C35": {
+   "outcome": "comparable",
+   "independent": true,
+   "a": {
+    "method": "GMAN",
+    "dataset": "PeMS",
+    "split": "70/10/20",
+    "horizon": "1 hour",
+    "aggregation": "single horizon",
+    "metricDefinition": "unmasked",
+    "provenance": "own"
+   },
+   "b": {
+    "method": "Graph WaveNet",
+    "dataset": "PEMS-BAY",
+    "split": "70/10/20",
+    "horizon": "1 hour",
+    "aggregation": "single horizon",
+    "metricDefinition": "unmasked",
+    "provenance": "own"
+   },
+   "explanation": "Both results are MAE for 1‑hour ahead prediction on the same PeMS/PEMS‑BAY dataset with identical 70/10/20 split, single‑horizon reporting, and standard MAE metric; no conflicting definitions.",
+   "seconds": 9.4
+  },
+  "C37": {
+   "outcome": "incompatible",
+   "independent": true,
+   "a": {
+    "method": "MTGNN",
+    "dataset": "PEMS-BAY",
+    "split": "70/20/10",
+    "horizon": "60 minutes",
+    "aggregation": "single horizon",
+    "metricDefinition": "unmasked",
+    "provenance": "own"
+   },
+   "b": {
+    "method": "Graph WaveNet",
+    "dataset": "PEMS-BAY",
+    "split": "70/10/20",
+    "horizon": "60 minutes",
+    "aggregation": "single horizon",
+    "metricDefinition": "unmasked",
+    "provenance": "own"
+   },
+   "explanation": "Dataset, horizon, and metric match but the train/validation/test splits differ (70/20/10 vs 70/10/20), making the results incomparable.",
+   "seconds": 10.5
+  },
+  "C36": {
+   "outcome": "comparable",
+   "independent": false,
+   "a": {
+    "method": "Graph WaveNet",
+    "dataset": "PeMS",
+    "split": "70/10/20",
+    "horizon": "1 hour",
+    "aggregation": "single horizon",
+    "metricDefinition": "unmasked",
+    "provenance": "cited"
+   },
+   "b": {
+    "method": "Graph WaveNet",
+    "dataset": "PeMS-BAY",
+    "split": "70/10/20",
+    "horizon": "60 minutes",
+    "aggregation": "single horizon",
+    "metricDefinition": "unmasked",
+    "provenance": "own"
+   },
+   "explanation": "Both results are Graph WaveNet MAE on PeMS with identical 70/10/20 split, 1‑hour horizon, single‑horizon aggregation, and standard MAE; paper A cites the value from paper B.",
+   "seconds": 11.3
+  },
+  "C19": {
+   "outcome": "comparable",
+   "independent": true,
+   "a": {
+    "method": "AGCRN",
+    "dataset": "PEMS04",
+    "split": "6:2:2",
+    "horizon": "12 steps",
+    "aggregation": "average over horizons",
+    "metricDefinition": "null",
+    "provenance": "unknown"
+   },
+   "b": {
+    "method": "AGCRN",
+    "dataset": "PeMSD4",
+    "split": "6:2:2",
+    "horizon": "12 steps",
+    "aggregation": "average over horizons",
+    "metricDefinition": "null",
+    "provenance": "own"
+   },
+   "explanation": "Dataset, split, horizon length, aggregation method, and metric all match; no stated conflict in metric definition",
+   "seconds": 57.1
+  },
+  "C38": {
+   "outcome": "comparable",
+   "independent": true,
+   "a": {
+    "method": "STID",
+    "dataset": "PEMS-BAY",
+    "split": "70/10/20",
+    "horizon": "60 minutes",
+    "aggregation": "single",
+    "metricDefinition": "unmasked",
+    "provenance": "own"
+   },
+   "b": {
+    "method": "Graph WaveNet",
+    "dataset": "PEMS-BAY",
+    "split": "70/10/20",
+    "horizon": "60 minutes",
+    "aggregation": "single",
+    "metricDefinition": "unmasked",
+    "provenance": "own"
+   },
+   "explanation": "Both results are MAE on PEMS-BAY at 60‑minute horizon with identical 70/10/20 split, single‑horizon reporting, and standard (unmasked) MAE definition; no conflicting details.",
+   "seconds": 11.3
+  },
+  "C43": {
+   "outcome": "comparable",
+   "independent": true,
+   "a": {
+    "method": "GWNet",
+    "dataset": "METR-LA",
+    "split": "70/10/20",
+    "horizon": "60 min",
+    "aggregation": "single horizon",
+    "metricDefinition": "null",
+    "provenance": "unknown"
+   },
+   "b": {
+    "method": "Graph WaveNet",
+    "dataset": "METR-LA",
+    "split": "70/10/20",
+    "horizon": "60 min",
+    "aggregation": "single horizon",
+    "metricDefinition": "null",
+    "provenance": "own"
+   },
+   "explanation": "Both results refer to MAE on METR-LA with the same 70/10/20 split, single 60‑minute horizon, and no differing metric definitions; all required fields match and no conflict is stated.",
+   "seconds": 11.8
+  },
+  "C41": {
+   "outcome": "comparable",
+   "independent": true,
+   "a": {
+    "method": "DCRNN",
+    "dataset": "METR-LA",
+    "split": "70/20/10",
+    "horizon": "12 steps (60 minutes)",
+    "aggregation": "single horizon",
+    "metricDefinition": "unmasked",
+    "provenance": "unknown"
+   },
+   "b": {
+    "method": "DCRNN",
+    "dataset": "METR-LA",
+    "split": "70/20/10",
+    "horizon": "12 steps (60 minutes)",
+    "aggregation": "single horizon",
+    "metricDefinition": "unmasked",
+    "provenance": "own"
+   },
+   "explanation": "Both results report DCRNN MAE on METR-LA with identical 70/20/10 split, single‑hour horizon, and standard MAE definition; no conflicting details are stated.",
+   "seconds": 12.9
+  }
+ }
+}

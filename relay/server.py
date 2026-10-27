@@ -99,10 +99,13 @@ def make_handler(store,port):
                 elif self.path=='/api/research/branch': result=research.branch(data)
                 elif self.path=='/api/research/update': result=research.update(data)
                 elif self.path=='/api/research/draft': result=research.draft(data)
+                elif self.path=='/api/research/investigate': result=research.investigate(data)
+                elif self.path=='/api/research/regenerate': result=research.regenerate(data)
                 elif self.path=='/api/research/compile': result=research.compile(data)
                 elif self.path=='/api/research/compare':
                     with research.lock:
-                        p=research.get(data.get('id')); result=compare([x for x in p['papers'] if x['id'] in data.get('papers',[])])
+                        p=research.get(data.get('id')); chosen=set(data.get('papers') or [])
+                        result=compare(p['papers'],chosen if len(chosen)>=2 else None)
                 elif self.path=='/api/clips': result=store.add_clip(data)
                 elif self.path=='/api/sources/remove':
                     with store.lock:

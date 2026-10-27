@@ -50,3 +50,25 @@ References:
 - https://learn.chatgpt.com/docs/computer-use
 - https://developer.chrome.com/docs/extensions/develop/concepts/activeTab
 - https://developer.apple.com/library/archive/documentation/LanguagesUtilities/Conceptual/MacAutomationScriptingGuide/index.html
+
+## Update — 27 October 2026
+
+Positioning for the Best Apps and Agents track: check whether a published comparison holds before building on it. Relay investigates the evidence behind reported numbers, shows what is missing, lets a researcher correct it, and shows which comparisons and manuscript claims change.
+
+What is supported by evidence in the repository:
+- Relay refused to accept wrong comparisons more often than a single-pass Nemotron call in every evaluation run (see `docs/EVALUATION.md`).
+- Relay is less complete: it answers fewer comparisons and sometimes marks valid ones as insufficient.
+- A live run on Nebius completed the research workflow up to the draft and export.
+
+What is not supported:
+- Any claim that Relay is more accurate than a single-pass Nemotron baseline. On dev it sometimes is not.
+- Any claim about researcher usefulness. No researcher has tested the app.
+- Any claim about the UI. It has not been opened in a browser.
+
+Known gaps from the Codex review (27 October):
+- The Devpost rules page could not be fetched from this environment (HTTP 403), so the submission requirements in this document are not verified. Check the event page directly before submitting.
+- The repository has an MIT license (`LICENSE`).
+- A hosted demo is not set up. Hosting a build that holds a Nebius key on the server needs a decision about key handling, and that decision is the user's.
+- The demo video, public repository, and Devpost write-up are not started.
+
+Suggested order for the remaining days: browser check of the interface; a seeded project that opens in the app with no key needed; a demo video centred on the GTS correction (reported 2.99, corrected 3.41, Graph WaveNet 3.53, which shrinks the apparent lead from about 15 percent to about 3 percent); README and Devpost text; submission well before the deadline.

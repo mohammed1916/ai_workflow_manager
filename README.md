@@ -102,3 +102,13 @@ Two additional workflows support longer tasks:
 - **Metrics to decisions:** deterministic local CSV profiling (row counts, missing values, duplicates, numeric min/max/sum/mean), followed by a model-written trends report, experiment list, JSON quality report, and ZIP.
 
 Plans support up to ten actions. `create_archive` can reference only outputs from earlier steps, preserves human edits, and verifies each ZIP member against its original file. Models still generate analyses and proposals; review recommendations and arithmetic that fall outside the local profile calculations.
+
+## Research workspace: evidence checks (27 October 2026)
+
+The research workspace checks whether two published results can be compared. It extracts each result with its experimental context, verifies each claim against the source text and table cells, and returns one of three outcomes: comparable, incompatible, or insufficient evidence.
+
+- Reproduce the evaluation: `python3 eval/run.py --validate`, then `python3 eval/run.py --split dev`. See [the evaluation report](docs/EVALUATION.md) for results, limits, and known errors.
+- Run the tests: `python3 -m unittest discover -s tests`.
+- Live model runs use Nebius Token Factory with `NEBIUS_API_KEY` in `.env`. Live test scripts are in `scripts/live/`.
+
+Limits: the interface has not been browser-tested, the gold labels are not yet checked by a researcher, and single evaluation runs vary.

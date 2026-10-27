@@ -63,3 +63,39 @@ This turn's live inference used Ollama, not Nebius. Nebius remains available in 
 - Screenshots: `docs/research-map.png`, `docs/research-manuscript.png`.
 
 Research-specific live Nemotron/Nebius testing, external user evaluation, and an annotated extraction benchmark remain submission preparation work. The earlier generic-workflow Nebius test is not counted as research-agent validation.
+
+## Validation — 27 October 2026
+
+### Automated
+
+`python3 -m unittest discover -s tests`: **105 tests pass**. New coverage this session: comparison outcomes for missing context, proposal detection, dataset-scoped split parsing, horizon spans, metric-name recovery, dataset recovery from table columns, citation filtering in drafts, number-word run counts, and the targeted "check a number" path.
+
+JavaScript passes `node --check` for the research interface files.
+
+### Live Nemotron journey (isolated test server, final code)
+
+Model: `nvidia/nemotron-3-super-120b-a12b` on Nebius Token Factory. Run from `scripts/live/` against a copy of the app on a separate port.
+
+Completed on the live server:
+- Seeded investigation with five arXiv papers; all papers extracted and table cells matched.
+- Targeted check of GTS 2.99 against its table cell.
+- Repository-assisted investigations on four author repositories, pinned to commits.
+- Five proposals accepted, four of them from author code (see caveat below).
+- Draft generated from reviewed papers, with comparison claims classified (one paragraph marked unsupported, deliberately).
+- PDF compiled and Overleaf ZIP exported.
+- Branch created from the state before the first correction.
+- Record saved as `docs/research-nemotron-evidence.json`. No API keys appear in it.
+
+Not completed live:
+- A researcher's own correction, followed by regeneration of stale claims. The correction and regeneration code is covered by unit tests with a mocked model.
+- A draft re-run after the citation fix. The record's top-level error field is stale from before that fix; the fix is unit-tested.
+
+Caveat: the proposal decisions, paper reviews, and draft acceptance in that run were made by `scripts/live/phase3.py`, not by a human. The record says so.
+
+### Browser and UI
+
+Not done. No browser tool was available in this session. The research interface has never been opened in a browser, so layout, navigation, and the evidence cards are unverified.
+
+### Evaluation
+
+See `docs/EVALUATION.md`. The current numbers are in its "Runs after the metric-name and dataset fixes" section. Single runs vary; use the ranges there.

@@ -37,3 +37,19 @@ macOS `sandbox-exec` restricts personal/workspace reads and writes outside the i
 - Overleaf Git integration: https://docs.overleaf.com/integrations-and-add-ons/git-integration-and-github-synchronization
 
 Overleaf Cloud Git/GitHub integrations are premium features. The implemented path is local editing and compilation plus ZIP import; browser automation of an unrelated logged-in project is not an application integration.
+
+## Evidence checks and what they do not do (27 October 2026)
+
+- Every reported number carries dataset, split, horizon, aggregation, metric definition, and provenance. Missing fields are shown as missing, not guessed.
+- Each model-claimed value is checked against the retrieved text. Values or quotes that are not in the source are rejected and listed on the result card.
+- Table cells are located and their row and column labels are compared with the method and metric. A mismatch is shown as a warning.
+- A paper's own correction or appendix note (for example "Table 1 was computed differently; see Table 4") marks the original value as non-standard.
+- A dataset named only as "PeMS" is resolved from the sensor count stated in the paper.
+- Comparisons return one of three outcomes: comparable, incompatible, or insufficient evidence. Missing context never produces "incompatible".
+- A repository check reads the authors' code at a pinned commit. Repository evidence is labelled as such and is not used in the paper-only evaluation.
+
+Limits:
+- The model can still misread a table, and the verifier can still miss a misreading when the quoted text is correct but the reading is wrong.
+- Comparisons in this app are only as complete as the papers provided. They are not a systematic review.
+- A "comparable" label means the stated context matches and nothing conflicts. It does not mean the methods are equally well implemented.
+- Every correction and proposal decision is recorded with its source and reason. Accepting a proposal changes the comparison; check the source first.
