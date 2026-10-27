@@ -1,9 +1,10 @@
 from __future__ import annotations
-import argparse, json, mimetypes, os, secrets, subprocess, sys
+import argparse, json, mimetypes, os, secrets, sys
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from urllib.parse import urlsplit, unquote
-from .core import Store, RelayError, read_config, digest
+from .core import RelayError, read_config
+from types import SimpleNamespace
 from .providers import with_key
 
 ROOT=Path(__file__).resolve().parent.parent
@@ -27,37 +28,42 @@ def make_handler(store,port):
             self.send_header('X-Content-Type-Options','nosniff')
             self.send_header('Referrer-Policy','no-referrer')
             self.send_header('Content-Security-Policy',"frame-ancestors 'self'" if content_type=='application/pdf' else "default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self'; img-src 'self' data:; connect-src 'self'; frame-ancestors 'self'")
-            request_origin=self.headers.get('Origin','')
-            if self.path=='/api/clips' and request_origin.startswith('chrome-extension://'):
-                self.send_header('Access-Control-Allow-Origin',request_origin)
-                self.send_header('Vary','Origin')
             self.end_headers(); self.wfile.write(body)
         def guard(self,mutation=False):
             if self.headers.get('Host') not in hosts: raise RelayError('INVALID_HOST','Open Relay at '+origin,403)
             request_origin=self.headers.get('Origin','')
-            extension=self.path=='/api/clips' and request_origin.startswith('chrome-extension://')
-            if request_origin and request_origin not in origins and not extension: raise RelayError('ORIGIN_DENIED','This origin is not allowed.',403)
-            if self.headers.get('Sec-Fetch-Site')=='cross-site' and not extension and (mutation or self.path.startswith('/api/')): raise RelayError('ORIGIN_DENIED','Cross-site access is not allowed.',403)
+            if request_origin and request_origin not in origins: raise RelayError('ORIGIN_DENIED','This origin is not allowed.',403)
+            if self.headers.get('Sec-Fetch-Site')=='cross-site' and (mutation or self.path.startswith('/api/')): raise RelayError('ORIGIN_DENIED','Cross-site access is not allowed.',403)
             if mutation:
                 token=self.headers.get('Authorization','').removeprefix('Bearer ')
-                expected=store.pair_token if extension else store.token
-                if not secrets.compare_digest(token,expected): raise RelayError('UNAUTHORIZED','Refresh Relay or re-pair the extension.',403)
-        def do_OPTIONS(self):
-            if self.path!='/api/clips' or not self.headers.get('Origin','').startswith('chrome-extension://'):
-                self.respond({'error':'Origin denied'},403); return
-            self.send_response(204)
-            self.send_header('Access-Control-Allow-Origin',self.headers['Origin'])
-            self.send_header('Access-Control-Allow-Methods','POST')
-            self.send_header('Access-Control-Allow-Headers','Content-Type, Authorization')
-            self.end_headers()
+                expected=store.token
+                if not secrets.compare_digest(token,expected): raise RelayError('UNAUTHORIZED','Refresh Relay to renew the session token.',403)
         def do_GET(self):
             try:
                 self.guard()
                 route=unquote(urlsplit(self.path).path)
                 if route=='/api/state':
-                    with store.lock:
-                        cfg=read_config(store.root)
-                        self.respond({'token':store.token,'providers':{'ollama':bool(cfg.get('OLLAMA_TEST_API_KEY') or cfg.get('OLLAMA_API_KEY')),'nebius':bool(cfg.get('NEBIUS_API_KEY'))},'configured':bool(cfg.get('NEBIUS_API_KEY') or cfg.get('OLLAMA_TEST_API_KEY') or cfg.get('OLLAMA_API_KEY')),'model':cfg.get('NEBIUS_MODEL','nvidia/nemotron-3-super-120b-a12b'),'platform':sys.platform,'hosted':os.environ.get('RELAY_HOSTED')=='1','sources':store.sources(),'runs':store.state['runs']})
+                    cfg=read_config(store.root)
+                    self.respond({'token':store.token,'providers':{'ollama':bool(cfg.get('OLLAMA_TEST_API_KEY') or cfg.get('OLLAMA_API_KEY')),'nebius':bool(cfg.get('NEBIUS_API_KEY'))},'configured':bool(cfg.get('NEBIUS_API_KEY') or cfg.get('OLLAMA_TEST_API_KEY') or cfg.get('OLLAMA_API_KEY')),'model':cfg.get('NEBIUS_MODEL','nvidia/nemotron-3-super-120b-a12b'),'platform':sys.platform,'hosted':os.environ.get('RELAY_HOSTED')=='1'})
+                elif route=='/api/desk':
+                    from .desk import overview
+                    self.respond(overview(store.root,research))
+                elif route=='/api/submission/export':
+                    from scripts.package_submission import build
+                    path,_=build()
+                    self.respond(path.read_bytes(),content_type='application/zip')
+                elif route=='/api/schema':
+                    from .desk import schema
+                    self.respond(schema())
+                elif route=='/api/research/source':
+                    from urllib.parse import parse_qs
+                    from .core import digest
+                    q=parse_qs(urlsplit(self.path).query)
+                    with research.lock:
+                        paper=research.paper(research.get(q.get('id',[''])[0]),q.get('paper',[''])[0])
+                        text=research.source(paper)
+                        self.respond({'text':text,'sha256':digest(text),'url':paper.get('evidenceUrl'),'kind':paper.get('evidenceKind')})
+                elif route=='/README.md': self.respond((ROOT/'README.md').read_bytes(),content_type='text/plain; charset=utf-8')
                 elif route=='/api/research': self.respond(research.state())
                 elif route=='/api/research/checkpoint':
                     from urllib.parse import parse_qs
@@ -77,18 +83,8 @@ def make_handler(store,port):
                     provider=parse_qs(urlsplit(self.path).query).get('provider',['ollama'])[0]
                     hk=self.headers.get('X-Provider-Key','').strip() if self.headers.get('X-Provider','')==provider else ''
                     self.respond(models(with_key(read_config(store.root),provider,hk or None),provider))
-                elif route=='/api/pair': self.respond({'token':store.pair_token,'endpoint':origin})
-                elif route.startswith('/api/output/'):
-                    parts=route.split('/')
-                    if len(parts)!=5: raise RelayError('NOT_FOUND','File not found.',404)
-                    with store.lock:
-                        run=store.run(parts[3]); item=next((o for o in run['outputs'] if o['filename']==parts[4]),None)
-                        if not item: raise RelayError('NOT_FOUND','File not found.',404)
-                        path=store.root/item['path']
-                        if path.is_symlink() or not path.resolve().is_relative_to(store.outbox.resolve()): raise RelayError('INVALID_PATH','Unsafe output path.',403)
-                        self.respond(path.read_bytes(),content_type='application/zip' if path.suffix=='.zip' else 'text/plain; charset=utf-8')
                 else:
-                    path=ROOT/'web'/('research.html' if route=='/' else route.lstrip('/'))
+                    path=ROOT/'web'/('research.html' if route in ('/','/index.html') else route.lstrip('/'))
                     if not path.resolve().is_relative_to((ROOT/'web').resolve()) or not path.is_file(): raise RelayError('NOT_FOUND','Page not found.',404)
                     self.respond(path.read_bytes(),content_type=mimetypes.guess_type(path.name)[0] or 'application/octet-stream')
             except RelayError as e: self.respond({'error':str(e),'code':e.code},e.status)
@@ -106,7 +102,10 @@ def make_handler(store,port):
                 if key and self.path.startswith('/api/research/'):
                     if self.path=='/api/research/start': data['providerKey']=key
                     elif data.get('id'): research.set_key(data['id'],provider,key)
-                if self.path=='/api/research/start': result=research.start(data)
+                if self.path=='/api/desk/load':
+                    from .desk import load_study, load_discovery
+                    result=load_discovery(store.root,research) if data.get('study')=='discovery' else load_study(store.root,research)
+                elif self.path=='/api/research/start': result=research.start(data)
                 elif self.path=='/api/research/branch': result=research.branch(data)
                 elif self.path=='/api/research/update': result=research.update(data)
                 elif self.path=='/api/research/draft': result=research.draft(data)
@@ -117,25 +116,6 @@ def make_handler(store,port):
                     with research.lock:
                         p=research.get(data.get('id')); chosen=set(data.get('papers') or [])
                         result=compare(p['papers'],chosen if len(chosen)>=2 else None)
-                elif self.path=='/api/clips': result=store.add_clip(data)
-                elif self.path=='/api/sources/remove':
-                    with store.lock:
-                        store.state['clips']=[s for s in store.state['clips'] if s['id']!=data.get('id')]; store.save(); result={'ok':True}
-                elif self.path=='/api/runs': result=store.create(data.get('goal'),data.get('sources'),data.get('mode'),data.get('recipe','brief'),data.get('feedback',''),provider if key else data.get('provider','nebius'),data.get('model'),key or None)
-                elif self.path=='/api/workflow/branch': result=store.branch(data.get('id'),data.get('revision'))
-                elif self.path=='/api/approve': result=store.approve(data.get('id'),data.get('revision'))
-                elif self.path=='/api/edit': result=store.edit(data.get('id'),data.get('revision'),data.get('index'),data.get('content'))
-                elif self.path=='/api/reject': result=store.reject(data.get('id'),data.get('revision'),data.get('reason',''))
-                elif self.path=='/api/cancel': result=store.cancel(data.get('id'))
-                elif self.path=='/api/reveal':
-                    if sys.platform!='darwin': raise RelayError('MAC_REQUIRED','Finder requires macOS.')
-                    with store.lock:
-                        run=store.run(data.get('id'))
-                        if not run['outputs']: raise RelayError('NO_OUTPUT','This workflow has no saved files.')
-                        path=store.outbox/run['id']
-                        if path.is_symlink() or not path.exists(): raise RelayError('MISSING_OUTPUT','Output folder is missing.')
-                        subprocess.run(['/usr/bin/open',str(path)],check=True,timeout=10)
-                    result={'ok':True}
                 else: raise RelayError('NOT_FOUND','Unknown action.',404)
                 self.respond(result)
             except RelayError as e: self.respond({'error':str(e),'code':e.code},e.status)
@@ -147,7 +127,7 @@ def main():
     parser=argparse.ArgumentParser(description='Relay local workflow companion')
     parser.add_argument('--port',type=int,default=int(os.environ.get('PORT') or read_config(ROOT).get('RELAY_PORT','4280')))
     args=parser.parse_args()
-    store=Store(ROOT)
+    store=SimpleNamespace(root=ROOT,token=secrets.token_urlsafe(32))
     server=ThreadingHTTPServer((os.environ.get('RELAY_HOST','127.0.0.1'),args.port),make_handler(store,args.port))
     print(f'Relay is ready at http://127.0.0.1:{args.port}',flush=True)
     print('Local only. API keys stay on the companion. Ctrl+C to stop.',flush=True)

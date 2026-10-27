@@ -246,20 +246,21 @@ def manuscript(project, draft):
     if pairs:
         rows = '\n'.join(tex_escape(r['a']) + ' & ' + tex_escape(r['b']) + ' & ' + tex_escape(r['outcome']) + ' & ' + tex_escape(r['reason']) + r' \\' for r in pairs[:14])
         table = r'''
-\begin{table}[h]
-\small
-\begin{tabular}{p{3.5cm}p{3.5cm}p{2.1cm}p{5.6cm}}
+{\small
+\begin{longtable}{p{3.5cm}p{3.5cm}p{2.1cm}p{5.6cm}}
 \textbf{Result A} & \textbf{Result B} & \textbf{Outcome} & \textbf{Reason} \\ \hline
+\endhead
 ''' + rows + r'''
-\end{tabular}
-\caption{Comparison outcomes computed from source-checked experimental context. Insufficient means the context is not stated, not that the results conflict.}
-\end{table}
+\caption{Comparison outcomes computed from source-checked experimental context. Insufficient means the context is not stated, not that the results conflict.}\\
+\end{longtable}
+}
 '''
     control_list = ''.join(r'\item ' + tex_escape(c['text']) + '\n' for c in draft.get('controls', []))
     bib = '\n'.join('@article{' + p['id'] + ',\n title={' + tex_escape(p['title']) + '},\n author={' + ' and '.join(tex_escape(a) for a in p['authors']) + '},\n year={' + str(p['year'] or '') + '},\n note={' + tex_escape(p['url']) + '}\n}' for p in papers.values() if p.get('reviewed'))
     tex = r'''\documentclass[11pt]{article}
 \usepackage[margin=1in]{geometry}
 \usepackage{hyperref}
+\usepackage{longtable}
 \title{''' + tex_escape(project['hypothesis']) + r'''}
 \author{Research draft -- human review required}
 \date{\today}
@@ -516,6 +517,8 @@ class Research(ExecutionHistory):
         provider = data.get('provider') or ('nebius' if (read_config(self.root).get('NEBIUS_API_KEY') or key) else 'ollama')
         cfg = with_key(read_config(self.root), provider, key)
         model = data.get('model') or (cfg.get('NEBIUS_MODEL', 'nvidia/nemotron-3-super-120b-a12b') if provider == 'nebius' else 'gpt-oss:120b')
+        limit = data.get('paperLimit', 12)
+        if not isinstance(limit, int) or isinstance(limit, bool) or not 2 <= limit <= 12: raise RelayError('INVALID_LIMIT', 'Choose between 2 and 12 papers per discovery run.')
         seeds = [str(s).strip() for s in (data.get('seeds') or []) if str(s).strip()][:12]
         for s in seeds:
             if not ARXIV_ID.search(s): raise RelayError('INVALID_PAPER', f'"{s[:60]}" is not an arXiv ID or arXiv link.')
@@ -524,7 +527,7 @@ class Research(ExecutionHistory):
         with self.lock:
             if any(p['status'] in BUSY for p in self.projects): raise RelayError('BUSY', 'Wait for the active research agent to finish.')
             p = {'id': secrets.token_hex(8), 'hypothesis': hypothesis, 'provider': provider, 'model': model, 'created': now(), 'status': 'discovering', 'events': [], 'papers': [],
-                 'suggestions': [], 'revision': 1, 'tokens': 0, 'tex': '', 'bib': '', 'seeds': seeds, 'seedOnly': seed_only, 'proposals': [], 'corrections': [], 'calls': []}
+                 'suggestions': [], 'revision': 1, 'tokens': 0, 'tex': '', 'bib': '', 'seeds': seeds, 'seedOnly': seed_only, 'paperLimit': limit, 'proposals': [], 'corrections': [], 'calls': []}
             self.keys[p['id']] = cfg; self.projects.insert(0, p); self.checkpoint(p, 'hypothesis', 'Hypothesis accepted', details={'seeds': seeds, 'seedOnly': seed_only})
         threading.Thread(target=self.run, args=(p,), daemon=True).start()
         return {'id': p['id']}
@@ -549,7 +552,7 @@ class Research(ExecutionHistory):
                     self.event(p, 'Searching OpenAlex: ' + q)
                     for paper in discover(q):
                         if title_key(paper['title']) not in titles: papers.setdefault(paper['id'], paper); titles.add(title_key(paper['title']))
-            selected = list(papers.values())[:12]
+            selected = list(papers.values())[:p.get('paperLimit', 12)]
             if not selected: raise ValueError('No papers found. Try a broader hypothesis or add arXiv IDs.')
             self.event(p, f'Found {len(selected)} papers. Retrieving available arXiv full text and abstracts.')
             with concurrent.futures.ThreadPoolExecutor(max_workers=4) as pool: selected = list(pool.map(enrich, selected))
@@ -730,7 +733,7 @@ class Research(ExecutionHistory):
         paper = self.paper(p, prop['paper']); m = self.metric(paper, prop['metric'])
         value = norm(data.get('value') or prop['value'])
         evidence = {prop['field']: {'quote': prop['quote'], 'origin': prop['origin'], 'location': prop['location'], 'url': prop['url']}}
-        correction = self.correct(p, paper, m, {prop['field']: value}, 'agent proposal accepted by researcher', prop['explanation'], evidence)
+        correction = self.correct(p, paper, m, {prop['field']: value}, 'agent proposal accepted by agent' if data.get('actor') == 'agent' else 'agent proposal accepted by researcher', prop['explanation'], evidence)
         prop.update(status='accepted', decided=now(), correction=correction and correction['id'], acceptedValue=value)
         return correction
 
@@ -756,9 +759,10 @@ class Research(ExecutionHistory):
                     if not isinstance(edit, dict): continue
                     for key in ('name', 'value', 'unit', 'direction'): paper['metrics'][i][key] = revised[i][key]
                     ctx = {k: edit[k] for k in CONTEXT_EDITABLE if k in edit and k not in ('name', 'value', 'unit', 'direction')}
-                    c = self.correct(p, paper, paper['metrics'][i], ctx, 'researcher review', str(data.get('note', '')))
+                    c = self.correct(p, paper, paper['metrics'][i], ctx, 'agent review' if data.get('actor') == 'agent' else 'researcher review', str(data.get('note', '')))
                     if c: corrections.append(c['id'])
                 paper['reviewed'] = bool(data.get('reviewed'))
+                paper['reviewActor'] = 'agent' if data.get('actor') == 'agent' else 'researcher'
                 for i, m in enumerate(paper['metrics']): m['verified'] = i in data.get('verified', [])
                 paper['topic'] = canonical_topic(data.get('topic', paper.get('topic', 'Other approaches')))
                 for field in ('rationale', 'limitations'):
@@ -772,7 +776,7 @@ class Research(ExecutionHistory):
                 if field not in CONTEXT_EDITABLE or field in ('value', 'name', 'unit', 'direction'): raise RelayError('INVALID_FIELD', 'Correct an experimental-context field.')
                 note = str(data.get('note', '')).strip()
                 if len(note) < 5: raise RelayError('NOTE_REQUIRED', 'Say why this value is correct, for example the table, appendix, or code line you checked.')
-                c = self.correct(p, paper, m, {field: data.get('value', '')}, 'researcher correction', note)
+                c = self.correct(p, paper, m, {field: data.get('value', '')}, 'agent correction' if data.get('actor') == 'agent' else 'researcher correction', note)
                 if not c: raise RelayError('NO_CHANGE', 'That field already has this value.')
                 result['correction'] = c['id']; details.update(correction=c['id'], field=field)
             elif action == 'proposal':
@@ -805,6 +809,22 @@ class Research(ExecutionHistory):
                 if not ARXIV_ID.search(ident): raise RelayError('INVALID_PAPER', 'Use an arXiv ID such as 2101.06861 or an arxiv.org link.')
                 p['revision'] += 1; p['status'] = 'discovering'; self.checkpoint(p, 'input', 'Paper requested: ' + ident[:60], details={'arxiv': ident[:80]})
                 threading.Thread(target=self.add_paper, args=(p, ident), daemon=True).start(); return {'ok': True}
+            elif action == 'amend-draft':
+                note = str(data.get('note', '')).strip()
+                d = data.get('draft')
+                if not isinstance(d, dict) or len(json.dumps(d)) > 100000: raise RelayError('INVALID_DRAFT', 'Provide a structured draft under 100,000 characters.')
+                if len(note) < 5: raise RelayError('NOTE_REQUIRED', 'Explain the source review behind the manuscript amendment.')
+                d = copy.deepcopy(d)
+                papers = [x for x in p['papers'] if x.get('reviewed')]
+                pairs, _ = self.evidence_packet(p, papers)
+                self.check_draft(d, papers, pairs)
+                d['pairTable'] = self.pair_table(pairs); d['controls'] = controls(pairs)
+                tex, bib = manuscript(p, d)
+                p.update(draft=d, tex=tex, bib=bib, draftReviewed=False)
+                p.pop('compile', None)
+                actor = 'agent' if data.get('actor') == 'agent' else 'researcher'
+                p.setdefault('draftEdits', []).append({'at': now(), 'actor': actor, 'note': note[:3000]})
+                details.update(actor=actor, note=note[:3000])
             elif action == 'save':
                 if len(str(data.get('tex', ''))) > 100000 or len(str(data.get('bib', ''))) > 100000: raise RelayError('TOO_LARGE', 'Manuscript exceeds size limit.')
                 newtex, newbib = str(data.get('tex', '')), str(data.get('bib', ''))
@@ -813,7 +833,7 @@ class Research(ExecutionHistory):
             else: raise RelayError('INVALID_ACTION', 'Unknown research edit.')
             p['revision'] += 1
             labels = {'review': ('review', 'Evidence review saved'), 'correct': ('correction', 'Researcher correction applied'), 'proposal': ('correction' if data.get('decision') == 'accept' else 'review', 'Proposal accepted' if data.get('decision') == 'accept' else 'Proposal rejected'),
-                      'resolve': ('review', 'Correction impact reviewed'), 'save': ('edit', 'Manuscript saved')}
+                      'resolve': ('review', 'Correction impact reviewed'), 'save': ('edit', 'Manuscript saved'), 'amend-draft': ('edit', 'Source-reviewed manuscript amendment')}
             kind, label = labels[action]
             self.checkpoint(p, kind, label, details=details)
             return result

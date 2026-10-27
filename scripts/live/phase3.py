@@ -5,14 +5,14 @@ pid = open('project_id').read(); t = token()
 p = wait(pid, quiet=True); print('start', p['status'], p.get('error'), flush=True)
 for x in p['papers']:
     p = project(pid)
-    call('research/update', {'id': pid, 'revision': p['revision'], 'action': 'review', 'paper': x['id'], 'reviewed': True, 'verified': [],
+    call('research/update', {'id': pid, 'revision': p['revision'], 'action': 'review', 'actor': 'agent', 'paper': x['id'], 'reviewed': True, 'verified': [],
                              'note': 'Reviewed by test script for drafting; not human-verified.', 'metrics': []}, t)
 print('reviewed', len(p['papers']), flush=True)
 p = project(pid)
 for prop in [x for x in p.get('proposals', []) if x['status'] == 'pending']:
     p = project(pid)
     try:
-        r = call('research/update', {'id': pid, 'revision': p['revision'], 'action': 'proposal', 'proposal': prop['id'], 'decision': 'accept', 'value': prop['value']}, t)
+        r = call('research/update', {'id': pid, 'revision': p['revision'], 'action': 'proposal', 'actor': 'agent', 'proposal': prop['id'], 'decision': 'accept', 'value': prop['value']}, t)
         print('accepted', prop['field'], prop['value'][:60], '->', r.get('correction'), flush=True)
     except SystemExit as e: print('skip', prop['field'], str(e)[:120], flush=True)
 p = wait(pid, quiet=True); print('after accept', p['status'], flush=True)

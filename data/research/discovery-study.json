@@ -1,0 +1,2997 @@
+{
+ "id": "5fe59961a0374d8b",
+ "hypothesis": "Which published traffic forecasting results can serve as defensible baselines when forecast horizon and metric masking differ? Investigate evidence rather than assuming lower MAE proves superiority.",
+ "provider": "nebius",
+ "model": "nvidia/nemotron-3-super-120b-a12b",
+ "created": "2026-10-27T15:50:28.194979+00:00",
+ "status": "review",
+ "events": [
+  {
+   "time": "2026-10-27T15:50:28.207824+00:00",
+   "message": "Retrieving your paper 2101.06861"
+  },
+  {
+   "time": "2026-10-27T15:50:28.799659+00:00",
+   "message": "Retrieving your paper 1906.00121"
+  },
+  {
+   "time": "2026-10-27T15:50:29.082759+00:00",
+   "message": "Planning two complementary searches from your hypothesis."
+  },
+  {
+   "time": "2026-10-27T15:50:31.491661+00:00",
+   "message": "Searching OpenAlex: traffic forecasting benchmark horizon comparison"
+  },
+  {
+   "time": "2026-10-27T15:50:34.653496+00:00",
+   "message": "Searching OpenAlex: MAE RMSE metric masking study"
+  },
+  {
+   "time": "2026-10-27T15:50:36.206445+00:00",
+   "message": "Found 4 papers. Retrieving available arXiv full text and abstracts."
+  },
+  {
+   "time": "2026-10-27T15:50:36.742579+00:00",
+   "message": "Extracting experimental evidence: Discrete Graph Structure Learning for Forecasting Multiple Time Series"
+  },
+  {
+   "time": "2026-10-27T15:51:21.019996+00:00",
+   "message": "Extracting experimental evidence: Graph WaveNet for Deep Spatial-Temporal Graph Modeling"
+  },
+  {
+   "time": "2026-10-27T15:52:02.317823+00:00",
+   "message": "Extracting experimental evidence: LargeST: A Benchmark Dataset for Large-Scale Traffic Forecasting"
+  },
+  {
+   "time": "2026-10-27T15:52:32.584291+00:00",
+   "message": "Extracting experimental evidence: Graph Neural Controlled Differential Equations for Traffic Forecasting"
+  },
+  {
+   "time": "2026-10-27T15:52:37.112450+00:00",
+   "message": "Updating research questions from the latest evidence coverage."
+  },
+  {
+   "time": "2026-10-27T15:52:42.495828+00:00",
+   "message": "Ready for review. Check comparisons, investigate gaps, and verify the numbers you rely on."
+  },
+  {
+   "time": "2026-10-27T15:53:17.352749+00:00",
+   "message": "Locating 2.99 in Discrete Graph Structure Learning for Forecasting Multiple Time Series and reading its experimental setup."
+  },
+  {
+   "time": "2026-10-27T15:53:29.974867+00:00",
+   "message": "Added GTS MAE 2.99 with its context. See how it compares."
+  },
+  {
+   "time": "2026-10-27T15:53:53.638082+00:00",
+   "message": "Drafting a proposed-study manuscript from reviewed papers and comparison outcomes."
+  },
+  {
+   "time": "2026-10-27T15:54:14.526470+00:00",
+   "message": "Draft staged in the editor. Review the prose and citations before marking it approved."
+  }
+ ],
+ "papers": [
+  {
+   "id": "arXiv210106861",
+   "arxiv": "2101.06861",
+   "title": "Discrete Graph Structure Learning for Forecasting Multiple Time Series",
+   "year": 2021,
+   "url": "https://arxiv.org/abs/2101.06861",
+   "doi": null,
+   "authors": [
+    "Chao Shang",
+    "Jie Chen",
+    "Jinbo Bi"
+   ],
+   "venue": "arXiv",
+   "citations": 0,
+   "abstract": "Time series forecasting is an extensively studied subject in statistics, economics, and computer science. Exploration of the correlation and causation among the variables in a multivariate time series shows promise in enhancing the performance of a time series model. When using deep neural networks as forecasting models, we hypothesize that exploiting the pairwise information among multiple (multivariate) time series also improves their forecast. If an explicit graph structure is known, graph neural networks (GNNs) have been demonstrated as powerful tools to exploit the structure. In this work, we propose learning the structure simultaneously with the GNN if the graph is unknown. We cast the problem as learning a probabilistic graph model through optimizing the mean performance over the graph distribution. The distribution is parameterized by a neural network so that discrete graphs can be sampled differentiably through reparameterization. Empirical evaluations show that our method is simpler, more efficient, and better performing than a recently proposed bilevel learning approach for graph structure learning, as well as a broad array of forecasting models, either deep or non-deep learning based, and graph or non-graph based.",
+   "evidenceKind": "arXiv full text (48,305 characters, tables preserved)",
+   "evidenceUrl": "https://arxiv.org/html/2101.06861",
+   "topics": [],
+   "metrics": [
+    {
+     "name": "MAE",
+     "value": "2.39",
+     "unit": "unknown",
+     "direction": "lower",
+     "method": "GTS",
+     "dataset": "METR-LA",
+     "datasetVersion": "unknown",
+     "split": "70/10/20",
+     "horizon": "unknown",
+     "aggregation": "unknown",
+     "preprocessing": "unknown",
+     "metricDefinition": "non-standard per the paper's later correction: It was brought to our attention recently that this version calculated the evaluation metrics MAE/RMSE/MAPE in a manner slightly different from that used to report the results of DCRNN in the official publication (https://github.",
+     "provenance": "unknown",
+     "citedFrom": "unknown",
+     "locator": "Table 1",
+     "quote": "| 15 min | MAE | 4.16 | 3.99 | 4.42 | 3.99 | 3.99 | 3.44 | 2.77 | 2.75 | 2.61 | 2.39",
+     "verified": false,
+     "quoteLocated": false,
+     "evidence": {
+      "dataset": {
+       "quote": "We experiment with two benchmark data sets METR-LA and PEMS-BAY from Li et al. (2018).",
+       "origin": "paper"
+      },
+      "split": {
+       "quote": "For all data sets, we use a temporal 70/10/20 split for training, validation, and testing, respectively.",
+       "origin": "paper"
+      },
+      "method": {
+       "quote": "| | Metric | HA | ARIMA | VAR | SVR | FNN | LSTM | DCRNN | LDS | GTSv | GTS",
+       "origin": "paper"
+      },
+      "locator": {
+       "quote": "Table 1: Forecasting error (METR-LA).",
+       "origin": "paper"
+      },
+      "metricDefinition": {
+       "quote": "It was brought to our attention recently that this version calculated the evaluation metrics MAE/RMSE/MAPE in a manner slightly different from that used to report the results of DCRNN in the official publication (https://github.",
+       "origin": "paper"
+      }
+     },
+     "superseded": true,
+     "checks": {
+      "support": {
+       "method": "quoted",
+       "dataset": "nearby",
+       "datasetVersion": "missing",
+       "split": "quoted",
+       "horizon": "missing",
+       "aggregation": "missing",
+       "preprocessing": "missing",
+       "metricDefinition": "quoted",
+       "citedFrom": "missing",
+       "provenance": "missing"
+      },
+      "cell": {
+       "path": "15 min / MAE / GTS",
+       "caption": "Table 1: Forecasting error (METR-LA).",
+       "method": true,
+       "metric": true,
+       "horizon": true,
+       "ok": true,
+       "horizonLabel": "15 min"
+      }
+     },
+     "rejected": {},
+     "missing": [
+      "horizon",
+      "aggregation",
+      "preprocessing",
+      "provenance"
+     ],
+     "id": "b5422019fa37",
+     "history": []
+    },
+    {
+     "name": "MAE",
+     "value": "2.64",
+     "unit": "unknown",
+     "direction": "lower",
+     "method": "GTS",
+     "dataset": "METR-LA",
+     "datasetVersion": "unknown",
+     "split": "70/10/20",
+     "horizon": "unknown",
+     "aggregation": "unknown",
+     "preprocessing": "unknown",
+     "metricDefinition": "unknown",
+     "provenance": "unknown",
+     "citedFrom": "unknown",
+     "locator": "Table 4",
+     "quote": "| 15 min | MAE | 4.16 | 3.99 | 4.42 | 3.99 | 3.99 | 3.44 | 2.77 | 2.75 | 2.74 | 2.64",
+     "verified": false,
+     "quoteLocated": false,
+     "evidence": {
+      "dataset": {
+       "quote": "We experiment with two benchmark data sets METR-LA and PEMS-BAY from Li et al. (2018).",
+       "origin": "paper"
+      },
+      "split": {
+       "quote": "For all data sets, we use a temporal 70/10/20 split for training, validation, and testing, respectively.",
+       "origin": "paper"
+      },
+      "method": {
+       "quote": "| | Metric | HA | ARIMA | VAR | SVR | FNN | LSTM | DCRNN | LDS | GTSv | GTS",
+       "origin": "paper"
+      },
+      "locator": {
+       "quote": "Table 4: (Correction of Table 1) Forecasting error (METR-LA).",
+       "origin": "paper"
+      }
+     },
+     "checks": {
+      "support": {
+       "method": "quoted",
+       "dataset": "nearby",
+       "datasetVersion": "missing",
+       "split": "quoted",
+       "horizon": "missing",
+       "aggregation": "missing",
+       "preprocessing": "missing",
+       "metricDefinition": "missing",
+       "citedFrom": "missing",
+       "provenance": "missing"
+      },
+      "cell": {
+       "path": "15 min / MAE / GTS",
+       "caption": "Table 4: (Correction of Table 1) Forecasting error (METR-LA).",
+       "method": true,
+       "metric": true,
+       "horizon": true,
+       "ok": true,
+       "horizonLabel": "15 min"
+      }
+     },
+     "rejected": {},
+     "missing": [
+      "horizon",
+      "aggregation",
+      "metricDefinition",
+      "preprocessing",
+      "provenance"
+     ],
+     "id": "fa05f67a1dc1",
+     "history": []
+    },
+    {
+     "name": "MAE",
+     "value": "2.77",
+     "unit": "unknown",
+     "direction": "lower",
+     "method": "DCRNN",
+     "dataset": "METR-LA",
+     "datasetVersion": "unknown",
+     "split": "70/10/20",
+     "horizon": "unknown",
+     "aggregation": "unknown",
+     "preprocessing": "unknown",
+     "metricDefinition": "non-standard per the paper's later correction: It was brought to our attention recently that this version calculated the evaluation metrics MAE/RMSE/MAPE in a manner slightly different from that used to report the results of DCRNN in the official publication (https://github.",
+     "provenance": "unknown",
+     "citedFrom": "unknown",
+     "locator": "Table 1",
+     "quote": "| 15 min | MAE | 4.16 | 3.99 | 4.42 | 3.99 | 3.99 | 3.44 | 2.77 | 2.75 | 2.61 | 2.39",
+     "verified": false,
+     "quoteLocated": false,
+     "evidence": {
+      "dataset": {
+       "quote": "We experiment with two benchmark data sets METR-LA and PEMS-BAY from Li et al. (2018).",
+       "origin": "paper"
+      },
+      "split": {
+       "quote": "For all data sets, we use a temporal 70/10/20 split for training, validation, and testing, respectively.",
+       "origin": "paper"
+      },
+      "method": {
+       "quote": "| | Metric | HA | ARIMA | VAR | SVR | FNN | LSTM | DCRNN | LDS | GTSv | GTS",
+       "origin": "paper"
+      },
+      "locator": {
+       "quote": "Table 1: Forecasting error (METR-LA).",
+       "origin": "paper"
+      },
+      "metricDefinition": {
+       "quote": "It was brought to our attention recently that this version calculated the evaluation metrics MAE/RMSE/MAPE in a manner slightly different from that used to report the results of DCRNN in the official publication (https://github.",
+       "origin": "paper"
+      }
+     },
+     "superseded": true,
+     "checks": {
+      "support": {
+       "method": "quoted",
+       "dataset": "nearby",
+       "datasetVersion": "missing",
+       "split": "quoted",
+       "horizon": "missing",
+       "aggregation": "missing",
+       "preprocessing": "missing",
+       "metricDefinition": "quoted",
+       "citedFrom": "missing",
+       "provenance": "missing"
+      },
+      "cell": {
+       "path": "15 min / MAE / DCRNN",
+       "caption": "Table 1: Forecasting error (METR-LA).",
+       "method": true,
+       "metric": true,
+       "horizon": true,
+       "ok": true,
+       "horizonLabel": "15 min"
+      }
+     },
+     "rejected": {},
+     "missing": [
+      "horizon",
+      "aggregation",
+      "preprocessing",
+      "provenance"
+     ],
+     "id": "66fe90e2de8d",
+     "history": []
+    },
+    {
+     "name": "MAE",
+     "value": "3.60",
+     "unit": "unknown",
+     "direction": "lower",
+     "method": "DCRNN",
+     "dataset": "METR-LA",
+     "datasetVersion": "unknown",
+     "split": "70/10/20",
+     "horizon": "unknown",
+     "aggregation": "unknown",
+     "preprocessing": "unknown",
+     "metricDefinition": "non-standard per the paper's later correction: It was brought to our attention recently that this version calculated the evaluation metrics MAE/RMSE/MAPE in a manner slightly different from that used to report the results of DCRNN in the official publication (https://github.",
+     "provenance": "unknown",
+     "citedFrom": "unknown",
+     "locator": "Table 1",
+     "quote": "| 60 min | MAE | 4.16 | 6.90 | 6.52 | 6.72 | 4.49 | 4.37 | 3.60 | 3.63 | 3.46 | 2.99",
+     "verified": false,
+     "quoteLocated": false,
+     "evidence": {
+      "dataset": {
+       "quote": "We experiment with two benchmark data sets METR-LA and PEMS-BAY from Li et al. (2018).",
+       "origin": "paper"
+      },
+      "split": {
+       "quote": "For all data sets, we use a temporal 70/10/20 split for training, validation, and testing, respectively.",
+       "origin": "paper"
+      },
+      "method": {
+       "quote": "| | Metric | HA | ARIMA | VAR | SVR | FNN | LSTM | DCRNN | LDS | GTSv | GTS",
+       "origin": "paper"
+      },
+      "locator": {
+       "quote": "Table 1: Forecasting error (METR-LA).",
+       "origin": "paper"
+      },
+      "metricDefinition": {
+       "quote": "It was brought to our attention recently that this version calculated the evaluation metrics MAE/RMSE/MAPE in a manner slightly different from that used to report the results of DCRNN in the official publication (https://github.",
+       "origin": "paper"
+      }
+     },
+     "superseded": true,
+     "checks": {
+      "support": {
+       "method": "quoted",
+       "dataset": "nearby",
+       "datasetVersion": "missing",
+       "split": "quoted",
+       "horizon": "missing",
+       "aggregation": "missing",
+       "preprocessing": "missing",
+       "metricDefinition": "quoted",
+       "citedFrom": "missing",
+       "provenance": "missing"
+      },
+      "cell": {
+       "path": "60 min / MAE / DCRNN",
+       "caption": "Table 1: Forecasting error (METR-LA).",
+       "method": true,
+       "metric": true,
+       "horizon": true,
+       "ok": true,
+       "horizonLabel": "60 min"
+      }
+     },
+     "rejected": {},
+     "missing": [
+      "horizon",
+      "aggregation",
+      "preprocessing",
+      "provenance"
+     ],
+     "id": "ed531805dc76",
+     "history": []
+    },
+    {
+     "name": "MAE",
+     "value": "2.75",
+     "unit": "unknown",
+     "direction": "lower",
+     "method": "LDS",
+     "dataset": "METR-LA",
+     "datasetVersion": "unknown",
+     "split": "70/10/20",
+     "horizon": "unknown",
+     "aggregation": "unknown",
+     "preprocessing": "unknown",
+     "metricDefinition": "non-standard per the paper's later correction: It was brought to our attention recently that this version calculated the evaluation metrics MAE/RMSE/MAPE in a manner slightly different from that used to report the results of DCRNN in the official publication (https://github.",
+     "provenance": "unknown",
+     "citedFrom": "unknown",
+     "locator": "Table 1",
+     "quote": "| 15 min | MAE | 4.16 | 3.99 | 4.42 | 3.99 | 3.99 | 3.44 | 2.77 | 2.75 | 2.61 | 2.39",
+     "verified": false,
+     "quoteLocated": false,
+     "evidence": {
+      "dataset": {
+       "quote": "We experiment with two benchmark data sets METR-LA and PEMS-BAY from Li et al. (2018).",
+       "origin": "paper"
+      },
+      "split": {
+       "quote": "For all data sets, we use a temporal 70/10/20 split for training, validation, and testing, respectively.",
+       "origin": "paper"
+      },
+      "method": {
+       "quote": "| | Metric | HA | ARIMA | VAR | SVR | FNN | LSTM | DCRNN | LDS | GTSv | GTS",
+       "origin": "paper"
+      },
+      "locator": {
+       "quote": "Table 1: Forecasting error (METR-LA).",
+       "origin": "paper"
+      },
+      "metricDefinition": {
+       "quote": "It was brought to our attention recently that this version calculated the evaluation metrics MAE/RMSE/MAPE in a manner slightly different from that used to report the results of DCRNN in the official publication (https://github.",
+       "origin": "paper"
+      }
+     },
+     "superseded": true,
+     "checks": {
+      "support": {
+       "method": "quoted",
+       "dataset": "nearby",
+       "datasetVersion": "missing",
+       "split": "quoted",
+       "horizon": "missing",
+       "aggregation": "missing",
+       "preprocessing": "missing",
+       "metricDefinition": "quoted",
+       "citedFrom": "missing",
+       "provenance": "missing"
+      },
+      "cell": {
+       "path": "15 min / MAE / LDS",
+       "caption": "Table 1: Forecasting error (METR-LA).",
+       "method": true,
+       "metric": true,
+       "horizon": true,
+       "ok": true,
+       "horizonLabel": "15 min"
+      }
+     },
+     "rejected": {},
+     "missing": [
+      "horizon",
+      "aggregation",
+      "preprocessing",
+      "provenance"
+     ],
+     "id": "5a6163058109",
+     "history": []
+    },
+    {
+     "name": "MAE",
+     "value": "3.63",
+     "unit": "unknown",
+     "direction": "lower",
+     "method": "LDS",
+     "dataset": "METR-LA",
+     "datasetVersion": "unknown",
+     "split": "70/10/20",
+     "horizon": "unknown",
+     "aggregation": "unknown",
+     "preprocessing": "unknown",
+     "metricDefinition": "non-standard per the paper's later correction: It was brought to our attention recently that this version calculated the evaluation metrics MAE/RMSE/MAPE in a manner slightly different from that used to report the results of DCRNN in the official publication (https://github.",
+     "provenance": "unknown",
+     "citedFrom": "unknown",
+     "locator": "Table 1",
+     "quote": "| 60 min | MAE | 4.16 | 6.90 | 6.52 | 6.72 | 4.49 | 4.37 | 3.60 | 3.63 | 3.46 | 2.99",
+     "verified": false,
+     "quoteLocated": false,
+     "evidence": {
+      "dataset": {
+       "quote": "We experiment with two benchmark data sets METR-LA and PEMS-BAY from Li et al. (2018).",
+       "origin": "paper"
+      },
+      "split": {
+       "quote": "For all data sets, we use a temporal 70/10/20 split for training, validation, and testing, respectively.",
+       "origin": "paper"
+      },
+      "method": {
+       "quote": "| | Metric | HA | ARIMA | VAR | SVR | FNN | LSTM | DCRNN | LDS | GTSv | GTS",
+       "origin": "paper"
+      },
+      "locator": {
+       "quote": "Table 1: Forecasting error (METR-LA).",
+       "origin": "paper"
+      },
+      "metricDefinition": {
+       "quote": "It was brought to our attention recently that this version calculated the evaluation metrics MAE/RMSE/MAPE in a manner slightly different from that used to report the results of DCRNN in the official publication (https://github.",
+       "origin": "paper"
+      }
+     },
+     "superseded": true,
+     "checks": {
+      "support": {
+       "method": "quoted",
+       "dataset": "nearby",
+       "datasetVersion": "missing",
+       "split": "quoted",
+       "horizon": "missing",
+       "aggregation": "missing",
+       "preprocessing": "missing",
+       "metricDefinition": "quoted",
+       "citedFrom": "missing",
+       "provenance": "missing"
+      },
+      "cell": {
+       "path": "60 min / MAE / LDS",
+       "caption": "Table 1: Forecasting error (METR-LA).",
+       "method": true,
+       "metric": true,
+       "horizon": true,
+       "ok": true,
+       "horizonLabel": "60 min"
+      }
+     },
+     "rejected": {},
+     "missing": [
+      "horizon",
+      "aggregation",
+      "preprocessing",
+      "provenance"
+     ],
+     "id": "3d8a9014d7f2",
+     "history": []
+    },
+    {
+     "name": "MAE",
+     "value": "1.12",
+     "unit": "unknown",
+     "direction": "lower",
+     "method": "GTS",
+     "dataset": "PEMS-BAY",
+     "datasetVersion": "unknown",
+     "split": "70/10/20",
+     "horizon": "unknown",
+     "aggregation": "unknown",
+     "preprocessing": "unknown",
+     "metricDefinition": "non-standard per the paper's later correction: Table 6: (Correction of Table 3) Forecasting error (PEMS-BAY).",
+     "provenance": "unknown",
+     "citedFrom": "unknown",
+     "locator": "Table 3",
+     "quote": "| 15 min | MAE | 2.88 | 1.62 | 1.74 | 1.85 | 2.20 | 2.05 | 1.38 | 1.33 | 1.16 | 1.12",
+     "verified": false,
+     "quoteLocated": false,
+     "evidence": {
+      "dataset": {
+       "quote": "We experiment with two benchmark data sets METR-LA and PEMS-BAY from Li et al. (2018).",
+       "origin": "paper"
+      },
+      "split": {
+       "quote": "For all data sets, we use a temporal 70/10/20 split for training, validation, and testing, respectively.",
+       "origin": "paper"
+      },
+      "method": {
+       "quote": "| | Metric | HA | ARIMA | VAR | SVR | FNN | LSTM | DCRNN | LDS | GTSv | GTS",
+       "origin": "paper"
+      },
+      "locator": {
+       "quote": "Table 3: Forecasting error (PEMS-BAY).",
+       "origin": "paper"
+      },
+      "metricDefinition": {
+       "quote": "Table 6: (Correction of Table 3) Forecasting error (PEMS-BAY).",
+       "origin": "paper"
+      }
+     },
+     "superseded": true,
+     "checks": {
+      "support": {
+       "method": "quoted",
+       "dataset": "nearby",
+       "datasetVersion": "missing",
+       "split": "quoted",
+       "horizon": "missing",
+       "aggregation": "missing",
+       "preprocessing": "missing",
+       "metricDefinition": "quoted",
+       "citedFrom": "missing",
+       "provenance": "missing"
+      },
+      "cell": {
+       "path": "15 min / MAE / GTS",
+       "caption": "Table 3: Forecasting error (PEMS-BAY).",
+       "method": true,
+       "metric": true,
+       "horizon": true,
+       "ok": true,
+       "horizonLabel": "15 min"
+      }
+     },
+     "rejected": {},
+     "missing": [
+      "horizon",
+      "aggregation",
+      "preprocessing",
+      "provenance"
+     ],
+     "id": "9d22214c4fe2",
+     "history": []
+    },
+    {
+     "name": "MAE",
+     "value": "1.58",
+     "unit": "unknown",
+     "direction": "lower",
+     "method": "GTS",
+     "dataset": "PEMS-BAY",
+     "datasetVersion": "unknown",
+     "split": "70/10/20",
+     "horizon": "unknown",
+     "aggregation": "unknown",
+     "preprocessing": "unknown",
+     "metricDefinition": "non-standard per the paper's later correction: Table 6: (Correction of Table 3) Forecasting error (PEMS-BAY).",
+     "provenance": "unknown",
+     "citedFrom": "unknown",
+     "locator": "Table 3",
+     "quote": "| 60 min | MAE | 2.88 | 3.38 | 2.93 | 3.28 | 2.46 | 2.37 | 2.07 | 1.99 | 1.81 | 1.58",
+     "verified": false,
+     "quoteLocated": false,
+     "evidence": {
+      "dataset": {
+       "quote": "We experiment with two benchmark data sets METR-LA and PEMS-BAY from Li et al. (2018).",
+       "origin": "paper"
+      },
+      "split": {
+       "quote": "For all data sets, we use a temporal 70/10/20 split for training, validation, and testing, respectively.",
+       "origin": "paper"
+      },
+      "method": {
+       "quote": "| | Metric | HA | ARIMA | VAR | SVR | FNN | LSTM | DCRNN | LDS | GTSv | GTS",
+       "origin": "paper"
+      },
+      "locator": {
+       "quote": "Table 3: Forecasting error (PEMS-BAY).",
+       "origin": "paper"
+      },
+      "metricDefinition": {
+       "quote": "Table 6: (Correction of Table 3) Forecasting error (PEMS-BAY).",
+       "origin": "paper"
+      }
+     },
+     "superseded": true,
+     "checks": {
+      "support": {
+       "method": "quoted",
+       "dataset": "nearby",
+       "datasetVersion": "missing",
+       "split": "quoted",
+       "horizon": "missing",
+       "aggregation": "missing",
+       "preprocessing": "missing",
+       "metricDefinition": "quoted",
+       "citedFrom": "missing",
+       "provenance": "missing"
+      },
+      "cell": {
+       "path": "60 min / MAE / GTS",
+       "caption": "Table 3: Forecasting error (PEMS-BAY).",
+       "method": true,
+       "metric": true,
+       "horizon": true,
+       "ok": true,
+       "horizonLabel": "60 min"
+      }
+     },
+     "rejected": {},
+     "missing": [
+      "horizon",
+      "aggregation",
+      "preprocessing",
+      "provenance"
+     ],
+     "id": "0f85974a84c6",
+     "history": []
+    },
+    {
+     "name": "MAE",
+     "value": "2.99",
+     "unit": "unknown",
+     "direction": "lower",
+     "method": "GTS",
+     "dataset": "METR-LA",
+     "datasetVersion": "unknown",
+     "split": "70/10/20",
+     "horizon": "60 min (12 steps)",
+     "aggregation": "single horizon",
+     "preprocessing": "outlier filtering via lower/upper bounds; missing data imputed with series mean",
+     "metricDefinition": "non-standard per the paper's later correction: It was brought to our attention recently that this version calculated the evaluation metrics MAE/RMSE/MAPE in a manner slightly different from that used to report the results of DCRNN in the official publication (https://github.",
+     "provenance": "own",
+     "citedFrom": "Table 1",
+     "locator": "60 min / MAE / GTS",
+     "quote": "| 60 min | MAE | 4.16 | 6.90 | 6.52 | 6.72 | 4.49 | 4.37 | 3.60 | 3.63 | 3.46 | 2.99",
+     "verified": false,
+     "quoteLocated": false,
+     "evidence": {
+      "preprocessing": {
+       "quote": "Hence, we consult domain experts and set lower and upper bounds to filter out extremely small and large values. Accounting for missing data, within every five minutes we take the mean of the available readings if any, or impute with the mean of the entire series.",
+       "origin": "paper"
+      },
+      "metricDefinition": {
+       "quote": "It was brought to our attention recently that this version calculated the evaluation metrics MAE/RMSE/MAPE in a manner slightly different from that used to report the results of DCRNN in the official publication (https://github.",
+       "origin": "paper"
+      }
+     },
+     "superseded": true,
+     "checks": {
+      "support": {
+       "method": "nearby",
+       "dataset": "nearby",
+       "datasetVersion": "missing",
+       "split": "document",
+       "horizon": "nearby",
+       "aggregation": "derived",
+       "preprocessing": "quoted",
+       "metricDefinition": "quoted",
+       "citedFrom": "nearby",
+       "provenance": "default"
+      },
+      "cell": {
+       "path": "60 min / MAE / GTS",
+       "caption": "Table 1: Forecasting error (METR-LA).",
+       "method": true,
+       "metric": true,
+       "horizon": true,
+       "ok": true,
+       "horizonLabel": "60 min"
+      }
+     },
+     "rejected": {
+      "metricDefinition": {
+       "value": "We updated Tables 1, 2, and 3 by correcting the calculations to be consistent with the official DCRNN results.",
+       "reason": "Superseded by the paper's own correction note."
+      }
+     },
+     "missing": [],
+     "id": "67a1d26d5e4e",
+     "history": [],
+     "origin": "researcher-requested check"
+    }
+   ],
+   "reviewed": true,
+   "origin": "researcher",
+   "sourceRef": "aef24a36275988d7e7beadccaf5ebeb752e05d29d08c7494afee77621d24c88d",
+   "sourceChars": 48305,
+   "relevance": 85,
+   "rationale": "Paper presents extensive empirical results for traffic forecasting across multiple horizons (15,30,60 min) and several error metrics (MAE, RMSE, MAPE) on standard traffic datasets (METR‑LA, PMU, PEMS‑BAY). These tables enable comparison of methods under differing forecast horizons and metric choices, providing concrete baseline numbers that can be used when evaluating new models without assuming lower MAE alone indicates superiority. However, the paper does not explicitly discuss metric masking or varied loss functions beyond the reported metrics, limiting direct evidence on how masking affects baseline selection.",
+   "topic": "traffic forecasting baselines across horizons and metrics",
+   "limitations": "Appendix D explicitly corrects the original metric calculation. Distinguish original and corrected tables. Unknown extraction fields do not establish missing experiments.",
+   "rejectedMetrics": 0,
+   "reviewActor": "agent",
+   "reviewedAt": "2026-10-27T15:53:17.265092+00:00",
+   "reviewNote": ""
+  },
+  {
+   "id": "arXiv190600121",
+   "arxiv": "1906.00121",
+   "title": "Graph WaveNet for Deep Spatial-Temporal Graph Modeling",
+   "year": 2019,
+   "url": "https://arxiv.org/abs/1906.00121",
+   "doi": null,
+   "authors": [
+    "Zonghan Wu",
+    "Shirui Pan",
+    "Guodong Long",
+    "Jing Jiang",
+    "Chengqi Zhang"
+   ],
+   "venue": "arXiv",
+   "citations": 0,
+   "abstract": "Spatial-temporal graph modeling is an important task to analyze the spatial relations and temporal trends of components in a system. Existing approaches mostly capture the spatial dependency on a fixed graph structure, assuming that the underlying relation between entities is pre-determined. However, the explicit graph structure (relation) does not necessarily reflect the true dependency and genuine relation may be missing due to the incomplete connections in the data. Furthermore, existing methods are ineffective to capture the temporal trends as the RNNs or CNNs employed in these methods cannot capture long-range temporal sequences. To overcome these limitations, we propose in this paper a novel graph neural network architecture, Graph WaveNet, for spatial-temporal graph modeling. By developing a novel adaptive dependency matrix and learn it through node embedding, our model can precisely capture the hidden spatial dependency in the data. With a stacked dilated 1D convolution component whose receptive field grows exponentially as the number of layers increases, Graph WaveNet is able to handle very long sequences. These two components are integrated seamlessly in a unified framework and the whole framework is learned in an end-to-end manner. Experimental results on two public traffic network datasets, METR-LA and PEMS-BAY, demonstrate the superior performance of our algorithm.",
+   "evidenceKind": "arXiv full text (34,881 characters, tables preserved)",
+   "evidenceUrl": "https://arxiv.org/html/1906.00121",
+   "topics": [],
+   "metrics": [
+    {
+     "name": "MAE",
+     "value": "2.69",
+     "unit": "unknown",
+     "direction": "lower",
+     "method": "Graph WaveNet",
+     "dataset": "METR-LA",
+     "datasetVersion": "four months of statistics",
+     "split": "70/10/20",
+     "horizon": "15 minutes (horizon 3)",
+     "aggregation": "unknown",
+     "preprocessing": "Z-score normalization",
+     "metricDefinition": "Missing values are excluded both from training and testing",
+     "provenance": "own",
+     "citedFrom": "unknown",
+     "locator": "Table 2",
+     "quote": "| | Graph WaveNet | 2.69 | 5.15 | 6.90% | 3.07 | 6.22 | 8.37% | 3.53 | 7.37 | 10.01%",
+     "verified": false,
+     "quoteLocated": true,
+     "evidence": {
+      "method": {
+       "quote": "| METR-LA | Graph WaveNet | 2.69 | 5.15 | 6.90% | 3.07 | 6.22 | 8.37% | 3.53 | 7.37 | 10.01%",
+       "origin": "paper"
+      },
+      "provenance": {
+       "quote": "Experimental results on two public traffic network datasets, METR-LA and PEMS-BAY, demonstrate the superior performance of our algorithm.",
+       "origin": "paper"
+      },
+      "citedFrom": {
+       "quote": "unknown",
+       "origin": "paper"
+      },
+      "dataset": {
+       "quote": "| METR-LA | Graph WaveNet | 2.69 | 5.15 | 6.90% | 3.07 | 6.22 | 8.37% | 3.53 | 7.37 | 10.01%",
+       "origin": "paper"
+      },
+      "datasetVersion": {
+       "quote": "METR-LA records four months of statistics on traffic speed on 207 sensors on the highways of Los Angeles County.",
+       "origin": "paper"
+      },
+      "split": {
+       "quote": "The datasets are split in chronological order with 70% for training, 10% for validation and 20% for testing.",
+       "origin": "paper"
+      },
+      "horizon": {
+       "quote": "The readings of the sensors are aggregated into 5-minutes windows.",
+       "origin": "paper"
+      },
+      "aggregation": {
+       "quote": "unknown",
+       "origin": "paper"
+      },
+      "preprocessing": {
+       "quote": "Z-score normalization is applied to inputs.",
+       "origin": "paper"
+      },
+      "metricDefinition": {
+       "quote": "Missing values are excluded both from training and testing",
+       "origin": "paper"
+      },
+      "locator": {
+       "quote": "Table 2",
+       "origin": "paper"
+      }
+     },
+     "checks": {
+      "support": {
+       "method": "quoted",
+       "dataset": "nearby",
+       "datasetVersion": "quoted",
+       "split": "quoted",
+       "horizon": "nearby",
+       "aggregation": "missing",
+       "preprocessing": "quoted",
+       "metricDefinition": "quoted",
+       "citedFrom": "missing",
+       "provenance": "quoted"
+      },
+      "cell": {
+       "path": "Graph WaveNet / 15 min / MAE",
+       "caption": "Table 2: Performance comparison of Graph WaveNet and other baseline models. Graph WaveNet achieves the best results on both datasets.",
+       "method": true,
+       "metric": true,
+       "horizon": true,
+       "ok": true,
+       "horizonLabel": "15 min"
+      }
+     },
+     "rejected": {},
+     "missing": [
+      "aggregation"
+     ],
+     "id": "05568d4cda47",
+     "history": []
+    },
+    {
+     "name": "MAE",
+     "value": "2.71",
+     "unit": "unknown",
+     "direction": "lower",
+     "method": "GGRU",
+     "dataset": "METR-LA",
+     "datasetVersion": "four months of statistics",
+     "split": "70/10/20",
+     "horizon": "15 minutes (horizon 3)",
+     "aggregation": "unknown",
+     "preprocessing": "Z-score normalization",
+     "metricDefinition": "Missing values are excluded both from training and testing",
+     "provenance": "unknown",
+     "citedFrom": "unknown",
+     "locator": "Table 2",
+     "quote": "| METR-LA | GGRU Zhang et al. (2018) | 2.71 | 5.24 | 6.99% | 3.12 | 6.36 | 8.56% | 3.64 | 7.65 | 10.62%",
+     "verified": false,
+     "quoteLocated": false,
+     "evidence": {
+      "method": {
+       "quote": "| METR-LA | GGRU Zhang et al. (2018) | 2.71 | 5.24 | 6.99% | 3.12 | 6.36 | 8.56% | 3.64 | 7.65 | 10.62%",
+       "origin": "paper"
+      },
+      "provenance": {
+       "quote": "We compare Graph WaveNet with the following models.",
+       "origin": "paper"
+      },
+      "citedFrom": {
+       "quote": "unknown",
+       "origin": "paper"
+      },
+      "dataset": {
+       "quote": "| METR-LA | GGRU Zhang et al. (2018) | 2.71 | 5.24 | 6.99% | 3.12 | 6.36 | 8.56% | 3.64 | 7.65 | 10.62%",
+       "origin": "paper"
+      },
+      "datasetVersion": {
+       "quote": "METR-LA records four months of statistics on traffic speed on 207 sensors on the highways of Los Angeles County.",
+       "origin": "paper"
+      },
+      "split": {
+       "quote": "The datasets are split in chronological order with 70% for training, 10% for validation and 20% for testing.",
+       "origin": "paper"
+      },
+      "horizon": {
+       "quote": "The readings of the sensors are aggregated into 5-minutes windows.",
+       "origin": "paper"
+      },
+      "aggregation": {
+       "quote": "unknown",
+       "origin": "paper"
+      },
+      "preprocessing": {
+       "quote": "Z-score normalization is applied to inputs.",
+       "origin": "paper"
+      },
+      "metricDefinition": {
+       "quote": "Missing values are excluded both from training and testing",
+       "origin": "paper"
+      },
+      "locator": {
+       "quote": "Table 2",
+       "origin": "paper"
+      }
+     },
+     "checks": {
+      "support": {
+       "method": "quoted",
+       "dataset": "quoted",
+       "datasetVersion": "quoted",
+       "split": "quoted",
+       "horizon": "nearby",
+       "aggregation": "missing",
+       "preprocessing": "quoted",
+       "metricDefinition": "quoted",
+       "citedFrom": "missing",
+       "provenance": "missing"
+      },
+      "cell": {
+       "path": "METR-LA / GGRU Zhang et al. (2018) / 15 min / MAE",
+       "caption": "Table 2: Performance comparison of Graph WaveNet and other baseline models. Graph WaveNet achieves the best results on both datasets.",
+       "method": true,
+       "metric": true,
+       "horizon": true,
+       "ok": true,
+       "horizonLabel": "15 min"
+      }
+     },
+     "rejected": {
+      "provenance": {
+       "value": "reproduced",
+       "reason": "No source quote says how this number was obtained."
+      }
+     },
+     "missing": [
+      "aggregation",
+      "provenance"
+     ],
+     "id": "8ee1aef51100",
+     "history": []
+    },
+    {
+     "name": "MAE",
+     "value": "3.07",
+     "unit": "unknown",
+     "direction": "lower",
+     "method": "Graph WaveNet",
+     "dataset": "METR-LA",
+     "datasetVersion": "four months of statistics",
+     "split": "70/10/20",
+     "horizon": "30 minutes (horizon 6)",
+     "aggregation": "unknown",
+     "preprocessing": "Z-score normalization",
+     "metricDefinition": "Missing values are excluded both from training and testing",
+     "provenance": "own",
+     "citedFrom": "unknown",
+     "locator": "Table 2",
+     "quote": "| | Graph WaveNet | 2.69 | 5.15 | 6.90% | 3.07 | 6.22 | 8.37% | 3.53 | 7.37 | 10.01%",
+     "verified": false,
+     "quoteLocated": true,
+     "evidence": {
+      "method": {
+       "quote": "| METR-LA | Graph WaveNet | 2.69 | 5.15 | 6.90% | 3.07 | 6.22 | 8.37% | 3.53 | 7.37 | 10.01%",
+       "origin": "paper"
+      },
+      "provenance": {
+       "quote": "Experimental results on two public traffic network datasets, METR-LA and PEMS-BAY, demonstrate the superior performance of our algorithm.",
+       "origin": "paper"
+      },
+      "citedFrom": {
+       "quote": "unknown",
+       "origin": "paper"
+      },
+      "dataset": {
+       "quote": "| METR-LA | Graph WaveNet | 2.69 | 5.15 | 6.90% | 3.07 | 6.22 | 8.37% | 3.53 | 7.37 | 10.01%",
+       "origin": "paper"
+      },
+      "datasetVersion": {
+       "quote": "METR-LA records four months of statistics on traffic speed on 207 sensors on the highways of Los Angeles County.",
+       "origin": "paper"
+      },
+      "split": {
+       "quote": "The datasets are split in chronological order with 70% for training, 10% for validation and 20% for testing.",
+       "origin": "paper"
+      },
+      "horizon": {
+       "quote": "The readings of the sensors are aggregated into 5-minutes windows.",
+       "origin": "paper"
+      },
+      "aggregation": {
+       "quote": "unknown",
+       "origin": "paper"
+      },
+      "preprocessing": {
+       "quote": "Z-score normalization is applied to inputs.",
+       "origin": "paper"
+      },
+      "metricDefinition": {
+       "quote": "Missing values are excluded both from training and testing",
+       "origin": "paper"
+      },
+      "locator": {
+       "quote": "Table 2",
+       "origin": "paper"
+      }
+     },
+     "checks": {
+      "support": {
+       "method": "quoted",
+       "dataset": "nearby",
+       "datasetVersion": "quoted",
+       "split": "quoted",
+       "horizon": "nearby",
+       "aggregation": "missing",
+       "preprocessing": "quoted",
+       "metricDefinition": "quoted",
+       "citedFrom": "missing",
+       "provenance": "quoted"
+      },
+      "cell": {
+       "path": "Graph WaveNet / 30 min / MAE",
+       "caption": "Table 2: Performance comparison of Graph WaveNet and other baseline models. Graph WaveNet achieves the best results on both datasets.",
+       "method": true,
+       "metric": true,
+       "horizon": true,
+       "ok": true,
+       "horizonLabel": "30 min"
+      }
+     },
+     "rejected": {},
+     "missing": [
+      "aggregation"
+     ],
+     "id": "fee79633bfcd",
+     "history": []
+    },
+    {
+     "name": "MAE",
+     "value": "3.12",
+     "unit": "unknown",
+     "direction": "lower",
+     "method": "GGRU",
+     "dataset": "METR-LA",
+     "datasetVersion": "four months of statistics",
+     "split": "70/10/20",
+     "horizon": "30 minutes (horizon 6)",
+     "aggregation": "unknown",
+     "preprocessing": "Z-score normalization",
+     "metricDefinition": "Missing values are excluded both from training and testing",
+     "provenance": "unknown",
+     "citedFrom": "unknown",
+     "locator": "Table 2",
+     "quote": "| METR-LA | GGRU Zhang et al. (2018) | 2.71 | 5.24 | 6.99% | 3.12 | 6.36 | 8.56% | 3.64 | 7.65 | 10.62%",
+     "verified": false,
+     "quoteLocated": false,
+     "evidence": {
+      "method": {
+       "quote": "| METR-LA | GGRU Zhang et al. (2018) | 2.71 | 5.24 | 6.99% | 3.12 | 6.36 | 8.56% | 3.64 | 7.65 | 10.62%",
+       "origin": "paper"
+      },
+      "provenance": {
+       "quote": "We compare Graph WaveNet with the following models.",
+       "origin": "paper"
+      },
+      "citedFrom": {
+       "quote": "unknown",
+       "origin": "paper"
+      },
+      "dataset": {
+       "quote": "| METR-LA | GGRU Zhang et al. (2018) | 2.71 | 5.24 | 6.99% | 3.12 | 6.36 | 8.56% | 3.64 | 7.65 | 10.62%",
+       "origin": "paper"
+      },
+      "datasetVersion": {
+       "quote": "METR-LA records four months of statistics on traffic speed on 207 sensors on the highways of Los Angeles County.",
+       "origin": "paper"
+      },
+      "split": {
+       "quote": "The datasets are split in chronological order with 70% for training, 10% for validation and 20% for testing.",
+       "origin": "paper"
+      },
+      "horizon": {
+       "quote": "The readings of the sensors are aggregated into 5-minutes windows.",
+       "origin": "paper"
+      },
+      "aggregation": {
+       "quote": "unknown",
+       "origin": "paper"
+      },
+      "preprocessing": {
+       "quote": "Z-score normalization is applied to inputs.",
+       "origin": "paper"
+      },
+      "metricDefinition": {
+       "quote": "Missing values are excluded both from training and testing",
+       "origin": "paper"
+      },
+      "locator": {
+       "quote": "Table 2",
+       "origin": "paper"
+      }
+     },
+     "checks": {
+      "support": {
+       "method": "quoted",
+       "dataset": "quoted",
+       "datasetVersion": "quoted",
+       "split": "quoted",
+       "horizon": "nearby",
+       "aggregation": "missing",
+       "preprocessing": "quoted",
+       "metricDefinition": "quoted",
+       "citedFrom": "missing",
+       "provenance": "missing"
+      },
+      "cell": {
+       "path": "METR-LA / GGRU Zhang et al. (2018) / 30 min / MAE",
+       "caption": "Table 2: Performance comparison of Graph WaveNet and other baseline models. Graph WaveNet achieves the best results on both datasets.",
+       "method": true,
+       "metric": true,
+       "horizon": true,
+       "ok": true,
+       "horizonLabel": "30 min"
+      }
+     },
+     "rejected": {
+      "provenance": {
+       "value": "reproduced",
+       "reason": "No source quote says how this number was obtained."
+      }
+     },
+     "missing": [
+      "aggregation",
+      "provenance"
+     ],
+     "id": "70406f5d725a",
+     "history": []
+    },
+    {
+     "name": "MAE",
+     "value": "3.53",
+     "unit": "unknown",
+     "direction": "lower",
+     "method": "Graph WaveNet",
+     "dataset": "METR-LA",
+     "datasetVersion": "four months of statistics",
+     "split": "70/10/20",
+     "horizon": "60 minutes (horizon 12)",
+     "aggregation": "unknown",
+     "preprocessing": "Z-score normalization",
+     "metricDefinition": "Missing values are excluded both from training and testing",
+     "provenance": "own",
+     "citedFrom": "unknown",
+     "locator": "Table 2",
+     "quote": "| | Graph WaveNet | 2.69 | 5.15 | 6.90% | 3.07 | 6.22 | 8.37% | 3.53 | 7.37 | 10.01%",
+     "verified": false,
+     "quoteLocated": true,
+     "evidence": {
+      "method": {
+       "quote": "| METR-LA | Graph WaveNet | 2.69 | 5.15 | 6.90% | 3.07 | 6.22 | 8.37% | 3.53 | 7.37 | 10.01%",
+       "origin": "paper"
+      },
+      "provenance": {
+       "quote": "Experimental results on two public traffic network datasets, METR-LA and PEMS-BAY, demonstrate the superior performance of our algorithm.",
+       "origin": "paper"
+      },
+      "citedFrom": {
+       "quote": "unknown",
+       "origin": "paper"
+      },
+      "dataset": {
+       "quote": "| METR-LA | Graph WaveNet | 2.69 | 5.15 | 6.90% | 3.07 | 6.22 | 8.37% | 3.53 | 7.37 | 10.01%",
+       "origin": "paper"
+      },
+      "datasetVersion": {
+       "quote": "METR-LA records four months of statistics on traffic speed on 207 sensors on the highways of Los Angeles County.",
+       "origin": "paper"
+      },
+      "split": {
+       "quote": "The datasets are split in chronological order with 70% for training, 10% for validation and 20% for testing.",
+       "origin": "paper"
+      },
+      "horizon": {
+       "quote": "The readings of the sensors are aggregated into 5-minutes windows.",
+       "origin": "paper"
+      },
+      "aggregation": {
+       "quote": "unknown",
+       "origin": "paper"
+      },
+      "preprocessing": {
+       "quote": "Z-score normalization is applied to inputs.",
+       "origin": "paper"
+      },
+      "metricDefinition": {
+       "quote": "Missing values are excluded both from training and testing",
+       "origin": "paper"
+      },
+      "locator": {
+       "quote": "Table 2",
+       "origin": "paper"
+      }
+     },
+     "checks": {
+      "support": {
+       "method": "quoted",
+       "dataset": "nearby",
+       "datasetVersion": "quoted",
+       "split": "quoted",
+       "horizon": "nearby",
+       "aggregation": "missing",
+       "preprocessing": "quoted",
+       "metricDefinition": "quoted",
+       "citedFrom": "missing",
+       "provenance": "quoted"
+      },
+      "cell": {
+       "path": "Graph WaveNet / 60 min / MAE",
+       "caption": "Table 2: Performance comparison of Graph WaveNet and other baseline models. Graph WaveNet achieves the best results on both datasets.",
+       "method": true,
+       "metric": true,
+       "horizon": true,
+       "ok": true,
+       "horizonLabel": "60 min"
+      }
+     },
+     "rejected": {},
+     "missing": [
+      "aggregation"
+     ],
+     "id": "bd7eb395fe4a",
+     "history": []
+    },
+    {
+     "name": "MAE",
+     "value": "3.60",
+     "unit": "unknown",
+     "direction": "lower",
+     "method": "DCRNN",
+     "dataset": "METR-LA",
+     "datasetVersion": "four months of statistics",
+     "split": "70/10/20",
+     "horizon": "60 minutes (horizon 12)",
+     "aggregation": "unknown",
+     "preprocessing": "Z-score normalization",
+     "metricDefinition": "Missing values are excluded both from training and testing",
+     "provenance": "unknown",
+     "citedFrom": "unknown",
+     "locator": "Table 2",
+     "quote": "| METR-LA | DCRNN Li et al. (2018b) | 2.77 | 5.38 | 7.30% | 3.15 | 6.45 | 8.80% | 3.60 | 7.60 | 10.50%",
+     "verified": false,
+     "quoteLocated": false,
+     "evidence": {
+      "method": {
+       "quote": "| METR-LA | DCRNN Li et al. (2018b) | 2.77 | 5.38 | 7.30% | 3.15 | 6.45 | 8.80% | 3.60 | 7.60 | 10.50%",
+       "origin": "paper"
+      },
+      "provenance": {
+       "quote": "We compare Graph WaveNet with the following models.",
+       "origin": "paper"
+      },
+      "citedFrom": {
+       "quote": "unknown",
+       "origin": "paper"
+      },
+      "dataset": {
+       "quote": "| METR-LA | DCRNN Li et al. (2018b) | 2.77 | 5.38 | 7.30% | 3.15 | 6.45 | 8.80% | 3.60 | 7.60 | 10.50%",
+       "origin": "paper"
+      },
+      "datasetVersion": {
+       "quote": "METR-LA records four months of statistics on traffic speed on 207 sensors on the highways of Los Angeles County.",
+       "origin": "paper"
+      },
+      "split": {
+       "quote": "The datasets are split in chronological order with 70% for training, 10% for validation and 20% for testing.",
+       "origin": "paper"
+      },
+      "horizon": {
+       "quote": "The readings of the sensors are aggregated into 5-minutes windows.",
+       "origin": "paper"
+      },
+      "aggregation": {
+       "quote": "unknown",
+       "origin": "paper"
+      },
+      "preprocessing": {
+       "quote": "Z-score normalization is applied to inputs.",
+       "origin": "paper"
+      },
+      "metricDefinition": {
+       "quote": "Missing values are excluded both from training and testing",
+       "origin": "paper"
+      },
+      "locator": {
+       "quote": "Table 2",
+       "origin": "paper"
+      }
+     },
+     "checks": {
+      "support": {
+       "method": "quoted",
+       "dataset": "quoted",
+       "datasetVersion": "quoted",
+       "split": "quoted",
+       "horizon": "nearby",
+       "aggregation": "missing",
+       "preprocessing": "quoted",
+       "metricDefinition": "quoted",
+       "citedFrom": "missing",
+       "provenance": "missing"
+      },
+      "cell": {
+       "path": "METR-LA / DCRNN Li et al. (2018b) / 60 min / MAE",
+       "caption": "Table 2: Performance comparison of Graph WaveNet and other baseline models. Graph WaveNet achieves the best results on both datasets.",
+       "method": true,
+       "metric": true,
+       "horizon": true,
+       "ok": true,
+       "horizonLabel": "60 min"
+      }
+     },
+     "rejected": {
+      "provenance": {
+       "value": "reproduced",
+       "reason": "No source quote says how this number was obtained."
+      }
+     },
+     "missing": [
+      "aggregation",
+      "provenance"
+     ],
+     "id": "e820ecf739ff",
+     "history": []
+    },
+    {
+     "name": "MAE",
+     "value": "1.30",
+     "unit": "unknown",
+     "direction": "lower",
+     "method": "Graph WaveNet",
+     "dataset": "PEMS-BAY",
+     "datasetVersion": "six months of traffic speed information",
+     "split": "70/10/20",
+     "horizon": "15 minutes (horizon 3)",
+     "aggregation": "unknown",
+     "preprocessing": "Z-score normalization",
+     "metricDefinition": "Missing values are excluded both from training and testing",
+     "provenance": "own",
+     "citedFrom": "unknown",
+     "locator": "Table 2",
+     "quote": "| | Graph WaveNet | 1.30 | 2.74 | 2.73% | 1.63 | 3.70 | 3.67% | 1.95 | 4.52 | 4.63%",
+     "verified": false,
+     "quoteLocated": true,
+     "evidence": {
+      "method": {
+       "quote": "| PEMS-BAY | Graph WaveNet | 1.30 | 2.74 | 2.73% | 1.63 | 3.70 | 3.67% | 1.95 | 4.52 | 4.63%",
+       "origin": "paper"
+      },
+      "provenance": {
+       "quote": "Experimental results on two public traffic network datasets, METR-LA and PEMS-BAY, demonstrate the superior performance of our algorithm.",
+       "origin": "paper"
+      },
+      "citedFrom": {
+       "quote": "unknown",
+       "origin": "paper"
+      },
+      "dataset": {
+       "quote": "| PEMS-BAY | Graph WaveNet | 1.30 | 2.74 | 2.73% | 1.63 | 3.70 | 3.67% | 1.95 | 4.52 | 4.63%",
+       "origin": "paper"
+      },
+      "datasetVersion": {
+       "quote": "PEMS-BAY contains six months of traffic speed information on 325 sensors in the Bay area.",
+       "origin": "paper"
+      },
+      "split": {
+       "quote": "The datasets are split in chronological order with 70% for training, 10% for validation and 20% for testing.",
+       "origin": "paper"
+      },
+      "horizon": {
+       "quote": "The readings of the sensors are aggregated into 5-minutes windows.",
+       "origin": "paper"
+      },
+      "aggregation": {
+       "quote": "unknown",
+       "origin": "paper"
+      },
+      "preprocessing": {
+       "quote": "Z-score normalization is applied to inputs.",
+       "origin": "paper"
+      },
+      "metricDefinition": {
+       "quote": "Missing values are excluded both from training and testing",
+       "origin": "paper"
+      },
+      "locator": {
+       "quote": "Table 2",
+       "origin": "paper"
+      }
+     },
+     "checks": {
+      "support": {
+       "method": "quoted",
+       "dataset": "nearby",
+       "datasetVersion": "quoted",
+       "split": "quoted",
+       "horizon": "nearby",
+       "aggregation": "missing",
+       "preprocessing": "quoted",
+       "metricDefinition": "quoted",
+       "citedFrom": "missing",
+       "provenance": "quoted"
+      },
+      "cell": {
+       "path": "Graph WaveNet / 15 min / MAE",
+       "caption": "Table 2: Performance comparison of Graph WaveNet and other baseline models. Graph WaveNet achieves the best results on both datasets.",
+       "method": true,
+       "metric": true,
+       "horizon": true,
+       "ok": true,
+       "horizonLabel": "15 min"
+      }
+     },
+     "rejected": {},
+     "missing": [
+      "aggregation"
+     ],
+     "id": "09b069372f7d",
+     "history": []
+    },
+    {
+     "name": "MAE",
+     "value": "1.36",
+     "unit": "unknown",
+     "direction": "lower",
+     "method": "STGCN",
+     "dataset": "PEMS-BAY",
+     "datasetVersion": "six months of traffic speed information",
+     "split": "70/10/20",
+     "horizon": "15 minutes (horizon 3)",
+     "aggregation": "unknown",
+     "preprocessing": "Z-score normalization",
+     "metricDefinition": "Missing values are excluded both from training and testing",
+     "provenance": "unknown",
+     "citedFrom": "unknown",
+     "locator": "Table 2",
+     "quote": "| PEMS-BAY | STGCN Yu et al. (2018) | 1.36 | 2.96 | 2.90% | 1.81 | 4.27 | 4.17% | 2.49 | 5.69 | 5.79%",
+     "verified": false,
+     "quoteLocated": false,
+     "evidence": {
+      "method": {
+       "quote": "| PEMS-BAY | STGCN Yu et al. (2018) | 1.36 | 2.96 | 2.90% | 1.81 | 4.27 | 4.17% | 2.49 | 5.69 | 5.79%",
+       "origin": "paper"
+      },
+      "provenance": {
+       "quote": "We compare Graph WaveNet with the following models.",
+       "origin": "paper"
+      },
+      "citedFrom": {
+       "quote": "unknown",
+       "origin": "paper"
+      },
+      "dataset": {
+       "quote": "| PEMS-BAY | STGCN Yu et al. (2018) | 1.36 | 2.96 | 2.90% | 1.81 | 4.27 | 4.17% | 2.49 | 5.69 | 5.79%",
+       "origin": "paper"
+      },
+      "datasetVersion": {
+       "quote": "PEMS-BAY contains six months of traffic speed information on 325 sensors in the Bay area.",
+       "origin": "paper"
+      },
+      "split": {
+       "quote": "The datasets are split in chronological order with 70% for training, 10% for validation and 20% for testing.",
+       "origin": "paper"
+      },
+      "horizon": {
+       "quote": "The readings of the sensors are aggregated into 5-minutes windows.",
+       "origin": "paper"
+      },
+      "aggregation": {
+       "quote": "unknown",
+       "origin": "paper"
+      },
+      "preprocessing": {
+       "quote": "Z-score normalization is applied to inputs.",
+       "origin": "paper"
+      },
+      "metricDefinition": {
+       "quote": "Missing values are excluded both from training and testing",
+       "origin": "paper"
+      },
+      "locator": {
+       "quote": "Table 2",
+       "origin": "paper"
+      }
+     },
+     "checks": {
+      "support": {
+       "method": "quoted",
+       "dataset": "quoted",
+       "datasetVersion": "quoted",
+       "split": "quoted",
+       "horizon": "nearby",
+       "aggregation": "missing",
+       "preprocessing": "quoted",
+       "metricDefinition": "quoted",
+       "citedFrom": "missing",
+       "provenance": "missing"
+      },
+      "cell": {
+       "path": "PEMS-BAY / STGCN Yu et al. (2018) / 15 min / MAE",
+       "caption": "Table 2: Performance comparison of Graph WaveNet and other baseline models. Graph WaveNet achieves the best results on both datasets.",
+       "method": true,
+       "metric": true,
+       "horizon": true,
+       "ok": true,
+       "horizonLabel": "15 min"
+      }
+     },
+     "rejected": {
+      "provenance": {
+       "value": "reproduced",
+       "reason": "No source quote says how this number was obtained."
+      }
+     },
+     "missing": [
+      "aggregation",
+      "provenance"
+     ],
+     "id": "dfa243aafadf",
+     "history": []
+    }
+   ],
+   "reviewed": true,
+   "origin": "researcher",
+   "sourceRef": "9779e1be9de40767c586b25e503e3a4e605873714879c74f3de65f69c1f96924",
+   "sourceChars": 34881,
+   "relevance": 80,
+   "rationale": "The paper reports traffic forecasting performance (MAE, RMSE, MAPE) for multiple forecast horizons (15, 30, 60 minutes) on two widely used traffic datasets (METR‑LA, PEMS‑BAY). These results provide concrete numbers that can be reused as baselines when comparing new models under different horizons or metric masking conditions. However, the paper focuses on demonstrating superiority of its own model and does not discuss how metric masking or varying horizons affect baseline suitability, nor does it provide ablation studies or uncertainty estimates needed to assess baseline defensibility.",
+   "topic": "Graph neural networks",
+   "limitations": "This source reports multiple horizons and excludes missing values. Result provenance and protocol equivalence across papers still need source review. No assertion about absent significance tests is made.",
+   "rejectedMetrics": 0,
+   "reviewActor": "agent",
+   "reviewedAt": "2026-10-27T15:53:17.299485+00:00",
+   "reviewNote": ""
+  },
+  {
+   "id": "W7133245391",
+   "title": "LargeST: A Benchmark Dataset for Large-Scale Traffic Forecasting",
+   "year": 2023,
+   "url": "https://doi.org/10.52202/075280-3293",
+   "doi": "https://doi.org/10.52202/075280-3293",
+   "authors": [
+    "Xu Liu",
+    "Yutong Xia",
+    "Yuxuan Liang",
+    "Junfeng Hu",
+    "Yiwei Wang",
+    "Lei Bai",
+    "Chao Huang",
+    "Zhenguang Liu"
+   ],
+   "venue": "neural information processing systems",
+   "citations": 73,
+   "abstract": "Road traffic forecasting plays a critical role in smart city initiatives and has experienced significant advancements thanks to the power of deep learning in capturing non-linear patterns of traffic data. However, the promising results achieved on current public datasets may not be applicable to practical scenarios due to limitations within these datasets. First, the limited sizes of them may not reflect the real-world scale of traffic networks. Second, the temporal coverage of these datasets is typically short, posing hurdles in studying long-term patterns and acquiring sufficient samples for training deep models. Third, these datasets often lack adequate metadata for sensors, which compromises the reliability and interpretability of the data. To mitigate these limitations, we introduce the LargeST benchmark dataset. It encompasses a total number of 8,600 sensors in California with a 5-year time coverage and includes comprehensive metadata. Using LargeST, we perform in-depth data analysis to extract data insights, benchmark well-known baselines in terms of their performance and efficiency, and identify challenges as well as opportunities for future research. We release the datasets and baseline implementations at: https://github.com/liuxu77/LargeST.",
+   "evidenceKind": "arXiv full text (65,844 characters, tables preserved)",
+   "evidenceUrl": "https://arxiv.org/html/2306.08259",
+   "topics": [
+    "Traffic Prediction and Management Techniques",
+    "Forecasting Techniques and Applications",
+    "Internet Traffic Analysis and Secure E-voting"
+   ],
+   "metrics": [
+    {
+     "name": "MAE",
+     "value": "14.92",
+     "unit": "unknown",
+     "direction": "lower",
+     "method": "D2STGNN",
+     "dataset": "SD",
+     "datasetVersion": "01/01/2017 – 12/31/2021",
+     "split": "6:2:2",
+     "horizon": "45 minutes (horizon 3)",
+     "aggregation": "single horizon",
+     "preprocessing": "no imputation; missing values kept as is",
+     "metricDefinition": "unknown",
+     "provenance": "unknown",
+     "citedFrom": "unknown",
+     "locator": "Table 2",
+     "quote": "| | D2STGNN | 406K | 14.92 | 24.95 | 9.56% | 17.52 | 29.24 | 11.36% | 22.62 | 37.14 | 14.86% | 17.85 | 29.51 | 11.54% |",
+     "verified": false,
+     "quoteLocated": false,
+     "evidence": {
+      "dataset": {
+       "quote": "| SD | 716 | 17,319 | 24.2 | 9 | 01/01/2017 – 12/31/2021 | 525,888 | 0.38B |",
+       "origin": "paper"
+      },
+      "split": {
+       "quote": "We chronologically split the data into train, validation, and test sets, with a ratio of 6:2:2 for all sub-datasets.",
+       "origin": "paper"
+      },
+      "horizon": {
+       "quote": "Datasets. We conduct experiments on all sub-datasets of LargeST with the setting of predicting the 12-step future based on the 12-step historical data [19, 32]. To facilitate the study of traffic forecasting in a more extended future time period, we aggregate the traffic readings from 5-minute intervals into 15-minute windows, resulting in 96 time steps per day.",
+       "origin": "paper"
+      },
+      "preprocessing": {
+       "quote": "Because we intend to maintain the data in its original state as much as possible, so that users have the discretion to decide whether to fill missing values or not.",
+       "origin": "paper"
+      }
+     },
+     "checks": {
+      "support": {
+       "method": "quoted",
+       "dataset": "quoted",
+       "datasetVersion": "document",
+       "split": "document",
+       "horizon": "nearby",
+       "aggregation": "derived",
+       "preprocessing": "quoted",
+       "metricDefinition": "missing",
+       "citedFrom": "missing",
+       "provenance": "missing"
+      },
+      "cell": {
+       "path": "D2STGNN / 406K / Horizon 3 / MAE",
+       "caption": "Table 2: Performance comparisons. We bold the best-performing baseline result. The absence of baselines on the GLA and CA datasets indicates that the models incur out-of-memory issue even when we set batch size to 4 on an A6000 GPU with 48 ",
+       "method": true,
+       "metric": true,
+       "horizon": false,
+       "ok": true,
+       "horizonLabel": "Horizon 3"
+      }
+     },
+     "rejected": {
+      "provenance": {
+       "value": "reproduced",
+       "reason": "No source quote says how this number was obtained."
+      }
+     },
+     "missing": [
+      "metricDefinition",
+      "provenance"
+     ],
+     "id": "50c3705977cf",
+     "history": []
+    },
+    {
+     "name": "MAE",
+     "value": "21.56",
+     "unit": "unknown",
+     "direction": "lower",
+     "method": "GWNET",
+     "dataset": "SD",
+     "datasetVersion": "01/01/2017 – 12/31/2021",
+     "split": "6:2:2",
+     "horizon": "180 minutes (horizon 12)",
+     "aggregation": "single horizon",
+     "preprocessing": "no imputation; missing values kept as is",
+     "metricDefinition": "unknown",
+     "provenance": "unknown",
+     "citedFrom": "unknown",
+     "locator": "Table 2",
+     "quote": "| SD | GWNET | 311K | 15.24 | 25.13 | 9.86% | 17.74 | 29.51 | 11.70% | 21.56 | 36.82 | 15.13% | 17.74 | 29.62 | 11.88% |",
+     "verified": false,
+     "quoteLocated": false,
+     "evidence": {
+      "dataset": {
+       "quote": "| SD | 716 | 17,319 | 24.2 | 9 | 01/01/2017 – 12/31/2021 | 525,888 | 0.38B |",
+       "origin": "paper"
+      },
+      "split": {
+       "quote": "We chronologically split the data into train, validation, and test sets, with a ratio of 6:2:2 for all sub-datasets.",
+       "origin": "paper"
+      },
+      "horizon": {
+       "quote": "Datasets. We conduct experiments on all sub-datasets of LargeST with the setting of predicting the 12-step future based on the 12-step historical data [19, 32]. To facilitate the study of traffic forecasting in a more extended future time period, we aggregate the traffic readings from 5-minute intervals into 15-minute windows, resulting in 96 time steps per day.",
+       "origin": "paper"
+      },
+      "preprocessing": {
+       "quote": "Because we intend to maintain the data in its original state as much as possible, so that users have the discretion to decide whether to fill missing values or not.",
+       "origin": "paper"
+      }
+     },
+     "checks": {
+      "support": {
+       "method": "quoted",
+       "dataset": "quoted",
+       "datasetVersion": "document",
+       "split": "nearby",
+       "horizon": "nearby",
+       "aggregation": "derived",
+       "preprocessing": "quoted",
+       "metricDefinition": "missing",
+       "citedFrom": "missing",
+       "provenance": "missing"
+      },
+      "cell": {
+       "path": "SD / GWNET / 311K / Horizon 12 / MAE",
+       "caption": "Table 2: Performance comparisons. We bold the best-performing baseline result. The absence of baselines on the GLA and CA datasets indicates that the models incur out-of-memory issue even when we set batch size to 4 on an A6000 GPU with 48 ",
+       "method": true,
+       "metric": true,
+       "horizon": false,
+       "ok": true,
+       "horizonLabel": "Horizon 12"
+      }
+     },
+     "rejected": {
+      "provenance": {
+       "value": "reproduced",
+       "reason": "No source quote says how this number was obtained."
+      }
+     },
+     "missing": [
+      "metricDefinition",
+      "provenance"
+     ],
+     "id": "6a48c66f0b98",
+     "history": []
+    },
+    {
+     "name": "MAE",
+     "value": "17.54",
+     "unit": "unknown",
+     "direction": "lower",
+     "method": "D2STGNN",
+     "dataset": "GBA",
+     "datasetVersion": "01/01/2017 – 12/31/2021",
+     "split": "6:2:2",
+     "horizon": "45 minutes (horizon 3)",
+     "aggregation": "single horizon",
+     "preprocessing": "no imputation; missing values kept as is",
+     "metricDefinition": "unknown",
+     "provenance": "unknown",
+     "citedFrom": "unknown",
+     "locator": "Table 2",
+     "quote": "| | D2STGNN | 446K | 17.54 | 28.94 | 12.12% | 20.92 | 33.92 | 14.89% | 25.48 | 40.99 | 19.83% | 20.71 | 33.65 | 15.04% |",
+     "verified": false,
+     "quoteLocated": false,
+     "evidence": {
+      "dataset": {
+       "quote": "| GBA | 2,352 | 61,246 | 26.0 | 9 | 01/01/2017 – 12/31/2021 | 525,888 | 1.24B |",
+       "origin": "paper"
+      },
+      "split": {
+       "quote": "We chronologically split the data into train, validation, and test sets, with a ratio of 6:2:2 for all sub-datasets.",
+       "origin": "paper"
+      },
+      "horizon": {
+       "quote": "Datasets. We conduct experiments on all sub-datasets of LargeST with the setting of predicting the 12-step future based on the 12-step historical data [19, 32]. To facilitate the study of traffic forecasting in a more extended future time period, we aggregate the traffic readings from 5-minute intervals into 15-minute windows, resulting in 96 time steps per day.",
+       "origin": "paper"
+      },
+      "preprocessing": {
+       "quote": "Because we intend to maintain the data in its original state as much as possible, so that users have the discretion to decide whether to fill missing values or not.",
+       "origin": "paper"
+      }
+     },
+     "checks": {
+      "support": {
+       "method": "quoted",
+       "dataset": "quoted",
+       "datasetVersion": "document",
+       "split": "document",
+       "horizon": "nearby",
+       "aggregation": "derived",
+       "preprocessing": "quoted",
+       "metricDefinition": "missing",
+       "citedFrom": "missing",
+       "provenance": "missing"
+      },
+      "cell": {
+       "path": "D2STGNN / 446K / Horizon 3 / MAE",
+       "caption": "Table 2: Performance comparisons. We bold the best-performing baseline result. The absence of baselines on the GLA and CA datasets indicates that the models incur out-of-memory issue even when we set batch size to 4 on an A6000 GPU with 48 ",
+       "method": true,
+       "metric": true,
+       "horizon": false,
+       "ok": true,
+       "horizonLabel": "Horizon 3"
+      }
+     },
+     "rejected": {
+      "provenance": {
+       "value": "reproduced",
+       "reason": "No source quote says how this number was obtained."
+      }
+     },
+     "missing": [
+      "metricDefinition",
+      "provenance"
+     ],
+     "id": "8cbb10ace4bb",
+     "history": []
+    },
+    {
+     "name": "MAE",
+     "value": "24.85",
+     "unit": "unknown",
+     "direction": "lower",
+     "method": "AGCRN",
+     "dataset": "GBA",
+     "datasetVersion": "01/01/2017 – 12/31/2021",
+     "split": "6:2:2",
+     "horizon": "180 minutes (horizon 12)",
+     "aggregation": "single horizon",
+     "preprocessing": "no imputation; missing values kept as is",
+     "metricDefinition": "unknown",
+     "provenance": "unknown",
+     "citedFrom": "unknown",
+     "locator": "Table 2",
+     "quote": "| GBA | AGCRN | 777K | 18.31 | 30.24 | 14.27% | 21.27 | 34.72 | 16.89% | 24.85 | 40.18 | 20.80% | 21.01 | 34.25 | 16.90% |",
+     "verified": false,
+     "quoteLocated": false,
+     "evidence": {
+      "dataset": {
+       "quote": "| GBA | 2,352 | 61,246 | 26.0 | 9 | 01/01/2017 – 12/31/2021 | 525,888 | 1.24B |",
+       "origin": "paper"
+      },
+      "split": {
+       "quote": "We chronologically split the data into train, validation, and test sets, with a ratio of 6:2:2 for all sub-datasets.",
+       "origin": "paper"
+      },
+      "horizon": {
+       "quote": "Datasets. We conduct experiments on all sub-datasets of LargeST with the setting of predicting the 12-step future based on the 12-step historical data [19, 32]. To facilitate the study of traffic forecasting in a more extended future time period, we aggregate the traffic readings from 5-minute intervals into 15-minute windows, resulting in 96 time steps per day.",
+       "origin": "paper"
+      },
+      "preprocessing": {
+       "quote": "Because we intend to maintain the data in its original state as much as possible, so that users have the discretion to decide whether to fill missing values or not.",
+       "origin": "paper"
+      }
+     },
+     "checks": {
+      "support": {
+       "method": "quoted",
+       "dataset": "quoted",
+       "datasetVersion": "document",
+       "split": "document",
+       "horizon": "nearby",
+       "aggregation": "derived",
+       "preprocessing": "quoted",
+       "metricDefinition": "missing",
+       "citedFrom": "missing",
+       "provenance": "missing"
+      },
+      "cell": {
+       "path": "GBA / AGCRN / 777K / Horizon 12 / MAE",
+       "caption": "Table 2: Performance comparisons. We bold the best-performing baseline result. The absence of baselines on the GLA and CA datasets indicates that the models incur out-of-memory issue even when we set batch size to 4 on an A6000 GPU with 48 ",
+       "method": true,
+       "metric": true,
+       "horizon": false,
+       "ok": true,
+       "horizonLabel": "Horizon 12"
+      }
+     },
+     "rejected": {
+      "provenance": {
+       "value": "reproduced",
+       "reason": "No source quote says how this number was obtained."
+      }
+     },
+     "missing": [
+      "metricDefinition",
+      "provenance"
+     ],
+     "id": "e31772c1f8d4",
+     "history": []
+    },
+    {
+     "name": "MAE",
+     "value": "17.27",
+     "unit": "unknown",
+     "direction": "lower",
+     "method": "AGCRN",
+     "dataset": "GLA",
+     "datasetVersion": "01/01/2017 – 12/31/2021",
+     "split": "6:2:2",
+     "horizon": "45 minutes (horizon 3)",
+     "aggregation": "single horizon",
+     "preprocessing": "no imputation; missing values kept as is",
+     "metricDefinition": "unknown",
+     "provenance": "unknown",
+     "citedFrom": "unknown",
+     "locator": "Table 2",
+     "quote": "| GLA | AGCRN | 792K | 17.27 | 29.70 | 10.78% | 20.38 | 34.82 | 12.70% | 24.59 | 42.59 | 16.03% | 20.25 | 34.84 | 12.87% |",
+     "verified": false,
+     "quoteLocated": false,
+     "evidence": {
+      "dataset": {
+       "quote": "| GLA | 3,834 | 98,703 | 25.7 | 9 | 01/01/2017 – 12/31/2021 | 525,888 | 2.02B |",
+       "origin": "paper"
+      },
+      "split": {
+       "quote": "We chronologically split the data into train, validation, and test sets, with a ratio of 6:2:2 for all sub-datasets.",
+       "origin": "paper"
+      },
+      "horizon": {
+       "quote": "Datasets. We conduct experiments on all sub-datasets of LargeST with the setting of predicting the 12-step future based on the 12-step historical data [19, 32]. To facilitate the study of traffic forecasting in a more extended future time period, we aggregate the traffic readings from 5-minute intervals into 15-minute windows, resulting in 96 time steps per day.",
+       "origin": "paper"
+      },
+      "preprocessing": {
+       "quote": "Because we intend to maintain the data in its original state as much as possible, so that users have the discretion to decide whether to fill missing values or not.",
+       "origin": "paper"
+      }
+     },
+     "checks": {
+      "support": {
+       "method": "quoted",
+       "dataset": "quoted",
+       "datasetVersion": "document",
+       "split": "document",
+       "horizon": "nearby",
+       "aggregation": "derived",
+       "preprocessing": "quoted",
+       "metricDefinition": "missing",
+       "citedFrom": "missing",
+       "provenance": "missing"
+      },
+      "cell": {
+       "path": "GLA / AGCRN / 792K / Horizon 3 / MAE",
+       "caption": "Table 2: Performance comparisons. We bold the best-performing baseline result. The absence of baselines on the GLA and CA datasets indicates that the models incur out-of-memory issue even when we set batch size to 4 on an A6000 GPU with 48 ",
+       "method": true,
+       "metric": true,
+       "horizon": false,
+       "ok": true,
+       "horizonLabel": "Horizon 3"
+      }
+     },
+     "rejected": {
+      "provenance": {
+       "value": "reproduced",
+       "reason": "No source quote says how this number was obtained."
+      }
+     },
+     "missing": [
+      "metricDefinition",
+      "provenance"
+     ],
+     "id": "658e23d804d3",
+     "history": []
+    },
+    {
+     "name": "MAE",
+     "value": "24.59",
+     "unit": "unknown",
+     "direction": "lower",
+     "method": "AGCRN",
+     "dataset": "GLA",
+     "datasetVersion": "01/01/2017 – 12/31/2021",
+     "split": "6:2:2",
+     "horizon": "180 minutes (horizon 12)",
+     "aggregation": "single horizon",
+     "preprocessing": "no imputation; missing values kept as is",
+     "metricDefinition": "unknown",
+     "provenance": "unknown",
+     "citedFrom": "unknown",
+     "locator": "Table 2",
+     "quote": "| GLA | AGCRN | 792K | 17.27 | 29.70 | 10.78% | 20.38 | 34.82 | 12.70% | 24.59 | 42.59 | 16.03% | 20.25 | 34.84 | 12.87% |",
+     "verified": false,
+     "quoteLocated": false,
+     "evidence": {
+      "dataset": {
+       "quote": "| GLA | 3,834 | 98,703 | 25.7 | 9 | 01/01/2017 – 12/31/2021 | 525,888 | 2.02B |",
+       "origin": "paper"
+      },
+      "split": {
+       "quote": "We chronologically split the data into train, validation, and test sets, with a ratio of 6:2:2 for all sub-datasets.",
+       "origin": "paper"
+      },
+      "horizon": {
+       "quote": "Datasets. We conduct experiments on all sub-datasets of LargeST with the setting of predicting the 12-step future based on the 12-step historical data [19, 32]. To facilitate the study of traffic forecasting in a more extended future time period, we aggregate the traffic readings from 5-minute intervals into 15-minute windows, resulting in 96 time steps per day.",
+       "origin": "paper"
+      },
+      "preprocessing": {
+       "quote": "Because we intend to maintain the data in its original state as much as possible, so that users have the discretion to decide whether to fill missing values or not.",
+       "origin": "paper"
+      }
+     },
+     "checks": {
+      "support": {
+       "method": "quoted",
+       "dataset": "quoted",
+       "datasetVersion": "document",
+       "split": "document",
+       "horizon": "nearby",
+       "aggregation": "derived",
+       "preprocessing": "quoted",
+       "metricDefinition": "missing",
+       "citedFrom": "missing",
+       "provenance": "missing"
+      },
+      "cell": {
+       "path": "GLA / AGCRN / 792K / Horizon 12 / MAE",
+       "caption": "Table 2: Performance comparisons. We bold the best-performing baseline result. The absence of baselines on the GLA and CA datasets indicates that the models incur out-of-memory issue even when we set batch size to 4 on an A6000 GPU with 48 ",
+       "method": true,
+       "metric": true,
+       "horizon": false,
+       "ok": true,
+       "horizonLabel": "Horizon 12"
+      }
+     },
+     "rejected": {
+      "provenance": {
+       "value": "reproduced",
+       "reason": "No source quote says how this number was obtained."
+      }
+     },
+     "missing": [
+      "metricDefinition",
+      "provenance"
+     ],
+     "id": "7092ba563224",
+     "history": []
+    },
+    {
+     "name": "MAE",
+     "value": "17.14",
+     "unit": "unknown",
+     "direction": "lower",
+     "method": "GWNET",
+     "dataset": "CA",
+     "datasetVersion": "01/01/2017 – 12/31/2021",
+     "split": "6:2:2",
+     "horizon": "45 minutes (horizon 3)",
+     "aggregation": "single horizon",
+     "preprocessing": "no imputation; missing values kept as is",
+     "metricDefinition": "unknown",
+     "provenance": "unknown",
+     "citedFrom": "unknown",
+     "locator": "Table 2",
+     "quote": "| CA | GWNET | 469K | 17.14 | 27.81 | 12.62% | 21.68 | 34.16 | 17.14% | 28.58 | 44.13 | 24.24% | 21.72 | 34.20 | 17.40% |",
+     "verified": false,
+     "quoteLocated": false,
+     "evidence": {
+      "dataset": {
+       "quote": "| CA | 8,600 | 201,363 | 23.4 | 9 | 01/01/2017 – 12/31/2021 | 525,888 | 4.52B |",
+       "origin": "paper"
+      },
+      "split": {
+       "quote": "We chronologically split the data into train, validation, and test sets, with a ratio of 6:2:2 for all sub-datasets.",
+       "origin": "paper"
+      },
+      "horizon": {
+       "quote": "Datasets. We conduct experiments on all sub-datasets of LargeST with the setting of predicting the 12-step future based on the 12-step historical data [19, 32]. To facilitate the study of traffic forecasting in a more extended future time period, we aggregate the traffic readings from 5-minute intervals into 15-minute windows, resulting in 96 time steps per day.",
+       "origin": "paper"
+      },
+      "preprocessing": {
+       "quote": "Because we intend to maintain the data in its original state as much as possible, so that users have the discretion to decide whether to fill missing values or not.",
+       "origin": "paper"
+      }
+     },
+     "checks": {
+      "support": {
+       "method": "quoted",
+       "dataset": "quoted",
+       "datasetVersion": "document",
+       "split": "document",
+       "horizon": "nearby",
+       "aggregation": "derived",
+       "preprocessing": "quoted",
+       "metricDefinition": "missing",
+       "citedFrom": "missing",
+       "provenance": "missing"
+      },
+      "cell": {
+       "path": "CA / GWNET / 469K / Horizon 3 / MAE",
+       "caption": "Table 2: Performance comparisons. We bold the best-performing baseline result. The absence of baselines on the GLA and CA datasets indicates that the models incur out-of-memory issue even when we set batch size to 4 on an A6000 GPU with 48 ",
+       "method": true,
+       "metric": true,
+       "horizon": false,
+       "ok": true,
+       "horizonLabel": "Horizon 3"
+      }
+     },
+     "rejected": {
+      "provenance": {
+       "value": "reproduced",
+       "reason": "No source quote says how this number was obtained."
+      }
+     },
+     "missing": [
+      "metricDefinition",
+      "provenance"
+     ],
+     "id": "a16eb566c425",
+     "history": []
+    },
+    {
+     "name": "MAE",
+     "value": "24.94",
+     "unit": "unknown",
+     "direction": "lower",
+     "method": "STGCN",
+     "dataset": "CA",
+     "datasetVersion": "01/01/2017 – 12/31/2021",
+     "split": "6:2:2",
+     "horizon": "180 minutes (horizon 12)",
+     "aggregation": "single horizon",
+     "preprocessing": "no imputation; missing values kept as is",
+     "metricDefinition": "unknown",
+     "provenance": "unknown",
+     "citedFrom": "unknown",
+     "locator": "Table 2",
+     "quote": "| CA | STGCN | 4.5M | 18.99 | 32.37 | 14.84% | 21.37 | 36.46 | 16.27% | 24.94 | 42.59 | 19.74% | 21.33 | 36.39 | 16.53% |",
+     "verified": false,
+     "quoteLocated": false,
+     "evidence": {
+      "dataset": {
+       "quote": "| CA | 8,600 | 201,363 | 23.4 | 9 | 01/01/2017 – 12/31/2021 | 525,888 | 4.52B |",
+       "origin": "paper"
+      },
+      "split": {
+       "quote": "We chronologically split the data into train, validation, and test sets, with a ratio of 6:2:2 for all sub-datasets.",
+       "origin": "paper"
+      },
+      "horizon": {
+       "quote": "Datasets. We conduct experiments on all sub-datasets of LargeST with the setting of predicting the 12-step future based on the 12-step historical data [19, 32]. To facilitate the study of traffic forecasting in a more extended future time period, we aggregate the traffic readings from 5-minute intervals into 15-minute windows, resulting in 96 time steps per day.",
+       "origin": "paper"
+      },
+      "preprocessing": {
+       "quote": "Because we intend to maintain the data in its original state as much as possible, so that users have the discretion to decide whether to fill missing values or not.",
+       "origin": "paper"
+      }
+     },
+     "checks": {
+      "support": {
+       "method": "quoted",
+       "dataset": "quoted",
+       "datasetVersion": "document",
+       "split": "document",
+       "horizon": "nearby",
+       "aggregation": "derived",
+       "preprocessing": "quoted",
+       "metricDefinition": "missing",
+       "citedFrom": "missing",
+       "provenance": "missing"
+      },
+      "cell": {
+       "path": "CA / STGCN / 4.5M / Horizon 12 / MAE",
+       "caption": "Table 2: Performance comparisons. We bold the best-performing baseline result. The absence of baselines on the GLA and CA datasets indicates that the models incur out-of-memory issue even when we set batch size to 4 on an A6000 GPU with 48 ",
+       "method": true,
+       "metric": true,
+       "horizon": false,
+       "ok": true,
+       "horizonLabel": "Horizon 12"
+      }
+     },
+     "rejected": {
+      "provenance": {
+       "value": "reproduced",
+       "reason": "No source quote says how this number was obtained."
+      }
+     },
+     "missing": [
+      "metricDefinition",
+      "provenance"
+     ],
+     "id": "7b71405bbe0f",
+     "history": []
+    }
+   ],
+   "reviewed": false,
+   "origin": "search",
+   "sourceRef": "46050323ba00cca36bdd6d995ea0646813681f2fcacf85045d7daa7cf34d3dbc",
+   "sourceChars": 65844,
+   "relevance": 78,
+   "rationale": "The paper provides extensive baseline performance numbers (MAE, RMSE, MAPE) for multiple traffic forecasting models across several forecast horizons (3, 6, 12 steps) on the LargeST dataset and its sub‑regions. This empirical evidence allows comparison of how models behave when the horizon changes and when different error metrics are used, which directly addresses the question of identifying defensible baselines under varying horizons and metric masking. However, the work is primarily a dataset introduction and benchmark; it does not explicitly discuss or test the notion of metric masking, nor does it provide statistical analysis or guidance on selecting baselines when horizons and metrics differ across studies.",
+   "topic": "Large‑scale traffic forecasting benchmark offering baseline model results across horizons and error ",
+   "limitations": "The paper does not analyze which baselines remain robust when horizon or metric changes; it lacks cross‑dataset validation, significance testing, and explicit treatment of metric masking. Results are limited to the LargeST dataset (California regions) and a fixed 5‑minute sampling rate, limiting generalizability to other traffic domains or different temporal resolutions.",
+   "rejectedMetrics": 0
+  },
+  {
+   "id": "W4283817628",
+   "title": "Graph Neural Controlled Differential Equations for Traffic Forecasting",
+   "year": 2022,
+   "url": "https://doi.org/10.1609/aaai.v36i6.20587",
+   "doi": "https://doi.org/10.1609/aaai.v36i6.20587",
+   "authors": [
+    "Jeongwhan Choi",
+    "Hwangyong Choi",
+    "Hwang, Jeehyun",
+    "Noseong Park"
+   ],
+   "venue": "AAAI Publications (The Association for the Advancement of Artificial Intelligence (AAAI))",
+   "citations": 368,
+   "abstract": "Traffic forecasting is one of the most popular spatio-temporal tasks in the field of machine learning. A prevalent approach in the field is to combine graph convolutional networks and recurrent neural networks for the spatio-temporal processing. There has been fierce competition and many novel methods have been proposed. In this paper, we present the method of spatio-temporal graph neural controlled differential equation (STG-NCDE). Neural controlled differential equations (NCDEs) are a breakthrough concept for processing sequential data. We extend the concept and design two NCDEs: one for the temporal processing and the other for the spatial processing. After that, we combine them into a single framework. We conduct experiments with 6 benchmark datasets and 20 baselines. STG-NCDE shows the best accuracy in all cases, outperforming all those 20 baselines by non-trivial margins.",
+   "evidenceKind": "abstract",
+   "evidenceUrl": "https://doi.org/10.1609/aaai.v36i6.20587",
+   "topics": [
+    "Traffic Prediction and Management Techniques",
+    "Advanced Graph Neural Networks",
+    "Traffic control and management"
+   ],
+   "metrics": [],
+   "reviewed": false,
+   "origin": "search",
+   "relevance": 30,
+   "rationale": "The paper presents STG‑NCDE and evaluates it against 20 baselines on six benchmark datasets, claiming superior accuracy. However, it does not discuss how forecast horizon or metric masking varies across experiments, nor does it analyze baseline robustness when those factors change. Thus it provides limited evidence for selecting defensible baselines under differing horizons or masking schemes.",
+   "topic": "Graph neural networks",
+   "limitations": "No explicit reporting of forecast horizon lengths, metric masking strategies, or ablation studies that would show baseline performance under varying horizons or masked metrics; the evaluation assumes identical experimental settings across all methods, limiting insight into baseline suitability when those conditions differ.",
+   "rejectedMetrics": 0
+  }
+ ],
+ "suggestions": [
+  {
+   "topic": "Validate and correct reported MAE values for METR-LA using the original evaluation protocol",
+   "why": "Many incompatibilities stem from non‑standard metric calculations noted in the source; extracting verified numbers will clarify which models truly perform comparably at the same horizon.",
+   "paperIds": [
+    "arXiv190600121",
+    "W7133245391"
+   ]
+  },
+  {
+   "topic": "Systematically evaluate baseline models across multiple forecast horizons (15,30,60 min) with consistent metric masking",
+   "why": "Horizon differences drive most incompatible comparisons; a controlled study will reveal which baselines retain relative performance when horizon changes, informing defensible baseline selection.",
+   "paperIds": [
+    "arXiv210106861",
+    "W4283817628"
+   ]
+  }
+ ],
+ "revision": 9,
+ "tokens": 114655,
+ "tex": "\\documentclass[11pt]{article}\n\\usepackage[margin=1in]{geometry}\n\\usepackage{hyperref}\n\\usepackage{longtable}\n\\title{Which published traffic forecasting results can serve as defensible baselines when forecast horizon and metric masking differ? Investigate evidence rather than assuming lower MAE proves superiority.}\n\\author{Research draft -- human review required}\n\\date{\\today}\n\\begin{document}\n\\maketitle\n\\begin{abstract}\nWe propose a controlled replication study of traffic-forecasting baselines, motivated by a source audit of GTS and Graph WaveNet. The GTS appendix corrects an earlier metric calculation, while Graph WaveNet explicitly excludes missing values during training and testing. These details show why reported values must retain their experimental context. The proposed study will align data splits, preprocessing, forecast horizons, and metric masking before evaluating models under one implementation. The present work audits published evidence and has not run forecasting experiments. All extracted numeric results remain provisional pending independent review.\n\\end{abstract}\n\\section{Related work}\nThe GTS paper reports original results and subsequently supplies corrected results in Appendix D. The authors explain that the earlier version calculated MAE, RMSE, and MAPE differently from the official DCRNN publication. Original and corrected tables must therefore remain distinct evidence records; a source quotation containing a number alone does not resolve this distinction. \\cite{arXiv210106861}\n\nGraph WaveNet reports results at 15, 30, and 60 minutes on METR-LA and PEMS-BAY. Its experimental section states that missing values are excluded from training and testing. This provides a stated evaluation detail that must be checked against the version and protocol of any candidate baseline. \\cite{arXiv190600121}\n\\section{Evidence assessment}\nThe original GTS METR-LA 60-minute MAE of 2.99 must be read with the Appendix D correction. The corrected table reports 3.41. These are source-reported values from different calculation versions, not new measurements produced by this audit. We exclude the original calculation from the proposed common-protocol baseline set. \\cite{arXiv210106861}\n\nThe software identifies provisional context matches as well as conflicts. Neither a matched dataset label nor an unverified extraction establishes complete protocol equivalence. Each candidate pair still requires review of masking, preprocessing, table version, result provenance, and horizon aggregation before it is used to justify an experiment. \\cite{arXiv190600121,arXiv210106861}\n{\\small\n\\begin{longtable}{p{3.5cm}p{3.5cm}p{2.1cm}p{5.6cm}}\n\\textbf{Result A} & \\textbf{Result B} & \\textbf{Outcome} & \\textbf{Reason} \\\\ \\hline\n\\endhead\nGTS MAE 2.64 (Discrete Graph Structure Learning for Fo) & Graph WaveNet 2.69 (Graph WaveNet for Deep Spatial-Temporal ) & comparable & Dataset, split, horizon, and metric match. Extraction is not yet human-verified. Caveat: Metric definition (for example masking of missing values) is not stated for Discrete Graph Structure Learning for Forecasting Multiple Time Series. \\\\\nGTS MAE 2.64 (Discrete Graph Structure Learning for Fo) & GGRU 2.71 (Graph WaveNet for Deep Spatial-Temporal ) & comparable & Dataset, split, horizon, and metric match. Extraction is not yet human-verified. Caveat: Metric definition (for example masking of missing values) is not stated for Discrete Graph Structure Learning for Forecasting Multiple Time Series. \\\\\nGTS MAE 2.39 (Discrete Graph Structure Learning for Fo) & Graph WaveNet 2.69 (Graph WaveNet for Deep Spatial-Temporal ) & incompatible & The source states that one metric was computed differently from the standard protocol: \"non-standard per the paper's later correction: It was brought to our attention recently that this version calculated the evaluation metrics MAE/RMSE/MAPE in a manner slightly different from that used to report the results of DCRNN in the official publication (https://github.\". \\\\\nGTS MAE 2.39 (Discrete Graph Structure Learning for Fo) & GGRU 2.71 (Graph WaveNet for Deep Spatial-Temporal ) & incompatible & The source states that one metric was computed differently from the standard protocol: \"non-standard per the paper's later correction: It was brought to our attention recently that this version calculated the evaluation metrics MAE/RMSE/MAPE in a manner slightly different from that used to report the results of DCRNN in the official publication (https://github.\". \\\\\nGTS MAE 2.39 (Discrete Graph Structure Learning for Fo) & Graph WaveNet 3.07 (Graph WaveNet for Deep Spatial-Temporal ) & incompatible & These results use different horizons: single horizon at 15 minutes vs single horizon at 30 minutes. \\\\\nGTS MAE 2.39 (Discrete Graph Structure Learning for Fo) & GGRU 3.12 (Graph WaveNet for Deep Spatial-Temporal ) & incompatible & These results use different horizons: single horizon at 15 minutes vs single horizon at 30 minutes. \\\\\nGTS MAE 2.39 (Discrete Graph Structure Learning for Fo) & Graph WaveNet 3.53 (Graph WaveNet for Deep Spatial-Temporal ) & incompatible & These results use different horizons: single horizon at 15 minutes vs single horizon at 60 minutes. \\\\\nGTS MAE 2.39 (Discrete Graph Structure Learning for Fo) & DCRNN 3.60 (Graph WaveNet for Deep Spatial-Temporal ) & incompatible & These results use different horizons: single horizon at 15 minutes vs single horizon at 60 minutes. \\\\\nDCRNN MAE 2.77 (Discrete Graph Structure Learning for Fo) & Graph WaveNet 2.69 (Graph WaveNet for Deep Spatial-Temporal ) & incompatible & The source states that one metric was computed differently from the standard protocol: \"non-standard per the paper's later correction: It was brought to our attention recently that this version calculated the evaluation metrics MAE/RMSE/MAPE in a manner slightly different from that used to report the results of DCRNN in the official publication (https://github.\". \\\\\nDCRNN MAE 2.77 (Discrete Graph Structure Learning for Fo) & GGRU 2.71 (Graph WaveNet for Deep Spatial-Temporal ) & incompatible & The source states that one metric was computed differently from the standard protocol: \"non-standard per the paper's later correction: It was brought to our attention recently that this version calculated the evaluation metrics MAE/RMSE/MAPE in a manner slightly different from that used to report the results of DCRNN in the official publication (https://github.\". \\\\\nDCRNN MAE 2.77 (Discrete Graph Structure Learning for Fo) & Graph WaveNet 3.07 (Graph WaveNet for Deep Spatial-Temporal ) & incompatible & These results use different horizons: single horizon at 15 minutes vs single horizon at 30 minutes. \\\\\nDCRNN MAE 2.77 (Discrete Graph Structure Learning for Fo) & GGRU 3.12 (Graph WaveNet for Deep Spatial-Temporal ) & incompatible & These results use different horizons: single horizon at 15 minutes vs single horizon at 30 minutes. \\\\\nDCRNN MAE 2.77 (Discrete Graph Structure Learning for Fo) & Graph WaveNet 3.53 (Graph WaveNet for Deep Spatial-Temporal ) & incompatible & These results use different horizons: single horizon at 15 minutes vs single horizon at 60 minutes. \\\\\nDCRNN MAE 2.77 (Discrete Graph Structure Learning for Fo) & DCRNN 3.60 (Graph WaveNet for Deep Spatial-Temporal ) & incompatible & These results use different horizons: single horizon at 15 minutes vs single horizon at 60 minutes. \\\\\n\\caption{Comparison outcomes computed from source-checked experimental context. Insufficient means the context is not stated, not that the results conflict.}\\\\\n\\end{longtable}\n}\n\n\\section{Proposed study}\nRe-run GTS and Graph WaveNet on one explicitly versioned METR-LA dataset. Use one chronological train/validation/test split and one normalization implementation. Evaluate the same 15-, 30-, and 60-minute horizons separately, and distinguish these from averages over horizons. Define exactly which zero or missing targets are masked. Use the corrected metric implementation and record the code commit. Repeat training with shared seeds and report mean and standard deviation, with no selection of only the best run. Keep cited baseline values separate from independently reproduced results. These are proposed controls; no model-training experiment has been conducted.\n\\subsection{Controls required by the evidence}\n\\begin{itemize}\n\\item Compute every metric with one stated definition, including how zero or missing targets are masked; report masked and unmasked values when baselines differ.\n\\item Report each forecast horizon separately (for example 15, 30, and 60 minutes) and report the average over horizons as a separate row; never compare one with the other.\n\\end{itemize}\n\\bibliographystyle{plain}\n\\bibliography{references}\n\\end{document}\n",
+ "bib": "@article{arXiv210106861,\n title={Discrete Graph Structure Learning for Forecasting Multiple Time Series},\n author={Chao Shang and Jie Chen and Jinbo Bi},\n year={2021},\n note={https://arxiv.org/abs/2101.06861}\n}\n@article{arXiv190600121,\n title={Graph WaveNet for Deep Spatial-Temporal Graph Modeling},\n author={Zonghan Wu and Shirui Pan and Guodong Long and Jing Jiang and Chengqi Zhang},\n year={2019},\n note={https://arxiv.org/abs/1906.00121}\n}",
+ "seeds": [
+  "2101.06861",
+  "1906.00121"
+ ],
+ "seedOnly": false,
+ "paperLimit": 4,
+ "proposals": [],
+ "corrections": [],
+ "calls": [
+  {
+   "at": "2026-10-27T15:50:29.104288+00:00",
+   "kind": "plan",
+   "provider": "nebius",
+   "model": "nvidia/nemotron-3-super-120b-a12b",
+   "attempts": 1,
+   "repaired": false,
+   "promptTokens": 108,
+   "completionTokens": 337,
+   "totalTokens": 445,
+   "ok": true,
+   "ms": 2376
+  },
+  {
+   "at": "2026-10-27T15:50:36.761532+00:00",
+   "kind": "assess",
+   "provider": "nebius",
+   "model": "nvidia/nemotron-3-super-120b-a12b",
+   "attempts": 1,
+   "repaired": false,
+   "promptTokens": 5139,
+   "completionTokens": 365,
+   "totalTokens": 5504,
+   "ok": true,
+   "ms": 2912
+  },
+  {
+   "at": "2026-10-27T15:50:39.687671+00:00",
+   "kind": "extract",
+   "provider": "nebius",
+   "model": "nvidia/nemotron-3-super-120b-a12b",
+   "attempts": 1,
+   "repaired": false,
+   "promptTokens": 9718,
+   "completionTokens": 10188,
+   "totalTokens": 19906,
+   "ok": true,
+   "ms": 41280
+  },
+  {
+   "at": "2026-10-27T15:51:21.031754+00:00",
+   "kind": "assess",
+   "provider": "nebius",
+   "model": "nvidia/nemotron-3-super-120b-a12b",
+   "attempts": 1,
+   "repaired": false,
+   "promptTokens": 3743,
+   "completionTokens": 388,
+   "totalTokens": 4131,
+   "ok": true,
+   "ms": 3018
+  },
+  {
+   "at": "2026-10-27T15:51:24.050226+00:00",
+   "kind": "extract",
+   "provider": "nebius",
+   "model": "nvidia/nemotron-3-super-120b-a12b",
+   "attempts": 1,
+   "repaired": false,
+   "promptTokens": 12066,
+   "completionTokens": 10236,
+   "totalTokens": 22302,
+   "ok": true,
+   "ms": 38215
+  },
+  {
+   "at": "2026-10-27T15:52:02.340119+00:00",
+   "kind": "assess",
+   "provider": "nebius",
+   "model": "nvidia/nemotron-3-super-120b-a12b",
+   "attempts": 1,
+   "repaired": false,
+   "promptTokens": 6201,
+   "completionTokens": 499,
+   "totalTokens": 6700,
+   "ok": true,
+   "ms": 3646
+  },
+  {
+   "at": "2026-10-27T15:52:05.999156+00:00",
+   "kind": "extract",
+   "provider": "nebius",
+   "model": "nvidia/nemotron-3-super-120b-a12b",
+   "attempts": 1,
+   "repaired": false,
+   "promptTokens": 12297,
+   "completionTokens": 7920,
+   "totalTokens": 20217,
+   "ok": true,
+   "ms": 26208
+  },
+  {
+   "at": "2026-10-27T15:52:32.594634+00:00",
+   "kind": "assess",
+   "provider": "nebius",
+   "model": "nvidia/nemotron-3-super-120b-a12b",
+   "attempts": 1,
+   "repaired": false,
+   "promptTokens": 538,
+   "completionTokens": 368,
+   "totalTokens": 906,
+   "ok": true,
+   "ms": 3412
+  },
+  {
+   "at": "2026-10-27T15:52:36.006593+00:00",
+   "kind": "extract",
+   "provider": "nebius",
+   "model": "nvidia/nemotron-3-super-120b-a12b",
+   "attempts": 1,
+   "repaired": false,
+   "promptTokens": 777,
+   "completionTokens": 60,
+   "totalTokens": 837,
+   "ok": true,
+   "ms": 1087
+  },
+  {
+   "at": "2026-10-27T15:52:37.133451+00:00",
+   "kind": "synthesis",
+   "provider": "nebius",
+   "model": "nvidia/nemotron-3-super-120b-a12b",
+   "attempts": 1,
+   "repaired": false,
+   "promptTokens": 4592,
+   "completionTokens": 1017,
+   "totalTokens": 5609,
+   "ok": true,
+   "ms": 5321
+  },
+  {
+   "at": "2026-10-27T15:53:17.397607+00:00",
+   "kind": "target",
+   "provider": "nebius",
+   "model": "nvidia/nemotron-3-super-120b-a12b",
+   "attempts": 1,
+   "repaired": false,
+   "promptTokens": 2488,
+   "completionTokens": 2732,
+   "totalTokens": 5220,
+   "ok": true,
+   "ms": 12522
+  },
+  {
+   "at": "2026-10-27T15:53:53.661256+00:00",
+   "kind": "draft",
+   "provider": "nebius",
+   "model": "nvidia/nemotron-3-super-120b-a12b",
+   "attempts": 1,
+   "repaired": false,
+   "promptTokens": 20576,
+   "completionTokens": 2302,
+   "totalTokens": 22878,
+   "ok": true,
+   "ms": 20832
+  }
+ ],
+ "execution": [
+  {
+   "id": "722b2ba429adae3d",
+   "kind": "hypothesis",
+   "label": "Hypothesis accepted",
+   "status": "complete",
+   "at": "2026-10-27T15:50:28.194993+00:00",
+   "parent": null,
+   "revision": 1,
+   "paperCount": 0,
+   "metricCount": 0,
+   "tokens": 0,
+   "details": {
+    "seeds": [
+     "2101.06861",
+     "1906.00121"
+    ],
+    "seedOnly": false
+   },
+   "sha256": "236bc8d6d1340cfec60307254a4045952f342f3e9d19c6332596fe62d9521f62"
+  },
+  {
+   "id": "396139449e02c2b2",
+   "kind": "plan",
+   "label": "Search plan generated",
+   "status": "complete",
+   "at": "2026-10-27T15:50:31.480096+00:00",
+   "parent": "722b2ba429adae3d",
+   "revision": 1,
+   "paperCount": 0,
+   "metricCount": 0,
+   "tokens": 445,
+   "details": {
+    "queries": [
+     "traffic forecasting benchmark horizon comparison",
+     "MAE RMSE metric masking study"
+    ]
+   },
+   "sha256": "e31833898605b0e26eabaa9bc8a1b011d1fbfb5ef414017c6241278c6c26f902"
+  },
+  {
+   "id": "66911c84a900574e",
+   "kind": "retrieval",
+   "label": "Paper discovery and retrieval completed",
+   "status": "complete",
+   "at": "2026-10-27T15:50:36.730270+00:00",
+   "parent": "396139449e02c2b2",
+   "revision": 1,
+   "paperCount": 4,
+   "metricCount": 0,
+   "tokens": 445,
+   "details": {
+    "queries": [
+     "traffic forecasting benchmark horizon comparison",
+     "MAE RMSE metric masking study"
+    ],
+    "fullText": 3
+   },
+   "sha256": "cbfb9bab33dbb9c5d12b9d7e5dcb68fa1c4dbac417c862bb899d59d854e5fb10"
+  },
+  {
+   "id": "5925517dbb98031f",
+   "kind": "assessment",
+   "label": "Assessed Discrete Graph Structure Learning for Forecasting Multiple Time Series",
+   "status": "complete",
+   "at": "2026-10-27T15:51:21.007019+00:00",
+   "parent": "66911c84a900574e",
+   "revision": 1,
+   "paperCount": 4,
+   "metricCount": 8,
+   "tokens": 25855,
+   "details": {
+    "paper": "arXiv210106861",
+    "metrics": 8,
+    "rejected": 0
+   },
+   "sha256": "a2b0b8cf15455710e3504b41c2014d6a71cb2c45010643ea58d5f70796d9152f"
+  },
+  {
+   "id": "91ca93dd5fca76c8",
+   "kind": "assessment",
+   "label": "Assessed Graph WaveNet for Deep Spatial-Temporal Graph Modeling",
+   "status": "complete",
+   "at": "2026-10-27T15:52:02.294824+00:00",
+   "parent": "5925517dbb98031f",
+   "revision": 1,
+   "paperCount": 4,
+   "metricCount": 16,
+   "tokens": 52288,
+   "details": {
+    "paper": "arXiv190600121",
+    "metrics": 8,
+    "rejected": 0
+   },
+   "sha256": "d85d664a5e6d45eaf051589b52c28f7f35ce1f25bd7c861bbe21e2ccd3b3ecd8"
+  },
+  {
+   "id": "af17a6ef353fa1bd",
+   "kind": "assessment",
+   "label": "Assessed LargeST: A Benchmark Dataset for Large-Scale Traffic Forecasting",
+   "status": "complete",
+   "at": "2026-10-27T15:52:32.566884+00:00",
+   "parent": "91ca93dd5fca76c8",
+   "revision": 1,
+   "paperCount": 4,
+   "metricCount": 24,
+   "tokens": 79205,
+   "details": {
+    "paper": "W7133245391",
+    "metrics": 8,
+    "rejected": 0
+   },
+   "sha256": "6483a050024bb6f7d10b4ff1ded7dce212661fb7094b2463ed25e9b8ce82b132"
+  },
+  {
+   "id": "c0cb3bb13cf93134",
+   "kind": "assessment",
+   "label": "Assessed Graph Neural Controlled Differential Equations for Traffic Forecasting",
+   "status": "complete",
+   "at": "2026-10-27T15:52:37.093441+00:00",
+   "parent": "af17a6ef353fa1bd",
+   "revision": 1,
+   "paperCount": 4,
+   "metricCount": 24,
+   "tokens": 80948,
+   "details": {
+    "paper": "W4283817628",
+    "metrics": 0,
+    "rejected": 0
+   },
+   "sha256": "16ee4d152ddcf662715712e27492586f39b040bb7f950648145fe1fa6a96b5a6"
+  },
+  {
+   "id": "3c9234a0234284e9",
+   "kind": "synthesis",
+   "label": "Research directions generated",
+   "status": "complete",
+   "at": "2026-10-27T15:52:42.454433+00:00",
+   "parent": "c0cb3bb13cf93134",
+   "revision": 1,
+   "paperCount": 4,
+   "metricCount": 24,
+   "tokens": 86557,
+   "details": {},
+   "sha256": "130a5605d42e6afed4c0b434a84395849f1f06044b0f5ec9177f73708b9e98cf"
+  },
+  {
+   "id": "fe1689193d308d68",
+   "kind": "ready",
+   "label": "Research discovery completed",
+   "status": "complete",
+   "at": "2026-10-27T15:52:42.477335+00:00",
+   "parent": "3c9234a0234284e9",
+   "revision": 2,
+   "paperCount": 4,
+   "metricCount": 24,
+   "tokens": 86557,
+   "details": {},
+   "sha256": "25c0f7a4180a680a6350d53fda8e879520be8380800b74ac47f174eb5ff41349"
+  },
+  {
+   "id": "215622dbf0285dc1",
+   "kind": "review",
+   "label": "Evidence review saved",
+   "status": "complete",
+   "at": "2026-10-27T15:53:17.265121+00:00",
+   "parent": "fe1689193d308d68",
+   "revision": 3,
+   "paperCount": 4,
+   "metricCount": 24,
+   "tokens": 86557,
+   "details": {
+    "paper": "arXiv210106861",
+    "corrections": []
+   },
+   "sha256": "4f618e365e901d3e3170a5e2a17ffcac8ed2eeddf0f6f26eb009c3a8ee3ee142"
+  },
+  {
+   "id": "1312ef10075c3ea9",
+   "kind": "review",
+   "label": "Evidence review saved",
+   "status": "complete",
+   "at": "2026-10-27T15:53:17.299502+00:00",
+   "parent": "215622dbf0285dc1",
+   "revision": 4,
+   "paperCount": 4,
+   "metricCount": 24,
+   "tokens": 86557,
+   "details": {
+    "paper": "arXiv190600121",
+    "corrections": []
+   },
+   "sha256": "145b918350bdf28f9cd16be8310b87f13b7354cd5560d7737da8b7f013e8fcfb"
+  },
+  {
+   "id": "ad334df77e4c6816",
+   "kind": "input",
+   "label": "Check requested for 2.99",
+   "status": "complete",
+   "at": "2026-10-27T15:53:17.330590+00:00",
+   "parent": "1312ef10075c3ea9",
+   "revision": 5,
+   "paperCount": 4,
+   "metricCount": 24,
+   "tokens": 86557,
+   "details": {
+    "paper": "arXiv210106861",
+    "value": "2.99"
+   },
+   "sha256": "3c5a5851111be1405955d6fbc5cec633c152ea19ef8fa168a859f9bfe75f8298"
+  },
+  {
+   "id": "acd3788634d78db5",
+   "kind": "assessment",
+   "label": "Checked GTS MAE 2.99",
+   "status": "complete",
+   "at": "2026-10-27T15:53:29.949531+00:00",
+   "parent": "ad334df77e4c6816",
+   "revision": 6,
+   "paperCount": 4,
+   "metricCount": 25,
+   "tokens": 91777,
+   "details": {
+    "paper": "arXiv210106861",
+    "metric": "67a1d26d5e4e",
+    "cell": "60 min / MAE / GTS"
+   },
+   "sha256": "14f0e4b836595c77f1f56ba197b0abde965552b7dfeb257a67f01ce1b0cd0376"
+  },
+  {
+   "id": "73c850bcd65df0a9",
+   "kind": "draft-input",
+   "label": "Draft instructions saved",
+   "status": "complete",
+   "at": "2026-10-27T15:53:53.613004+00:00",
+   "parent": "acd3788634d78db5",
+   "revision": 6,
+   "paperCount": 4,
+   "metricCount": 25,
+   "tokens": 91777,
+   "details": {
+    "reviewedPapers": [
+     "arXiv210106861",
+     "arXiv190600121"
+    ]
+   },
+   "sha256": "c5fd38858d6a75a3bc1c0536185b87cd041385e50433daea85768ca7a2eca7b2"
+  },
+  {
+   "id": "c162b122ec87823e",
+   "kind": "draft",
+   "label": "Cited manuscript generated",
+   "status": "complete",
+   "at": "2026-10-27T15:54:14.497299+00:00",
+   "parent": "73c850bcd65df0a9",
+   "revision": 7,
+   "paperCount": 4,
+   "metricCount": 25,
+   "tokens": 114655,
+   "details": {
+    "claims": {
+     "supported": 0,
+     "provisional": 0,
+     "attributed": 0,
+     "descriptive": 4,
+     "unsupported": 0
+    }
+   },
+   "sha256": "c1021caa8e6eb2e29c1a99b9fb1e93c1bcbdd5b7c5c58c1e23329d633efbe7bc"
+  },
+  {
+   "id": "8432d50eefe53083",
+   "kind": "compile",
+   "label": "PDF compiled",
+   "status": "complete",
+   "at": "2026-10-27T15:55:01.240601+00:00",
+   "parent": "c162b122ec87823e",
+   "revision": 7,
+   "paperCount": 4,
+   "metricCount": 25,
+   "tokens": 114655,
+   "details": {
+    "hash": "bca79b1f807d2a0c",
+    "log": "note: Running TeX ...\nnote: Running BibTeX on main.aux ...\nnote: warnings were issued by BibTeX; use --print and/or --keep-logs for details.\nnote: Rerunning TeX because bibtex was run ...\nnote: Rerunning TeX because \"main.aux\" changed ...\nnote: Running xdvipdfmx ...\nnote: Writing `main.pdf` (32.6962890625 KiB)\nnote: Writing `main.log` (13.125 KiB)\nnote: Writing `main.blg` (297 B)\nnote: Skipped writing 3 intermediate files (use --keep-intermediates to keep them)\nwarning: main.tex:24: Underfull \\hbox (badness 1286) in paragraph at lines 24--24\nwarning: main.tex:24: Underfull \\hbox (badness 10000) in paragraph at lines 24--24\nwarning: main.tex:24: Underfull \\hbox (badness 10000) in paragraph at lines 24--24\nwarning: main.tex:25: Underfull \\hbox (badness 6063) in paragraph at lines 25--25\nwarning: main.tex:25: Underfull \\hbox (badness 10000) in paragraph at lines 25--25\nwarning: main.tex:26: Underfull \\hbox (badness 1286) in paragraph at lines 26--26\nwarning: main.tex:26: Underfull \\hbox (badness 10000) in paragraph at lines 26--26\nwarning: main.tex:26: Underfull \\hbox (badness 10000) in paragraph at lines 26--26\nwarning: main.tex:27: Underfull \\hbox (badness 1342) in paragraph at lines 26--27\nwarning: main.tex:27: Underfull \\hbox (badness 6063) in paragraph at lines 27--27\nwarning: main.tex:27: Underfull \\hbox (badness 10000) in paragraph at lines 27--27\nwarning: main.tex:28: Underfull \\hbox (badness 1342) in paragraph at lines 27--28\nwarning: main.tex:28: Underfull \\hbox (badness 1286) in paragraph at lines 28--28\nwarning: main.tex:28: Underfull \\hbox (badness 10000) in paragraph at lines 28--28\nwarning: main.tex:28: Underfull \\hbox (badness 10000) in paragraph at lines 28--28\nwarning: main.tex:29: Underfull \\hbox (badness 6063) in paragraph at lines 29--29\nwarning: main.tex:29: Underfull \\hbox (badness 10000) in paragraph at lines 29--29\nwarning: main.tex:30: Underfull \\hbox (badness 1286) in paragraph at lines 30--30\nwarning: main.tex:30: Underfull \\hbox (badness 10000) in paragraph at lines 30--30\nwarning: main.tex:30: Underfull \\hbox (badness 10000) in paragraph at lines 30--30\nwarning: main.tex:31: Underfull \\hbox (badness 10000) in paragraph at lines 31--31\nwarning: main.tex:32: Underfull \\hbox (badness 8170) in paragraph at lines 32--32\nwarning: main.tex:32: Underfull \\hbox (badness 1286) in paragraph at lines 32--32\nwarning: main.tex:32: Underfull \\hbox (badness 10000) in paragraph at lines 32--32\nwarning: main.tex:32: Underfull \\hbox (badness 10000) in paragraph at lines 32--32\nwarning: main.tex:33: Underfull \\hbox (badness 1342) in paragraph at lines 32--33\nwarning: main.tex:33: Underfull \\hbox (badness 8170) in paragraph at lines 33--33\nwarning: main.tex:33: Underfull \\hbox (badness 6063) in paragraph at lines 33--33\nwarning: main.tex:33: Underfull \\hbox (badness 10000) in paragraph at lines 33--33\nwarning: main.tex:34: Underfull \\hbox (badness 1342) in paragraph at lines 33--34\nwarning: main.tex:34: Underfull \\hbox (badness 8170) in paragraph at lines 34--34\nwarning: main.tex:34: Underfull \\hbox (badness 1286) in paragraph at lines 34--34\nwarning: main.tex:34: Underfull \\hbox (badness 10000) in paragraph at lines 34--34\nwarning: main.tex:34: Underfull \\hbox (badness 10000) in paragraph at lines 34--34\nwarning: main.tex:35: Underfull \\hbox (badness 8170) in paragraph at lines 35--35\nwarning: main.tex:35: Underfull \\hbox (badness 6063) in paragraph at lines 35--35\nwarning: main.tex:35: Underfull \\hbox (badness 10000) in paragraph at lines 35--35\nwarning: main.tex:36: Underfull \\hbox (badness 8170) in paragraph at lines 36--36\nwarning: main.tex:36: Underfull \\hbox (badness 1286) in paragraph at lines 36--36\nwarning: main.tex:36: Underfull \\hbox (badness 10000) in paragraph at lines 36--36\nwarning: main.tex:36: Underfull \\hbox (badness 10000) in paragraph at lines 36--36\nwarning: main.tex:37: Underfull \\hbox (badness 8170) in paragraph at lines 37--37\nwarning: main.tex:37: Underfull \\hbox (badness 10000) in paragraph at lines 37--37\nwarning: main.tex:24: Underfull \\hbox (badness 1286) in paragraph at lines 24--24\nwarning: main.tex:24: Underfull \\hbox (badness 10000) in paragraph at lines 24--24\nwarning: main.tex:24: Underfull \\hbox (badness 10000) in paragraph at lines 24--24\nwarning: main.tex:25: Underfull \\hbox (badness 6063) in paragraph at lines 25--25\nwarning: main.tex:25: Underfull \\hbox (badness 10000) in paragraph at lines 25--25\nwarning: main.tex:26: Underfull \\hbox (badness 1286) in paragraph at lines 26--26\nwarning: main.tex:26: Underfull \\hbox (badness 10000) in paragraph at lines 26--26\nwarning: main.tex:26: Underfull \\hbox (badness 10000) in paragraph at lines 26--26\nwarning: main.tex:27: Underfull \\hbox (badness 1342) in paragraph at lines 26--27\nwarning: main.tex:27: Underfull \\hbox (badness 6063) in paragraph at lines 27--27\nwarning: main.tex:27: Underfull \\hbox (badness 10000) in paragraph at lines 27--27\nwarning: main.tex:28: Underfull \\hbox (badness 1342) in paragraph at lines 27--28\nwarning: main.tex:28: Underfull \\hbox (badness 1286) in paragraph at lines 28--28\nwarning: main.tex:28: Underfull \\hbox (badness 10000) in paragraph at lines 28--28\nwarning: main.tex:28: Underfull \\hbox (badness 10000) in paragraph at lines 28--28\nwarning: main.tex:29: Underfull \\hbox (badness 6063) in paragraph at lines 29--29\nwarning: main.tex:29: Underfull \\hbox (badness 10000) in paragraph at lines 29--29\nwarning: main.tex:30: Underfull \\hbox (badness 1286) in paragraph at lines 30--30\nwarning: main.tex:30: Underfull \\hbox (badness 10000) in paragraph at lines 30--30\nwarning: main.tex:30: Underfull \\hbox (badness 10000) in paragraph at lines 30--30\nwarning: main.tex:31: Underfull \\hbox (badness 10000) in paragraph at lines 31--31\nwarning: main.tex:32: Underfull \\hbox (badness 8170) in paragraph at lines 32--32\nwarning: main.tex:32: Underfull \\hbox (badness 1286) in paragraph at lines 32--32\nwarning: main.tex:32: Underfull \\hbox (badness 10000) in paragraph at lines 32--32\nwarning: main.tex:32: Underfull \\hbox (badness 10000) in paragraph at lines 32--32\nwarning: main.tex:33: Underfull \\hbox (badness 1342) in paragraph at lines 32--33\nwarning: main.tex:33: Underfull \\hbox (badness 8170) in paragraph at lines 33--33\nwarning: main.tex:33: Underfull \\hbox (badness 6063) in paragraph at lines 33--33\nwarning: main.tex:33: Underfull \\hbox (badness 10000) in paragraph at lines 33--33\nwarning: main.tex:34: Underfull \\hbox (badness 1342) in paragraph at lines 33--34\nwarning: main.tex:34: Underfull \\hbox (badness 8170) in paragraph at lines 34--34\nwarning: main.tex:34: Underfull \\hbox (badness 1286) in paragraph at lines 34--34\nwarning: main.tex:34: Underfull \\hbox (badness 10000) in paragraph at lines 34--34\nwarning: main.tex:34: Underfull \\hbox (badness 10000) in paragraph at lines 34--34\nwarning: main.tex:35: Underfull \\hbox (badness 8170) in paragraph at lines 35--35\nwarning: main.tex:35: Underfull \\hbox (badness 6063) in paragraph at lines 35--35\nwarning: main.tex:35: Underfull \\hbox (badness 10000) in paragraph at lines 35--35\nwarning: main.tex:36: Underfull \\hbox (badness 8170) in paragraph at lines 36--36\nwarning: main.tex:36: Underfull \\hbox (badness 1286) in paragraph at lines 36--36\nwarning: main.tex:36: Underfull \\hbox (badness 10000) in paragraph at lines 36--36\nwarning: main.tex:36: Underfull \\hbox (badness 10000) in paragraph at lines 36--36\nwarning: main.tex:37: Underfull \\hbox (badness 8170) in paragraph at lines 37--37\nwarning: main.tex:37: Underfull \\hbox (badness 10000) in paragraph at lines 37--37\nwarning: main.tex:24: Underfull \\hbox (badness 1286) in paragraph at lines 24--24\nwarning: main.tex:24: Underfull \\hbox (badness 10000) in paragraph at lines 24--24\nwarning: main.tex:24: Underfull \\hbox (badness 10000) in paragraph at lines 24--24\nwarning: main.tex:25: Underfull \\hbox (badness 6063) in paragraph at lines 25--25\nwarning: main.tex:25: Underfull \\hbox (badness 10000) in paragraph at lines 25--25\nwarning: main.tex:26: Underfull \\hbox (badness 1286) in paragraph at lines 26--26\nwarning: main.tex:26: Underfull \\hbox (badness 10000) in paragraph at lines 26--26\nwarning: main.tex:26: Underfull \\hbox (badness 10000) in paragraph at lines 26--26\nwarning: main.tex:27: Underfull \\hbox (badness 1342) in paragraph at lines 26--27\nwarning: main.tex:27: Underfull \\hbox (badness 6063) in paragraph at lines 27--27\nwarning: main.tex:27: Underfull \\hbox (badness 10000) in paragraph at lines 27--27\nwarning: main.tex:28: Underfull \\hbox (badness 1342) in paragraph at lines 27--28\nwarning: main.tex:28: Underfull \\hbox (badness 1286) in paragraph at lines 28--28\nwarning: main.tex:28: Underfull \\hbox (badness 10000) in paragraph at lines 28--28\nwarning: main.tex:28: Underfull \\hbox (badness 10000) in paragraph at lines 28--28\nwarning: main.tex:29: Underfull \\hbox (badness 6063) in paragraph at lines 29--29\nwarning: main.tex:29: Underfull \\hbox (badness 10000) in paragraph at lines 29--29\nwarning: main.tex:30: Underfull \\hbox (badness 1286) in paragraph at lines 30--30\nwarning: main.tex:30: Underfull \\hbox (badness 10000) in paragraph at lines 30--30\nwarning: main.tex:30: Underfull \\hbox (badness 10000) in paragraph at lines 30--30\nwarning: main.tex:31: Underfull \\hbox (badness 10000) in paragraph at lines 31--31\nwarning: main.tex:32: Underfull \\hbox (badness 8170) in paragraph at lines 32--32\nwarning: main.tex:32: Underfull \\hbox (badness 1286) in paragraph at lines 32--32\nwarning: main.tex:32: Underfull \\hbox (badness 10000) in paragraph at lines 32--32\nwarning: main.tex:32: Underfull \\hbox (badness 10000) in paragraph at lines 32--32\nwarning: main.tex:33: Underfull \\hbox (badness 1342) in paragraph at lines 32--33\nwarning: main.tex:33: Underfull \\hbox (badness 8170) in paragraph at lines 33--33\nwarning: main.tex:33: Underfull \\hbox (badness 6063) in paragraph at lines 33--33\nwarning: main.tex:33: Underfull \\hbox (badness 10000) in paragraph at lines 33--33\nwarning: main.tex:34: Underfull \\hbox (badness 1342) in paragraph at lines 33--34\nwarning: main.tex:34: Underfull \\hbox (badness 8170) in paragraph at lines 34--34\nwarning: main.tex:34: Underfull \\hbox (badness 1286) in paragraph at lines 34--34\nwarning: main.tex:34: Underfull \\hbox (badness 10000) in paragraph at lines 34--34\nwarning: main.tex:34: Underfull \\hbox (badness 10000) in paragraph at lines 34--34\nwarning: main.tex:35: Underfull \\hbox (badness 8170) in paragraph at lines 35--35\nwarning: main.tex:35: Underfull \\hbox (badness 6063) in paragraph at lines 35--35\nwarning: main.tex:35: Underfull \\hbox (badness 10000) in paragraph at lines 35--35\nwarning: main.tex:36: Underfull \\hbox (badness 8170) in paragraph at lines 36--36\nwarning: main.tex:36: Underfull \\hbox (badness 1286) in paragraph at lines 36--36\nwarning: main.tex:36: Underfull \\hbox (badness 10000) in paragraph at lines 36--36\nwarning: main.tex:36: Underfull \\hbox (badness 10000) in paragraph at lines 36--36\nwarning: main.tex:37: Underfull \\hbox (badness 8170) in paragraph at lines 37--37\nwarning: main.tex:37: Underfull \\hbox (badness 10000) in paragraph at lines 37--37\nwarning: warnings were issued by the TeX engine; use --print and/or --keep-logs for details.\n"
+   },
+   "sha256": "5f1525a120fd5c65f220aa61d3f4b4a6df74c37ed3ef91b707d7b2f795c6fd90"
+  },
+  {
+   "id": "5b52fb8a810a7b29",
+   "kind": "edit",
+   "label": "Source-reviewed manuscript amendment",
+   "status": "complete",
+   "at": "2026-10-27T15:57:48.012521+00:00",
+   "parent": "8432d50eefe53083",
+   "revision": 8,
+   "paperCount": 4,
+   "metricCount": 25,
+   "tokens": 114655,
+   "details": {
+    "paper": null,
+    "actor": "agent",
+    "note": "Codex source review: removed ambiguous statements from the generated abstract and comparison discussion. Checked GTS Appendix D against original/corrected tables and Graph WaveNet experimental metrics. Preserved explicit distinction between source-reported numbers and experiments not performed. No independent researcher approval."
+   },
+   "sha256": "019073df1644ba43b8da16146763f53021a71af12e4ee15b58867050a6ad12a8"
+  },
+  {
+   "id": "db5da70cbfe27f30",
+   "kind": "compile",
+   "label": "PDF compiled",
+   "status": "complete",
+   "at": "2026-10-27T15:57:48.750024+00:00",
+   "parent": "5b52fb8a810a7b29",
+   "revision": 8,
+   "paperCount": 4,
+   "metricCount": 25,
+   "tokens": 114655,
+   "details": {
+    "hash": "f2296de21a898e1f",
+    "log": "note: Running TeX ...\nnote: Running BibTeX on main.aux ...\nnote: warnings were issued by BibTeX; use --print and/or --keep-logs for details.\nnote: Rerunning TeX because bibtex was run ...\nnote: Rerunning TeX because \"main.aux\" changed ...\nnote: Running xdvipdfmx ...\nnote: Writing `main.pdf` (31.3447265625 KiB)\nnote: Writing `main.blg` (297 B)\nnote: Writing `main.log` (13.123046875 KiB)\nnote: Skipped writing 3 intermediate files (use --keep-intermediates to keep them)\nwarning: main.tex:24: Underfull \\hbox (badness 1286) in paragraph at lines 24--24\nwarning: main.tex:24: Underfull \\hbox (badness 10000) in paragraph at lines 24--24\nwarning: main.tex:24: Underfull \\hbox (badness 10000) in paragraph at lines 24--24\nwarning: main.tex:25: Underfull \\hbox (badness 6063) in paragraph at lines 25--25\nwarning: main.tex:25: Underfull \\hbox (badness 10000) in paragraph at lines 25--25\nwarning: main.tex:26: Underfull \\hbox (badness 1286) in paragraph at lines 26--26\nwarning: main.tex:26: Underfull \\hbox (badness 10000) in paragraph at lines 26--26\nwarning: main.tex:26: Underfull \\hbox (badness 10000) in paragraph at lines 26--26\nwarning: main.tex:27: Underfull \\hbox (badness 1342) in paragraph at lines 26--27\nwarning: main.tex:27: Underfull \\hbox (badness 6063) in paragraph at lines 27--27\nwarning: main.tex:27: Underfull \\hbox (badness 10000) in paragraph at lines 27--27\nwarning: main.tex:28: Underfull \\hbox (badness 1342) in paragraph at lines 27--28\nwarning: main.tex:28: Underfull \\hbox (badness 1286) in paragraph at lines 28--28\nwarning: main.tex:28: Underfull \\hbox (badness 10000) in paragraph at lines 28--28\nwarning: main.tex:28: Underfull \\hbox (badness 10000) in paragraph at lines 28--28\nwarning: main.tex:29: Underfull \\hbox (badness 6063) in paragraph at lines 29--29\nwarning: main.tex:29: Underfull \\hbox (badness 10000) in paragraph at lines 29--29\nwarning: main.tex:30: Underfull \\hbox (badness 1286) in paragraph at lines 30--30\nwarning: main.tex:30: Underfull \\hbox (badness 10000) in paragraph at lines 30--30\nwarning: main.tex:30: Underfull \\hbox (badness 10000) in paragraph at lines 30--30\nwarning: main.tex:31: Underfull \\hbox (badness 10000) in paragraph at lines 31--31\nwarning: main.tex:32: Underfull \\hbox (badness 8170) in paragraph at lines 32--32\nwarning: main.tex:32: Underfull \\hbox (badness 1286) in paragraph at lines 32--32\nwarning: main.tex:32: Underfull \\hbox (badness 10000) in paragraph at lines 32--32\nwarning: main.tex:32: Underfull \\hbox (badness 10000) in paragraph at lines 32--32\nwarning: main.tex:33: Underfull \\hbox (badness 1342) in paragraph at lines 32--33\nwarning: main.tex:33: Underfull \\hbox (badness 8170) in paragraph at lines 33--33\nwarning: main.tex:33: Underfull \\hbox (badness 6063) in paragraph at lines 33--33\nwarning: main.tex:33: Underfull \\hbox (badness 10000) in paragraph at lines 33--33\nwarning: main.tex:34: Underfull \\hbox (badness 1342) in paragraph at lines 33--34\nwarning: main.tex:34: Underfull \\hbox (badness 8170) in paragraph at lines 34--34\nwarning: main.tex:34: Underfull \\hbox (badness 1286) in paragraph at lines 34--34\nwarning: main.tex:34: Underfull \\hbox (badness 10000) in paragraph at lines 34--34\nwarning: main.tex:34: Underfull \\hbox (badness 10000) in paragraph at lines 34--34\nwarning: main.tex:35: Underfull \\hbox (badness 8170) in paragraph at lines 35--35\nwarning: main.tex:35: Underfull \\hbox (badness 6063) in paragraph at lines 35--35\nwarning: main.tex:35: Underfull \\hbox (badness 10000) in paragraph at lines 35--35\nwarning: main.tex:36: Underfull \\hbox (badness 8170) in paragraph at lines 36--36\nwarning: main.tex:36: Underfull \\hbox (badness 1286) in paragraph at lines 36--36\nwarning: main.tex:36: Underfull \\hbox (badness 10000) in paragraph at lines 36--36\nwarning: main.tex:36: Underfull \\hbox (badness 10000) in paragraph at lines 36--36\nwarning: main.tex:37: Underfull \\hbox (badness 8170) in paragraph at lines 37--37\nwarning: main.tex:37: Underfull \\hbox (badness 10000) in paragraph at lines 37--37\nwarning: main.tex:24: Underfull \\hbox (badness 1286) in paragraph at lines 24--24\nwarning: main.tex:24: Underfull \\hbox (badness 10000) in paragraph at lines 24--24\nwarning: main.tex:24: Underfull \\hbox (badness 10000) in paragraph at lines 24--24\nwarning: main.tex:25: Underfull \\hbox (badness 6063) in paragraph at lines 25--25\nwarning: main.tex:25: Underfull \\hbox (badness 10000) in paragraph at lines 25--25\nwarning: main.tex:26: Underfull \\hbox (badness 1286) in paragraph at lines 26--26\nwarning: main.tex:26: Underfull \\hbox (badness 10000) in paragraph at lines 26--26\nwarning: main.tex:26: Underfull \\hbox (badness 10000) in paragraph at lines 26--26\nwarning: main.tex:27: Underfull \\hbox (badness 1342) in paragraph at lines 26--27\nwarning: main.tex:27: Underfull \\hbox (badness 6063) in paragraph at lines 27--27\nwarning: main.tex:27: Underfull \\hbox (badness 10000) in paragraph at lines 27--27\nwarning: main.tex:28: Underfull \\hbox (badness 1342) in paragraph at lines 27--28\nwarning: main.tex:28: Underfull \\hbox (badness 1286) in paragraph at lines 28--28\nwarning: main.tex:28: Underfull \\hbox (badness 10000) in paragraph at lines 28--28\nwarning: main.tex:28: Underfull \\hbox (badness 10000) in paragraph at lines 28--28\nwarning: main.tex:29: Underfull \\hbox (badness 6063) in paragraph at lines 29--29\nwarning: main.tex:29: Underfull \\hbox (badness 10000) in paragraph at lines 29--29\nwarning: main.tex:30: Underfull \\hbox (badness 1286) in paragraph at lines 30--30\nwarning: main.tex:30: Underfull \\hbox (badness 10000) in paragraph at lines 30--30\nwarning: main.tex:30: Underfull \\hbox (badness 10000) in paragraph at lines 30--30\nwarning: main.tex:31: Underfull \\hbox (badness 10000) in paragraph at lines 31--31\nwarning: main.tex:32: Underfull \\hbox (badness 8170) in paragraph at lines 32--32\nwarning: main.tex:32: Underfull \\hbox (badness 1286) in paragraph at lines 32--32\nwarning: main.tex:32: Underfull \\hbox (badness 10000) in paragraph at lines 32--32\nwarning: main.tex:32: Underfull \\hbox (badness 10000) in paragraph at lines 32--32\nwarning: main.tex:33: Underfull \\hbox (badness 1342) in paragraph at lines 32--33\nwarning: main.tex:33: Underfull \\hbox (badness 8170) in paragraph at lines 33--33\nwarning: main.tex:33: Underfull \\hbox (badness 6063) in paragraph at lines 33--33\nwarning: main.tex:33: Underfull \\hbox (badness 10000) in paragraph at lines 33--33\nwarning: main.tex:34: Underfull \\hbox (badness 1342) in paragraph at lines 33--34\nwarning: main.tex:34: Underfull \\hbox (badness 8170) in paragraph at lines 34--34\nwarning: main.tex:34: Underfull \\hbox (badness 1286) in paragraph at lines 34--34\nwarning: main.tex:34: Underfull \\hbox (badness 10000) in paragraph at lines 34--34\nwarning: main.tex:34: Underfull \\hbox (badness 10000) in paragraph at lines 34--34\nwarning: main.tex:35: Underfull \\hbox (badness 8170) in paragraph at lines 35--35\nwarning: main.tex:35: Underfull \\hbox (badness 6063) in paragraph at lines 35--35\nwarning: main.tex:35: Underfull \\hbox (badness 10000) in paragraph at lines 35--35\nwarning: main.tex:36: Underfull \\hbox (badness 8170) in paragraph at lines 36--36\nwarning: main.tex:36: Underfull \\hbox (badness 1286) in paragraph at lines 36--36\nwarning: main.tex:36: Underfull \\hbox (badness 10000) in paragraph at lines 36--36\nwarning: main.tex:36: Underfull \\hbox (badness 10000) in paragraph at lines 36--36\nwarning: main.tex:37: Underfull \\hbox (badness 8170) in paragraph at lines 37--37\nwarning: main.tex:37: Underfull \\hbox (badness 10000) in paragraph at lines 37--37\nwarning: main.tex:24: Underfull \\hbox (badness 1286) in paragraph at lines 24--24\nwarning: main.tex:24: Underfull \\hbox (badness 10000) in paragraph at lines 24--24\nwarning: main.tex:24: Underfull \\hbox (badness 10000) in paragraph at lines 24--24\nwarning: main.tex:25: Underfull \\hbox (badness 6063) in paragraph at lines 25--25\nwarning: main.tex:25: Underfull \\hbox (badness 10000) in paragraph at lines 25--25\nwarning: main.tex:26: Underfull \\hbox (badness 1286) in paragraph at lines 26--26\nwarning: main.tex:26: Underfull \\hbox (badness 10000) in paragraph at lines 26--26\nwarning: main.tex:26: Underfull \\hbox (badness 10000) in paragraph at lines 26--26\nwarning: main.tex:27: Underfull \\hbox (badness 1342) in paragraph at lines 26--27\nwarning: main.tex:27: Underfull \\hbox (badness 6063) in paragraph at lines 27--27\nwarning: main.tex:27: Underfull \\hbox (badness 10000) in paragraph at lines 27--27\nwarning: main.tex:28: Underfull \\hbox (badness 1342) in paragraph at lines 27--28\nwarning: main.tex:28: Underfull \\hbox (badness 1286) in paragraph at lines 28--28\nwarning: main.tex:28: Underfull \\hbox (badness 10000) in paragraph at lines 28--28\nwarning: main.tex:28: Underfull \\hbox (badness 10000) in paragraph at lines 28--28\nwarning: main.tex:29: Underfull \\hbox (badness 6063) in paragraph at lines 29--29\nwarning: main.tex:29: Underfull \\hbox (badness 10000) in paragraph at lines 29--29\nwarning: main.tex:30: Underfull \\hbox (badness 1286) in paragraph at lines 30--30\nwarning: main.tex:30: Underfull \\hbox (badness 10000) in paragraph at lines 30--30\nwarning: main.tex:30: Underfull \\hbox (badness 10000) in paragraph at lines 30--30\nwarning: main.tex:31: Underfull \\hbox (badness 10000) in paragraph at lines 31--31\nwarning: main.tex:32: Underfull \\hbox (badness 8170) in paragraph at lines 32--32\nwarning: main.tex:32: Underfull \\hbox (badness 1286) in paragraph at lines 32--32\nwarning: main.tex:32: Underfull \\hbox (badness 10000) in paragraph at lines 32--32\nwarning: main.tex:32: Underfull \\hbox (badness 10000) in paragraph at lines 32--32\nwarning: main.tex:33: Underfull \\hbox (badness 1342) in paragraph at lines 32--33\nwarning: main.tex:33: Underfull \\hbox (badness 8170) in paragraph at lines 33--33\nwarning: main.tex:33: Underfull \\hbox (badness 6063) in paragraph at lines 33--33\nwarning: main.tex:33: Underfull \\hbox (badness 10000) in paragraph at lines 33--33\nwarning: main.tex:34: Underfull \\hbox (badness 1342) in paragraph at lines 33--34\nwarning: main.tex:34: Underfull \\hbox (badness 8170) in paragraph at lines 34--34\nwarning: main.tex:34: Underfull \\hbox (badness 1286) in paragraph at lines 34--34\nwarning: main.tex:34: Underfull \\hbox (badness 10000) in paragraph at lines 34--34\nwarning: main.tex:34: Underfull \\hbox (badness 10000) in paragraph at lines 34--34\nwarning: main.tex:35: Underfull \\hbox (badness 8170) in paragraph at lines 35--35\nwarning: main.tex:35: Underfull \\hbox (badness 6063) in paragraph at lines 35--35\nwarning: main.tex:35: Underfull \\hbox (badness 10000) in paragraph at lines 35--35\nwarning: main.tex:36: Underfull \\hbox (badness 8170) in paragraph at lines 36--36\nwarning: main.tex:36: Underfull \\hbox (badness 1286) in paragraph at lines 36--36\nwarning: main.tex:36: Underfull \\hbox (badness 10000) in paragraph at lines 36--36\nwarning: main.tex:36: Underfull \\hbox (badness 10000) in paragraph at lines 36--36\nwarning: main.tex:37: Underfull \\hbox (badness 8170) in paragraph at lines 37--37\nwarning: main.tex:37: Underfull \\hbox (badness 10000) in paragraph at lines 37--37\nwarning: warnings were issued by the TeX engine; use --print and/or --keep-logs for details.\n"
+   },
+   "sha256": "0ae4be62925bebc16aab65e234a1512cc8cc8ba4e051827122819d29421d0b76"
+  },
+  {
+   "id": "13e3e89a3fd41c90",
+   "kind": "edit",
+   "label": "Source-reviewed manuscript amendment",
+   "status": "complete",
+   "at": "2026-10-27T16:00:41.850410+00:00",
+   "parent": "db5da70cbfe27f30",
+   "revision": 9,
+   "paperCount": 4,
+   "metricCount": 25,
+   "tokens": 114655,
+   "details": {
+    "paper": null,
+    "actor": "agent",
+    "note": "Preserved manuscript prose and regenerated its source with a page-breaking comparison table to prevent PDF overflow."
+   },
+   "sha256": "2fa21b10a20a27353411742b34c7fcec65b5bb42b75745bb53878d054b7c206c"
+  },
+  {
+   "id": "54c7538c5c9bd1d4",
+   "kind": "compile",
+   "label": "PDF compiled",
+   "status": "complete",
+   "at": "2026-10-27T16:00:44.956869+00:00",
+   "parent": "13e3e89a3fd41c90",
+   "revision": 9,
+   "paperCount": 4,
+   "metricCount": 25,
+   "tokens": 114655,
+   "details": {
+    "hash": "923373d24b736eac",
+    "log": "note: Running TeX ...\nnote: downloading longtable.sty\nnote: Running BibTeX on main.aux ...\nnote: warnings were issued by BibTeX; use --print and/or --keep-logs for details.\nnote: Rerunning TeX because bibtex was run ...\nnote: Rerunning TeX because \"main.aux\" changed ...\nnote: Running xdvipdfmx ...\nnote: Writing `main.blg` (297 B)\nnote: Writing `main.log` (13.19921875 KiB)\nnote: Writing `main.pdf` (32.4990234375 KiB)\nnote: Skipped writing 3 intermediate files (use --keep-intermediates to keep them)\nwarning: main.tex:25: Underfull \\hbox (badness 1286) in paragraph at lines 25--25\nwarning: main.tex:25: Underfull \\hbox (badness 10000) in paragraph at lines 25--25\nwarning: main.tex:25: Underfull \\hbox (badness 10000) in paragraph at lines 25--25\nwarning: main.tex:26: Underfull \\hbox (badness 6063) in paragraph at lines 26--26\nwarning: main.tex:26: Underfull \\hbox (badness 10000) in paragraph at lines 26--26\nwarning: main.tex:27: Underfull \\hbox (badness 1286) in paragraph at lines 27--27\nwarning: main.tex:27: Underfull \\hbox (badness 10000) in paragraph at lines 27--27\nwarning: main.tex:27: Underfull \\hbox (badness 10000) in paragraph at lines 27--27\nwarning: main.tex:28: Underfull \\hbox (badness 1342) in paragraph at lines 27--28\nwarning: main.tex:28: Underfull \\hbox (badness 6063) in paragraph at lines 28--28\nwarning: main.tex:28: Underfull \\hbox (badness 10000) in paragraph at lines 28--28\nwarning: main.tex:29: Underfull \\hbox (badness 1342) in paragraph at lines 28--29\nwarning: main.tex:29: Underfull \\hbox (badness 1286) in paragraph at lines 29--29\nwarning: main.tex:29: Underfull \\hbox (badness 10000) in paragraph at lines 29--29\nwarning: main.tex:29: Underfull \\hbox (badness 10000) in paragraph at lines 29--29\nwarning: main.tex:30: Underfull \\hbox (badness 6063) in paragraph at lines 30--30\nwarning: main.tex:30: Underfull \\hbox (badness 10000) in paragraph at lines 30--30\nwarning: main.tex:31: Underfull \\hbox (badness 1286) in paragraph at lines 31--31\nwarning: main.tex:31: Underfull \\hbox (badness 10000) in paragraph at lines 31--31\nwarning: main.tex:31: Underfull \\hbox (badness 10000) in paragraph at lines 31--31\nwarning: main.tex:32: Underfull \\hbox (badness 10000) in paragraph at lines 32--32\nwarning: main.tex:33: Underfull \\hbox (badness 8170) in paragraph at lines 33--33\nwarning: main.tex:33: Underfull \\hbox (badness 1286) in paragraph at lines 33--33\nwarning: main.tex:33: Underfull \\hbox (badness 10000) in paragraph at lines 33--33\nwarning: main.tex:33: Underfull \\hbox (badness 10000) in paragraph at lines 33--33\nwarning: main.tex:34: Underfull \\hbox (badness 1342) in paragraph at lines 33--34\nwarning: main.tex:34: Underfull \\hbox (badness 8170) in paragraph at lines 34--34\nwarning: main.tex:34: Underfull \\hbox (badness 6063) in paragraph at lines 34--34\nwarning: main.tex:34: Underfull \\hbox (badness 10000) in paragraph at lines 34--34\nwarning: main.tex:35: Underfull \\hbox (badness 1342) in paragraph at lines 34--35\nwarning: main.tex:35: Underfull \\hbox (badness 8170) in paragraph at lines 35--35\nwarning: main.tex:35: Underfull \\hbox (badness 1286) in paragraph at lines 35--35\nwarning: main.tex:35: Underfull \\hbox (badness 10000) in paragraph at lines 35--35\nwarning: main.tex:35: Underfull \\hbox (badness 10000) in paragraph at lines 35--35\nwarning: main.tex:36: Underfull \\hbox (badness 8170) in paragraph at lines 36--36\nwarning: main.tex:36: Underfull \\hbox (badness 6063) in paragraph at lines 36--36\nwarning: main.tex:36: Underfull \\hbox (badness 10000) in paragraph at lines 36--36\nwarning: main.tex:37: Underfull \\hbox (badness 8170) in paragraph at lines 37--37\nwarning: main.tex:37: Underfull \\hbox (badness 1286) in paragraph at lines 37--37\nwarning: main.tex:37: Underfull \\hbox (badness 10000) in paragraph at lines 37--37\nwarning: main.tex:37: Underfull \\hbox (badness 10000) in paragraph at lines 37--37\nwarning: main.tex:38: Underfull \\hbox (badness 8170) in paragraph at lines 38--38\nwarning: main.tex:38: Underfull \\hbox (badness 10000) in paragraph at lines 38--38\nwarning: main.tex:25: Underfull \\hbox (badness 1286) in paragraph at lines 25--25\nwarning: main.tex:25: Underfull \\hbox (badness 10000) in paragraph at lines 25--25\nwarning: main.tex:25: Underfull \\hbox (badness 10000) in paragraph at lines 25--25\nwarning: main.tex:26: Underfull \\hbox (badness 6063) in paragraph at lines 26--26\nwarning: main.tex:26: Underfull \\hbox (badness 10000) in paragraph at lines 26--26\nwarning: main.tex:27: Underfull \\hbox (badness 1286) in paragraph at lines 27--27\nwarning: main.tex:27: Underfull \\hbox (badness 10000) in paragraph at lines 27--27\nwarning: main.tex:27: Underfull \\hbox (badness 10000) in paragraph at lines 27--27\nwarning: main.tex:28: Underfull \\hbox (badness 1342) in paragraph at lines 27--28\nwarning: main.tex:28: Underfull \\hbox (badness 6063) in paragraph at lines 28--28\nwarning: main.tex:28: Underfull \\hbox (badness 10000) in paragraph at lines 28--28\nwarning: main.tex:29: Underfull \\hbox (badness 1342) in paragraph at lines 28--29\nwarning: main.tex:29: Underfull \\hbox (badness 1286) in paragraph at lines 29--29\nwarning: main.tex:29: Underfull \\hbox (badness 10000) in paragraph at lines 29--29\nwarning: main.tex:29: Underfull \\hbox (badness 10000) in paragraph at lines 29--29\nwarning: main.tex:30: Underfull \\hbox (badness 6063) in paragraph at lines 30--30\nwarning: main.tex:30: Underfull \\hbox (badness 10000) in paragraph at lines 30--30\nwarning: main.tex:31: Underfull \\hbox (badness 1286) in paragraph at lines 31--31\nwarning: main.tex:31: Underfull \\hbox (badness 10000) in paragraph at lines 31--31\nwarning: main.tex:31: Underfull \\hbox (badness 10000) in paragraph at lines 31--31\nwarning: main.tex:32: Underfull \\hbox (badness 10000) in paragraph at lines 32--32\nwarning: main.tex:33: Underfull \\hbox (badness 8170) in paragraph at lines 33--33\nwarning: main.tex:33: Underfull \\hbox (badness 1286) in paragraph at lines 33--33\nwarning: main.tex:33: Underfull \\hbox (badness 10000) in paragraph at lines 33--33\nwarning: main.tex:33: Underfull \\hbox (badness 10000) in paragraph at lines 33--33\nwarning: main.tex:34: Underfull \\hbox (badness 1342) in paragraph at lines 33--34\nwarning: main.tex:34: Underfull \\hbox (badness 8170) in paragraph at lines 34--34\nwarning: main.tex:34: Underfull \\hbox (badness 6063) in paragraph at lines 34--34\nwarning: main.tex:34: Underfull \\hbox (badness 10000) in paragraph at lines 34--34\nwarning: main.tex:35: Underfull \\hbox (badness 1342) in paragraph at lines 34--35\nwarning: main.tex:35: Underfull \\hbox (badness 8170) in paragraph at lines 35--35\nwarning: main.tex:35: Underfull \\hbox (badness 1286) in paragraph at lines 35--35\nwarning: main.tex:35: Underfull \\hbox (badness 10000) in paragraph at lines 35--35\nwarning: main.tex:35: Underfull \\hbox (badness 10000) in paragraph at lines 35--35\nwarning: main.tex:36: Underfull \\hbox (badness 8170) in paragraph at lines 36--36\nwarning: main.tex:36: Underfull \\hbox (badness 6063) in paragraph at lines 36--36\nwarning: main.tex:36: Underfull \\hbox (badness 10000) in paragraph at lines 36--36\nwarning: main.tex:37: Underfull \\hbox (badness 8170) in paragraph at lines 37--37\nwarning: main.tex:37: Underfull \\hbox (badness 1286) in paragraph at lines 37--37\nwarning: main.tex:37: Underfull \\hbox (badness 10000) in paragraph at lines 37--37\nwarning: main.tex:37: Underfull \\hbox (badness 10000) in paragraph at lines 37--37\nwarning: main.tex:38: Underfull \\hbox (badness 8170) in paragraph at lines 38--38\nwarning: main.tex:38: Underfull \\hbox (badness 10000) in paragraph at lines 38--38\nwarning: main.tex:25: Underfull \\hbox (badness 1286) in paragraph at lines 25--25\nwarning: main.tex:25: Underfull \\hbox (badness 10000) in paragraph at lines 25--25\nwarning: main.tex:25: Underfull \\hbox (badness 10000) in paragraph at lines 25--25\nwarning: main.tex:26: Underfull \\hbox (badness 6063) in paragraph at lines 26--26\nwarning: main.tex:26: Underfull \\hbox (badness 10000) in paragraph at lines 26--26\nwarning: main.tex:27: Underfull \\hbox (badness 1286) in paragraph at lines 27--27\nwarning: main.tex:27: Underfull \\hbox (badness 10000) in paragraph at lines 27--27\nwarning: main.tex:27: Underfull \\hbox (badness 10000) in paragraph at lines 27--27\nwarning: main.tex:28: Underfull \\hbox (badness 1342) in paragraph at lines 27--28\nwarning: main.tex:28: Underfull \\hbox (badness 6063) in paragraph at lines 28--28\nwarning: main.tex:28: Underfull \\hbox (badness 10000) in paragraph at lines 28--28\nwarning: main.tex:29: Underfull \\hbox (badness 1342) in paragraph at lines 28--29\nwarning: main.tex:29: Underfull \\hbox (badness 1286) in paragraph at lines 29--29\nwarning: main.tex:29: Underfull \\hbox (badness 10000) in paragraph at lines 29--29\nwarning: main.tex:29: Underfull \\hbox (badness 10000) in paragraph at lines 29--29\nwarning: main.tex:30: Underfull \\hbox (badness 6063) in paragraph at lines 30--30\nwarning: main.tex:30: Underfull \\hbox (badness 10000) in paragraph at lines 30--30\nwarning: main.tex:31: Underfull \\hbox (badness 1286) in paragraph at lines 31--31\nwarning: main.tex:31: Underfull \\hbox (badness 10000) in paragraph at lines 31--31\nwarning: main.tex:31: Underfull \\hbox (badness 10000) in paragraph at lines 31--31\nwarning: main.tex:32: Underfull \\hbox (badness 10000) in paragraph at lines 32--32\nwarning: main.tex:33: Underfull \\hbox (badness 8170) in paragraph at lines 33--33\nwarning: main.tex:33: Underfull \\hbox (badness 1286) in paragraph at lines 33--33\nwarning: main.tex:33: Underfull \\hbox (badness 10000) in paragraph at lines 33--33\nwarning: main.tex:33: Underfull \\hbox (badness 10000) in paragraph at lines 33--33\nwarning: main.tex:34: Underfull \\hbox (badness 1342) in paragraph at lines 33--34\nwarning: main.tex:34: Underfull \\hbox (badness 8170) in paragraph at lines 34--34\nwarning: main.tex:34: Underfull \\hbox (badness 6063) in paragraph at lines 34--34\nwarning: main.tex:34: Underfull \\hbox (badness 10000) in paragraph at lines 34--34\nwarning: main.tex:35: Underfull \\hbox (badness 1342) in paragraph at lines 34--35\nwarning: main.tex:35: Underfull \\hbox (badness 8170) in paragraph at lines 35--35\nwarning: main.tex:35: Underfull \\hbox (badness 1286) in paragraph at lines 35--35\nwarning: main.tex:35: Underfull \\hbox (badness 10000) in paragraph at lines 35--35\nwarning: main.tex:35: Underfull \\hbox (badness 10000) in paragraph at lines 35--35\nwarning: main.tex:36: Underfull \\hbox (badness 8170) in paragraph at lines 36--36\nwarning: main.tex:36: Underfull \\hbox (badness 6063) in paragraph at lines 36--36\nwarning: main.tex:36: Underfull \\hbox (badness 10000) in paragraph at lines 36--36\nwarning: main.tex:37: Underfull \\hbox (badness 8170) in paragraph at lines 37--37\nwarning: main.tex:37: Underfull \\hbox (badness 1286) in paragraph at lines 37--37\nwarning: main.tex:37: Underfull \\hbox (badness 10000) in paragraph at lines 37--37\nwarning: main.tex:37: Underfull \\hbox (badness 10000) in paragraph at lines 37--37\nwarning: main.tex:38: Underfull \\hbox (badness 8170) in paragraph at lines 38--38\nwarning: main.tex:38: Underfull \\hbox (badness 10000) in paragraph at lines 38--38\nwarning: warnings were issued by the TeX engine; use --print and/or --keep-logs for details.\n"
+   },
+   "sha256": "145d246d6fed233659d162466cf03608c88d6bcd07022f68ee4f868408d3a062"
+  }
+ ],
+ "activeStep": "Draft staged in the editor. Review the prose and citations before marking it approved.",
+ "queries": [
+  "traffic forecasting benchmark horizon comparison",
+  "MAE RMSE metric masking study"
+ ],
+ "criteria": [
+  "Use identical traffic datasets and preprocessing steps",
+  "Report forecasts for overlapping prediction horizons",
+  "Apply the same masking scheme or explicitly account for metric differences"
+ ],
+ "synthesis": "No experimental performance conclusion is available yet. Extracted metrics have not been verified. Review source tables and evaluation settings before comparing methods. Hypothesis relevance scores do not establish superiority.",
+ "synthesisStale": true,
+ "feedback": "Draft a concise proposed-study abstract, related work, and evaluation plan. Explain GTS Appendix D and why the original 2.99 must not establish superiority over Graph WaveNet. No experiments have been run. Only two sources were agent-reviewed; do not imply human review or verified numeric superiority. Unknown fields are unknown, not missing experiments.",
+ "draft": {
+  "abstract": "We propose a controlled replication study of traffic-forecasting baselines, motivated by a source audit of GTS and Graph WaveNet. The GTS appendix corrects an earlier metric calculation, while Graph WaveNet explicitly excludes missing values during training and testing. These details show why reported values must retain their experimental context. The proposed study will align data splits, preprocessing, forecast horizons, and metric masking before evaluating models under one implementation. The present work audits published evidence and has not run forecasting experiments. All extracted numeric results remain provisional pending independent review.",
+  "relatedWork": [
+   {
+    "id": "rw1",
+    "text": "The GTS paper reports original results and subsequently supplies corrected results in Appendix D. The authors explain that the earlier version calculated MAE, RMSE, and MAPE differently from the official DCRNN publication. Original and corrected tables must therefore remain distinct evidence records; a source quotation containing a number alone does not resolve this distinction.",
+    "citations": [
+     "arXiv210106861"
+    ],
+    "pairs": [],
+    "claim": "descriptive"
+   },
+   {
+    "id": "rw2",
+    "text": "Graph WaveNet reports results at 15, 30, and 60 minutes on METR-LA and PEMS-BAY. Its experimental section states that missing values are excluded from training and testing. This provides a stated evaluation detail that must be checked against the version and protocol of any candidate baseline.",
+    "citations": [
+     "arXiv190600121"
+    ],
+    "pairs": [],
+    "claim": "descriptive"
+   }
+  ],
+  "comparisons": [
+   {
+    "id": "cmp1",
+    "text": "The original GTS METR-LA 60-minute MAE of 2.99 must be read with the Appendix D correction. The corrected table reports 3.41. These are source-reported values from different calculation versions, not new measurements produced by this audit. We exclude the original calculation from the proposed common-protocol baseline set.",
+    "citations": [
+     "arXiv210106861"
+    ],
+    "pairs": [],
+    "claim": "descriptive"
+   },
+   {
+    "id": "cmp2",
+    "text": "The software identifies provisional context matches as well as conflicts. Neither a matched dataset label nor an unverified extraction establishes complete protocol equivalence. Each candidate pair still requires review of masking, preprocessing, table version, result provenance, and horizon aggregation before it is used to justify an experiment.",
+    "citations": [
+     "arXiv190600121",
+     "arXiv210106861"
+    ],
+    "pairs": [],
+    "claim": "descriptive"
+   }
+  ],
+  "study": "Re-run GTS and Graph WaveNet on one explicitly versioned METR-LA dataset. Use one chronological train/validation/test split and one normalization implementation. Evaluate the same 15-, 30-, and 60-minute horizons separately, and distinguish these from averages over horizons. Define exactly which zero or missing targets are masked. Use the corrected metric implementation and record the code commit. Repeat training with shared seeds and report mean and standard deviation, with no selection of only the best run. Keep cited baseline values separate from independently reproduced results. These are proposed controls; no model-training experiment has been conducted.",
+  "pairTable": [
+   {
+    "pair": "73ce9c134dc7",
+    "a": "GTS MAE 2.64 (Discrete Graph Structure Learning for Fo)",
+    "b": "Graph WaveNet 2.69 (Graph WaveNet for Deep Spatial-Temporal )",
+    "outcome": "comparable",
+    "reason": "Dataset, split, horizon, and metric match. Extraction is not yet human-verified. Caveat: Metric definition (for example masking of missing values) is not stated for Discrete Graph Structure Learning for Forecasting Multiple Time Series."
+   },
+   {
+    "pair": "ece5372efe6e",
+    "a": "GTS MAE 2.64 (Discrete Graph Structure Learning for Fo)",
+    "b": "GGRU 2.71 (Graph WaveNet for Deep Spatial-Temporal )",
+    "outcome": "comparable",
+    "reason": "Dataset, split, horizon, and metric match. Extraction is not yet human-verified. Caveat: Metric definition (for example masking of missing values) is not stated for Discrete Graph Structure Learning for Forecasting Multiple Time Series."
+   },
+   {
+    "pair": "e8a9a0107b90",
+    "a": "GTS MAE 2.39 (Discrete Graph Structure Learning for Fo)",
+    "b": "Graph WaveNet 2.69 (Graph WaveNet for Deep Spatial-Temporal )",
+    "outcome": "incompatible",
+    "reason": "The source states that one metric was computed differently from the standard protocol: \"non-standard per the paper's later correction: It was brought to our attention recently that this version calculated the evaluation metrics MAE/RMSE/MAPE in a manner slightly different from that used to report the results of DCRNN in the official publication (https://github.\"."
+   },
+   {
+    "pair": "0d9fa78c5e12",
+    "a": "GTS MAE 2.39 (Discrete Graph Structure Learning for Fo)",
+    "b": "GGRU 2.71 (Graph WaveNet for Deep Spatial-Temporal )",
+    "outcome": "incompatible",
+    "reason": "The source states that one metric was computed differently from the standard protocol: \"non-standard per the paper's later correction: It was brought to our attention recently that this version calculated the evaluation metrics MAE/RMSE/MAPE in a manner slightly different from that used to report the results of DCRNN in the official publication (https://github.\"."
+   },
+   {
+    "pair": "5d1e0018abdf",
+    "a": "GTS MAE 2.39 (Discrete Graph Structure Learning for Fo)",
+    "b": "Graph WaveNet 3.07 (Graph WaveNet for Deep Spatial-Temporal )",
+    "outcome": "incompatible",
+    "reason": "These results use different horizons: single horizon at 15 minutes vs single horizon at 30 minutes."
+   },
+   {
+    "pair": "3898da3dedf9",
+    "a": "GTS MAE 2.39 (Discrete Graph Structure Learning for Fo)",
+    "b": "GGRU 3.12 (Graph WaveNet for Deep Spatial-Temporal )",
+    "outcome": "incompatible",
+    "reason": "These results use different horizons: single horizon at 15 minutes vs single horizon at 30 minutes."
+   },
+   {
+    "pair": "424cf7d96588",
+    "a": "GTS MAE 2.39 (Discrete Graph Structure Learning for Fo)",
+    "b": "Graph WaveNet 3.53 (Graph WaveNet for Deep Spatial-Temporal )",
+    "outcome": "incompatible",
+    "reason": "These results use different horizons: single horizon at 15 minutes vs single horizon at 60 minutes."
+   },
+   {
+    "pair": "2c4c5359fe0d",
+    "a": "GTS MAE 2.39 (Discrete Graph Structure Learning for Fo)",
+    "b": "DCRNN 3.60 (Graph WaveNet for Deep Spatial-Temporal )",
+    "outcome": "incompatible",
+    "reason": "These results use different horizons: single horizon at 15 minutes vs single horizon at 60 minutes."
+   },
+   {
+    "pair": "e5d412b6c43f",
+    "a": "DCRNN MAE 2.77 (Discrete Graph Structure Learning for Fo)",
+    "b": "Graph WaveNet 2.69 (Graph WaveNet for Deep Spatial-Temporal )",
+    "outcome": "incompatible",
+    "reason": "The source states that one metric was computed differently from the standard protocol: \"non-standard per the paper's later correction: It was brought to our attention recently that this version calculated the evaluation metrics MAE/RMSE/MAPE in a manner slightly different from that used to report the results of DCRNN in the official publication (https://github.\"."
+   },
+   {
+    "pair": "5b06830cffc6",
+    "a": "DCRNN MAE 2.77 (Discrete Graph Structure Learning for Fo)",
+    "b": "GGRU 2.71 (Graph WaveNet for Deep Spatial-Temporal )",
+    "outcome": "incompatible",
+    "reason": "The source states that one metric was computed differently from the standard protocol: \"non-standard per the paper's later correction: It was brought to our attention recently that this version calculated the evaluation metrics MAE/RMSE/MAPE in a manner slightly different from that used to report the results of DCRNN in the official publication (https://github.\"."
+   },
+   {
+    "pair": "72bb7cdbc15c",
+    "a": "DCRNN MAE 2.77 (Discrete Graph Structure Learning for Fo)",
+    "b": "Graph WaveNet 3.07 (Graph WaveNet for Deep Spatial-Temporal )",
+    "outcome": "incompatible",
+    "reason": "These results use different horizons: single horizon at 15 minutes vs single horizon at 30 minutes."
+   },
+   {
+    "pair": "9295c5484cd1",
+    "a": "DCRNN MAE 2.77 (Discrete Graph Structure Learning for Fo)",
+    "b": "GGRU 3.12 (Graph WaveNet for Deep Spatial-Temporal )",
+    "outcome": "incompatible",
+    "reason": "These results use different horizons: single horizon at 15 minutes vs single horizon at 30 minutes."
+   },
+   {
+    "pair": "4bf5ee180695",
+    "a": "DCRNN MAE 2.77 (Discrete Graph Structure Learning for Fo)",
+    "b": "Graph WaveNet 3.53 (Graph WaveNet for Deep Spatial-Temporal )",
+    "outcome": "incompatible",
+    "reason": "These results use different horizons: single horizon at 15 minutes vs single horizon at 60 minutes."
+   },
+   {
+    "pair": "2980631fdea7",
+    "a": "DCRNN MAE 2.77 (Discrete Graph Structure Learning for Fo)",
+    "b": "DCRNN 3.60 (Graph WaveNet for Deep Spatial-Temporal )",
+    "outcome": "incompatible",
+    "reason": "These results use different horizons: single horizon at 15 minutes vs single horizon at 60 minutes."
+   }
+  ],
+  "controls": [
+   {
+    "field": "metricDefinition",
+    "text": "Compute every metric with one stated definition, including how zero or missing targets are masked; report masked and unmasked values when baselines differ.",
+    "pairs": [
+     "0d9fa78c5e12",
+     "146882668335",
+     "1f635353e997",
+     "27b4b75f7331",
+     "285644b961ee",
+     "2980631fdea7",
+     "2c4c5359fe0d",
+     "37c3083561e7",
+     "3898da3dedf9",
+     "424cf7d96588",
+     "47d8fa583c98",
+     "4a24ca35727d"
+    ]
+   },
+   {
+    "field": "horizon",
+    "text": "Report each forecast horizon separately (for example 15, 30, and 60 minutes) and report the average over horizons as a separate row; never compare one with the other.",
+    "pairs": [
+     "146882668335",
+     "1f635353e997",
+     "27b4b75f7331",
+     "2980631fdea7",
+     "2c4c5359fe0d",
+     "37c3083561e7",
+     "3898da3dedf9",
+     "424cf7d96588",
+     "47d8fa583c98",
+     "4a24ca35727d",
+     "4bf5ee180695",
+     "5d1e0018abdf"
+    ]
+   }
+  ]
+ },
+ "draftReviewed": false,
+ "draftEdits": [
+  {
+   "at": "2026-10-27T15:57:48.012486+00:00",
+   "actor": "agent",
+   "note": "Codex source review: removed ambiguous statements from the generated abstract and comparison discussion. Checked GTS Appendix D against original/corrected tables and Graph WaveNet experimental metrics. Preserved explicit distinction between source-reported numbers and experiments not performed. No independent researcher approval."
+  },
+  {
+   "at": "2026-10-27T16:00:41.850392+00:00",
+   "actor": "agent",
+   "note": "Preserved manuscript prose and regenerated its source with a page-breaking comparison table to prevent PDF overflow."
+  }
+ ],
+ "_recordNote": "API-run discovery with four papers and 12 Nemotron calls; two source reviews, a manuscript amendment, and layout verification by Codex. Agent review only; numeric metrics remain unverified. No new forecasting experiments or independent researcher validation."
+}

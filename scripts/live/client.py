@@ -1,6 +1,6 @@
 """Minimal Relay API client for live acceptance runs (same requests the browser makes)."""
-import json, sys, time, urllib.request
-BASE = 'http://127.0.0.1:4281'
+import json, os, sys, time, urllib.request
+BASE = os.environ.get('RELAY_URL','http://127.0.0.1:4280').rstrip('/')
 def call(path, data=None, token=None):
     req = urllib.request.Request(BASE + '/api/' + path, data=json.dumps(data).encode() if data is not None else None,
                                  headers={'Content-Type': 'application/json', 'Authorization': 'Bearer ' + (token or ''), 'Origin': BASE} if data is not None else {})

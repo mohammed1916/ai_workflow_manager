@@ -29,6 +29,22 @@ class WorkflowTests(unittest.TestCase):
                   'status': 'review', 'revision': 1, 'tokens': 0, 'events': [], 'papers': [a, b], 'suggestions': [], 'tex': '', 'bib': '', 'proposals': [], 'corrections': [], 'calls': []}
         self.r.projects = [self.p]; self.r.checkpoint(self.p, 'retrieval', 'Retrieved')
 
+    def test_structured_draft_amendment_keeps_agent_attribution_and_invalidates_pdf(self):
+        self.p['compile']={'ok':True,'hash':'old'}
+        d={'abstract':'Proposed study; no experiments performed.','study':'Use one shared protocol.',
+           'relatedWork':[{'text':'Graph WaveNet reports experimental results.','citations':['WA']}], 'comparisons':[]}
+        self.r.update({'id':self.p['id'],'revision':1,'action':'amend-draft','actor':'agent','draft':d,'note':'Checked the source table and protocol.'})
+        self.assertNotIn('compile',self.p);self.assertFalse(self.p['draftReviewed'])
+        self.assertEqual(self.p['draftEdits'][-1]['actor'],'agent');self.assertIn('Graph WaveNet',self.p['tex'])
+        snapshot=self.r.get_checkpoint(self.p['id'],self.p['execution'][-1]['id'])[1]
+        self.assertEqual(snapshot['draftEdits'][-1]['actor'],'agent')
+
+    def test_invalid_manuscript_citations_do_not_overwrite_saved_draft(self):
+        self.p['tex']='Preserved'
+        with self.assertRaises(ValueError):
+            self.r.update({'id':self.p['id'],'revision':1,'action':'amend-draft','draft':{'abstract':'A','relatedWork':[{'text':'Claim','citations':['fake']}]},'note':'Checked source.'})
+        self.assertEqual(self.p['tex'],'Preserved');self.assertEqual(self.p['revision'],1)
+
     def tearDown(self): self.tmp.cleanup()
 
     def pair(self): return compare(self.p['papers'])['pairs'][0]
