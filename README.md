@@ -12,6 +12,21 @@ A benchmark table shows GTS reporting **2.99 MAE** for a 60-minute METR-LA forec
 
 Relay keeps the number attached to its table, experimental settings, and provenance. It investigates missing context in papers and author code, explains whether a comparison holds, and tracks which conclusions need revision after a correction. The example comes from [GTS, Appendix D](https://arxiv.org/html/2101.06861); these are reported results, not experiments run by Relay.
 
+## The lesson from the earlier WebMCP project
+
+The strongest lesson from our earlier winner analysis was **validation → feedback → correction**: human and agent should work on the same domain state, and the agent needs meaningful feedback when a result does not hold. Relay applies that lesson to experimental evidence. A source check or comparison conflict becomes an investigation; an accepted correction updates the shared evidence; dependent claims become stale; regeneration and saved branches make the consequences inspectable.
+
+The workflow is deliberate: **question → source evidence → compare → investigate gaps → review a proposal → propagate the correction → revise the manuscript**. Starting discovery does not fabricate corrections. Investigations can return no answer, proposals require review, and unresolved context remains unresolved.
+
+## What each service actually does
+
+- **OpenAlex and arXiv:** initial scholarly discovery and available full-text retrieval.
+- **NVIDIA Nemotron on Nebius Token Factory:** assess and extract evidence, reason over experimental context, propose source-linked corrections, and draft or revise the argument.
+- **Tavily, when configured:** web-search fallback for protocol fields that paper/code investigation has not settled. Add its key in Model settings, open a comparison with context gaps, and choose **Investigate**. Web passages retain source links and remain proposals for review.
+- **Relay's deterministic checks:** source/table validation, three-outcome comparisons, revision conflicts, correction impact, and checkpoint integrity.
+
+The Tavily fallback was live-smoke-tested on 28 October 2026 and returned four passages, including the MTGNN author repository. The receipt is in `data/research/tavily-search-receipt.json`. That verifies runtime retrieval; it does not establish a successful correction. The older prepared Nemotron studies predate Tavily integration and must not be presented as Tavily runs.
+
 ## Try it in two minutes
 
 1. Open the [Research desk](https://relay-research.onrender.com/#screen=desk).
@@ -42,7 +57,7 @@ The included fresh discovery record contains **four papers, 12 Nemotron calls, a
 
 ## Evidence, not a broad accuracy claim
 
-**90 automated tests pass.** The latest small development evaluation accepted **1 of 13 non-comparable cases incorrectly**, versus **6 of 13** for a single-pass baseline using the same Nemotron model and papers. Relay’s decisive-answer coverage was **80%**, versus **90%** for the baseline. This illustrates the trade-off between caution and coverage.
+**103 automated tests pass.** The latest small development evaluation accepted **1 of 13 non-comparable cases incorrectly**, versus **6 of 13** for a single-pass baseline using the same Nemotron model and papers. Relay’s decisive-answer coverage was **80%**, versus **90%** for the baseline. This illustrates the trade-off between caution and coverage.
 
 The dataset is agent-annotated, development cases informed fixes, and held-out cases share papers with development. These results are demonstration evidence, not independently validated scientific accuracy. Full runs, failures, costs, and caveats are included below and in the app. Current expertise is **ML/time-series benchmark auditing**, particularly traffic forecasting.
 
@@ -195,7 +210,7 @@ python3 eval/run.py --split heldout
 
 These commands call Nebius and consume inference credits. Do not tune on the held-out split and then present it as unseen. API acceptance helpers in `scripts/live/` use `RELAY_URL` (default `http://127.0.0.1:4280`). Their review actions are scripted and must remain labeled accordingly.
 
-Current automated verification: **90 tests pass**. All three JavaScript modules pass syntax checks. Tests cover source checks, comparison rules, provider separation, revision conflicts, correction propagation, stale-claim regeneration, immutable checkpoints, branch isolation, compiler restrictions, API origin/host/token enforcement, and saved-study imports. No GUI automation is required. Current changes have not received a visual browser review; the user will inspect the UI.
+Current automated verification: **103 tests pass**. All three JavaScript modules pass syntax checks. Tests cover source checks, comparison rules, provider separation, revision conflicts, correction propagation, stale-claim regeneration, immutable checkpoints, branch isolation, compiler restrictions, API origin/host/token enforcement, and saved-study imports. No GUI automation is required. Current changes have not received a visual browser review; the user will inspect the UI.
 
 ## PDF compilation
 
@@ -235,7 +250,7 @@ py -m relay.server
 
 Then open http://127.0.0.1:4280 in Chrome or Edge. Text files are read and written as UTF-8 on every platform.
 
-Three features are macOS-only and are refused cleanly on Windows: PDF compilation (it needs the macOS sandbox), opening links from a workflow, and revealing folders in Finder. On Windows, export the Overleaf ZIP and compile it with Tectonic or import it into Overleaf instead.
+Local PDF compilation requires the macOS sandbox. On Windows, export the Overleaf ZIP and compile it with an appropriate local toolchain or import it into Overleaf instead.
 
 Back up your work from **Your projects → Export file**. Keep the files in a folder you control, such as OneDrive or an external drive.
 

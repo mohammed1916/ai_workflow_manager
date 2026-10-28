@@ -1,0 +1,30 @@
+{
+  "at": "2026-10-28T07:11:29.267020+00:00",
+  "provider": "Tavily",
+  "operation": "Research.web_step live fallback search",
+  "query": "Connecting the Dots: Multivariate Time Series Forecasting with Graph Neural Networks Graph WaveNet METR-LA evaluation protocol Train/val/test split, Metric definition",
+  "resultCount": 4,
+  "results": [
+    {
+      "url": "https://www.xiaojun.ai/papers/kdd-2020-wu.pdf",
+      "title": "Multivariate Time Series Forecasting with Graph Neural ...",
+      "contentSha256": "f899b128ee5587891a3effb4714f98630653fc149b1a52131ac942da97d96c90"
+    },
+    {
+      "url": "https://kdd-milets.github.io/milets2022/papers/MILETS_2022_paper_6396.pdf",
+      "title": "Cross-Domain Graph Learning for Multivariate ...",
+      "contentSha256": "b73004c483b5299179f293b8bb55994ab7adc18444a7ef1a83c66f89171c61df"
+    },
+    {
+      "url": "https://www.scribd.com/document/825576659/2005-11650",
+      "title": "Connecting The Dots: Multivariate Time Series Forecasting With Graph Neural Networks | PDF",
+      "contentSha256": "b99fe27fd8e1c9ccb097e40f80ec7c76e31ead8213076367ec2fd60845f99885"
+    },
+    {
+      "url": "https://github.com/nnzhan/MTGNN",
+      "title": "GitHub - nnzhan/MTGNN · GitHub",
+      "contentSha256": "596025c75b24b6aab3fc92b1e0432e30301753f823a0261c458d4ddf2c58c721"
+    }
+  ],
+  "note": "Live Tavily retrieval smoke test. It verifies runtime search, not that a correction was found or accepted. The earlier prepared Nemotron studies predate Tavily integration."
+}
