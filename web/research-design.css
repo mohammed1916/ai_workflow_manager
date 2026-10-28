@@ -105,3 +105,10 @@ input[type=checkbox]:disabled{opacity:.45;cursor:not-allowed}
 .hypothesis-box .switch-row{display:flex;flex-direction:row;align-items:flex-start;gap:12px;font-size:13px;font-weight:400;letter-spacing:0;color:#e4dbef;margin:14px 0 4px}
 .hypothesis-box .switch-row .switch-text b{font-size:14px;font-weight:600;color:#f2e9fb;letter-spacing:0}
 .hypothesis-box .switch-row .switch-text small{font-size:12px;color:var(--muted)}
+/* Paper opening: the title and the actions open the paper's evidence. */
+.title-open{all:unset;cursor:pointer;color:inherit;font:inherit;font-weight:650;text-align:left;border-radius:6px}
+.title-open:hover{color:#f0dbff;text-decoration:underline;text-underline-offset:4px}
+.title-open:focus-visible{outline:2px solid var(--blue);outline-offset:3px}
+.paper-actions{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:12px}
+.paper-link{font-size:13px;color:#a8ceff;padding:8px 4px}
+.node.paper{cursor:pointer}
