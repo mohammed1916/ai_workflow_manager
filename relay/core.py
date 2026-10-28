@@ -17,7 +17,7 @@ def _read_env_config(root):
     config = dict(os.environ)
     env = root / '.env'
     if env.exists():
-        for line in env.read_text().splitlines():
+        for line in env.read_text(encoding='utf-8').splitlines():
             if '=' in line and not line.lstrip().startswith('#'):
                 k, v = line.split('=', 1)
                 config.setdefault(k.strip(), v.strip().strip('"\''))

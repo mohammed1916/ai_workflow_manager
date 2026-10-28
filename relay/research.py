@@ -432,7 +432,7 @@ from .executions import ExecutionHistory
 class Research(ExecutionHistory):
     def __init__(self, root):
         self.root = root; self.path = root / '.relay/research.json'; self.lock = threading.RLock(); self.keys = {}
-        self.projects = json.loads(self.path.read_text()) if self.path.exists() else []
+        self.projects = json.loads(self.path.read_text(encoding='utf-8')) if self.path.exists() else []
         for p in self.projects:
             for paper in p['papers']:
                 if 'topic' in paper: paper['topic'] = canonical_topic(paper['topic'])
@@ -451,7 +451,7 @@ class Research(ExecutionHistory):
             self.keys[pid] = with_key(base, provider, key)
 
     def save(self):
-        self.path.parent.mkdir(exist_ok=True); tmp = self.path.with_suffix('.tmp'); tmp.write_text(json.dumps(self.projects)); tmp.replace(self.path)
+        self.path.parent.mkdir(exist_ok=True); tmp = self.path.with_suffix('.tmp'); tmp.write_text(json.dumps(self.projects), encoding='utf-8'); tmp.replace(self.path)
 
     def store_source(self, paper):
         """Content-addressed full text; checkpoints keep the bounded `evidence` field and a reference."""
@@ -460,7 +460,7 @@ class Research(ExecutionHistory):
         ref = digest(full)
         folder = self.root / '.relay/sources'; folder.mkdir(parents=True, exist_ok=True)
         target = folder / (ref + '.txt')
-        if not target.exists(): target.write_text(full)
+        if not target.exists(): target.write_text(full, encoding='utf-8')
         paper.update(sourceRef=ref, sourceChars=len(full), evidence=full[:65000])
         return paper
 
@@ -469,7 +469,7 @@ class Research(ExecutionHistory):
         if ref and re.fullmatch(r'[a-f0-9]{64}', ref):
             path = self.root / '.relay/sources' / (ref + '.txt')
             if path.is_file() and not path.is_symlink():
-                text = path.read_text()
+                text = path.read_text(encoding='utf-8')
                 if digest(text) == ref: return text
         return paper.get('evidence', '')
 
@@ -646,7 +646,7 @@ class Research(ExecutionHistory):
         """Bounded, read-only retrieval of evaluation-relevant files at a fixed commit."""
         cache = self.root / '.relay/repos' / f"{link['owner']}__{link['repo']}.json"
         if cache.is_file() and not cache.is_symlink():
-            data = json.loads(cache.read_text())
+            data = json.loads(cache.read_text(encoding='utf-8'))
             if time.time() - data.get('fetched', 0) < 86400: return data['files']
         api = f"https://api.github.com/repos/{link['owner']}/{link['repo']}"
         head = json.loads(fetch(api + '/commits/HEAD', 2000000, {'Accept': 'application/vnd.github+json'}))
@@ -659,7 +659,7 @@ class Research(ExecutionHistory):
             raw = f"https://raw.githubusercontent.com/{link['owner']}/{link['repo']}/{sha}/{blob['path']}"
             try: files.append({'path': blob['path'], 'sha': sha, 'url': f"{link['url']}/blob/{sha}/{blob['path']}", 'text': fetch(raw, 200000)})
             except Exception: continue
-        cache.parent.mkdir(parents=True, exist_ok=True); cache.write_text(json.dumps({'fetched': time.time(), 'files': files}))
+        cache.parent.mkdir(parents=True, exist_ok=True); cache.write_text(json.dumps({'fetched': time.time(), 'files': files}), encoding='utf-8')
         return files
 
     def investigate(self, data):
@@ -1103,7 +1103,7 @@ class Research(ExecutionHistory):
         if not __import__('os').path.exists(executable): raise RelayError('COMPILER_MISSING', 'Install Tectonic to compile locally. You can still export the Overleaf ZIP.')
         if not tex.strip(): raise RelayError('EMPTY_DOCUMENT', 'Generate or write a manuscript first.')
         folder = self.root / '.relay/latex' / p['id'] / digest(tex + bib)[:16]; folder.mkdir(parents=True, exist_ok=True)
-        (folder / 'main.tex').write_text(tex); (folder / 'references.bib').write_text(bib)
+        (folder / 'main.tex').write_text(tex, encoding='utf-8'); (folder / 'references.bib').write_text(bib, encoding='utf-8')
         # OS isolation is required: untrusted mode alone does not restrict file reads.
         from .latex import compile_tex
         try:

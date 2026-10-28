@@ -225,6 +225,20 @@ Projects are saved in your browser, the way Excalidraw and Obsidian keep your wo
 
 Keys are never saved in the browser's storage or in files. Your model key and optional Tavily key stay in this browser tab only and are sent with each request. Tavily is optional: when a paper leaves out a detail such as its evaluation protocol, Relay can search the web for it. Web passages are labelled as web sources with their links, and you still accept or reject every proposal. Without a Tavily key, Relay tells you once that the search is available.
 
+## Running on Windows
+
+The server and the web app use only the Python standard library, so they run on Windows with Python 3.10 or newer:
+
+```
+py -m relay.server
+```
+
+Then open http://127.0.0.1:4280 in Chrome or Edge. Text files are read and written as UTF-8 on every platform.
+
+Three features are macOS-only and are refused cleanly on Windows: PDF compilation (it needs the macOS sandbox), opening links from a workflow, and revealing folders in Finder. On Windows, export the Overleaf ZIP and compile it with Tectonic or import it into Overleaf instead.
+
+Back up your work from **Your projects → Export file**. Keep the files in a folder you control, such as OneDrive or an external drive.
+
 ## Hosting and judge access
 
 `render.yaml` is an optional hosting blueprint. It requires persistent storage and a service hostname. In hosted mode, server-side provider keys are ignored and visitors bring their own key through the model menu. This build is a shared workspace; it has no multi-user account isolation. Deploy a dedicated judge/test instance rather than storing confidential research in a public instance.

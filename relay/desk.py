@@ -40,7 +40,7 @@ def evaluation(root):
     runs=[]
     for path in sorted((root/'eval/results').glob('*.json')):
         if path.name.startswith('.') or path.name < '20261027-063613': continue
-        record=json.loads(path.read_text())
+        record=json.loads(path.read_text(encoding='utf-8'))
         runs.append({'id':path.stem,'when':record.get('when'),'split':record['split'],'model':record['model'],
                      'relay':record['summary'].get('relay'),'baseline':record['summary'].get('baseline'),'cost':record.get('cost',{})})
     return {'runs':runs,'limitations':['Labels were annotated by an AI coding agent; there is no independent domain-researcher validation.',
@@ -71,12 +71,12 @@ def load_study(root, research):
     with research.lock:
         existing=next((p for p in research.projects if p.get('studyKey')=='nebius-benchmark-audit-v1' and not p.get('parentProject')),None)
         if existing:return {'id':existing['id'],'loaded':False}
-    records=[json.loads((root/'data/research'/name).read_text()) for name in ('before-correction.json','after-correction.json')]
+    records=[json.loads((root/'data/research'/name).read_text(encoding='utf-8')) for name in ('before-correction.json','after-correction.json')]
     # Validate every content-addressed source before changing any project state.
     texts={}
     for paper in records[-1]['papers']:
         path=root/'eval/.cache'/(paper['arxiv']+'.html')
-        raw=path.read_text() if path.exists() else fetch(paper['evidenceUrl'])
+        raw=path.read_text(encoding='utf-8') if path.exists() else fetch(paper['evidenceUrl'])
         text=html_to_text(raw)[:SOURCE_LIMIT]
         if digest(text)!=paper['sourceRef']:
             raise RelayError('SOURCE_CHANGED','The public source differs from the recorded version. The saved study was not loaded; use a fresh investigation instead.',409)
@@ -85,7 +85,7 @@ def load_study(root, research):
         existing=next((p for p in research.projects if p.get('studyKey')=='nebius-benchmark-audit-v1' and not p.get('parentProject')),None)
         if existing:return {'id':existing['id'],'loaded':False}
         source_dir=root/'.relay/sources';source_dir.mkdir(parents=True,exist_ok=True)
-        for ref,text in texts.items():(source_dir/(ref+'.txt')).write_text(text)
+        for ref,text in texts.items():(source_dir/(ref+'.txt')).write_text(text, encoding='utf-8')
         pid=secrets.token_hex(8)
         def prepare(record):
             p=copy.deepcopy(record)
@@ -114,7 +114,7 @@ def load_study(root, research):
 def load_discovery(root, research):
     """Replay the saved open-search result as one honest imported snapshot."""
     from .research import html_to_text, fetch, SOURCE_LIMIT, ARXIV_ID
-    record=json.loads((root/'data/research/discovery-study.json').read_text())
+    record=json.loads((root/'data/research/discovery-study.json').read_text(encoding='utf-8'))
     with research.lock:
         existing=next((p for p in research.projects if p['id']==record['id'] or (p.get('studyKey')=='nebius-discovery-v1' and not p.get('parentProject'))),None)
         if existing:return {'id':existing['id'],'loaded':False}
@@ -124,7 +124,7 @@ def load_discovery(root, research):
         aid=ARXIV_ID.search(paper.get('evidenceUrl',''))
         if not aid:raise RelayError('SOURCE_MISSING','Recorded source has no arXiv locator.')
         cache=root/'eval/.cache'/(aid[1]+'.html')
-        text=html_to_text(cache.read_text() if cache.exists() else fetch(paper['evidenceUrl']))[:SOURCE_LIMIT]
+        text=html_to_text(cache.read_text(encoding='utf-8') if cache.exists() else fetch(paper['evidenceUrl']))[:SOURCE_LIMIT]
         if digest(text)!=paper['sourceRef']:raise RelayError('SOURCE_CHANGED','The source version differs from the recorded discovery. Start a fresh investigation.',409)
         sources[paper['sourceRef']]=text
     with research.lock:
@@ -137,7 +137,7 @@ def load_discovery(root, research):
             paper['evidence']=sources.get(paper.get('sourceRef'),paper.get('abstract',''))[:65000]
             if paper.get('reviewed'):paper['reviewActor']='agent'
         folder=root/'.relay/sources';folder.mkdir(parents=True,exist_ok=True)
-        for ref,text in sources.items():(folder/(ref+'.txt')).write_text(text)
+        for ref,text in sources.items():(folder/(ref+'.txt')).write_text(text, encoding='utf-8')
         research.projects.insert(0,p)
         research.checkpoint(p,'import','Recorded discovery and manuscript',details={'note':'Imported final snapshot of an API-run study, not reconstructed intermediate executions.'})
         return {'id':p['id'],'loaded':True}

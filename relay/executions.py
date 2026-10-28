@@ -16,7 +16,7 @@ class ExecutionHistory:
             blob=json.dumps(snapshot,ensure_ascii=False,sort_keys=True)
             node['sha256']=digest(blob)
             folder=self.root/'.relay/checkpoints'/p['id']; folder.mkdir(parents=True,exist_ok=True)
-            (folder/(node['id']+'.json')).write_text(blob)
+            (folder/(node['id']+'.json')).write_text(blob, encoding='utf-8')
             nodes.append(node); self.save()
             if p.get('status') not in ('discovering', 'drafting', 'investigating') and hasattr(self, 'keys'): self.keys.pop(p['id'], None)
         return node
@@ -32,7 +32,7 @@ class ExecutionHistory:
             if not node: raise RelayError('CHECKPOINT_NOT_FOUND','Choose an existing execution checkpoint.',404)
             path=self.root/'.relay/checkpoints'/p['id']/(node['id']+'.json')
             if not path.is_file() or path.is_symlink(): raise RelayError('CHECKPOINT_MISSING','This saved checkpoint is missing. The current project is preserved.',404)
-            blob=path.read_text()
+            blob=path.read_text(encoding='utf-8')
             if digest(blob)!=node['sha256']: raise RelayError('CHECKPOINT_CHANGED','Checkpoint integrity check failed. Branching was blocked.',409)
             return copy.deepcopy(node),json.loads(blob)
 
