@@ -168,6 +168,9 @@ A second saved run in `data/research/discovery-study.json` uses two seed papers 
 
 ## Evaluation and limitations
 
+To check every number yourself, run `python3 scripts/verify_evaluation.py`. It rebuilds the table from the recorded run files in `eval/results/`, which are committed in this repository.
+
+
 The evaluation dataset is in `eval/cases.json`; runs are in `eval/results/`. The Research desk displays the recorded metrics and caveats.
 
 - 14 traffic-forecasting papers, 47 target results, 44 comparison cases.
