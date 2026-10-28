@@ -113,3 +113,16 @@ input[type=checkbox]:disabled{opacity:.45;cursor:not-allowed}
 .paper-link{font-size:13px;color:#a8ceff;padding:8px 4px}
 .node.paper{cursor:pointer}
 .desk-link{display:inline-block;margin:8px 0 0;font-size:13px;color:#a8ceff}
+
+/* Clickable help works on touch and keyboard, including inside evidence dialogs. */
+.info-button { display:inline-flex; align-items:center; justify-content:center; width:28px; height:28px; min-width:28px; padding:0; margin:0 4px; border:1px solid #69617c; border-radius:50%; background:#211b30; color:#d9bcff; font:600 14px/1 Georgia,serif; vertical-align:middle; cursor:pointer; letter-spacing:0; text-transform:none; }
+.info-button:hover { background:#3c2850; border-color:#d98bfa; color:#fff; }
+.info-button:focus-visible, #help-dialog button:focus-visible { outline:3px solid #70c9ff; outline-offset:3px; }
+.view-guide { display:flex; align-items:center; justify-content:flex-end; gap:6px; margin:0 0 14px; color:#b8adc9; font-size:12px; }
+#help-dialog { width:min(560px,calc(100vw - 32px)); max-height:85vh; box-sizing:border-box; padding:32px; border:1px solid #655077; border-radius:20px; background:#15111e; color:#f5f0fc; box-shadow:0 24px 90px #0009; }
+#help-dialog::backdrop { background:rgb(0 0 0 / 55%); }
+#help-dialog h2 { padding-right:20px; font-size:24px; }
+#help-description { color:#d2c8df; line-height:1.75; font-size:15px; }
+.help-close { position:absolute; top:12px; right:12px; font-size:22px; }
+.desk-metrics .info-button { display:inline-flex; }
+@media (pointer:coarse) { .info-button { min-width:36px; width:36px; height:36px; } }

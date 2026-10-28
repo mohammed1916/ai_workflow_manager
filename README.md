@@ -286,3 +286,7 @@ Hosted application: https://relay-research.onrender.com/. Source and local test 
 ## License
 
 MIT; see LICENSE. Third-party paper text and author code retain their own rights and licenses. Cached source text is not included in the source submission archive. Citation and source URLs remain attached to research records.
+
+### Contextual explanations
+
+Use the circled info buttons on the Research Desk, evaluation scores, investigation steps, evidence fields, review controls, and model settings. Explanations open separately from editors so unsaved corrections stay intact. Evaluation help defines denominators and discloses tuning and annotation limitations. “Authors’ own-method result” refers to the source paper’s experiment, never an experiment performed by Relay; unknown provenance remains unresolved until supported by evidence.
