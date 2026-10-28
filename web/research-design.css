@@ -112,3 +112,4 @@ input[type=checkbox]:disabled{opacity:.45;cursor:not-allowed}
 .paper-actions{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:12px}
 .paper-link{font-size:13px;color:#a8ceff;padding:8px 4px}
 .node.paper{cursor:pointer}
+.desk-link{display:inline-block;margin:8px 0 0;font-size:13px;color:#a8ceff}
