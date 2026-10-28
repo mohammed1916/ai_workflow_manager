@@ -68,3 +68,40 @@ button.side-note.ok{display:block;width:100%;text-align:left;color:#c6f0d6;borde
 .panel-msg{min-height:1.5em;color:#dfb7f6;font-size:12px;margin:10px 0 0}
 #import-file{max-width:100%;font-size:12px;color:#c9bbdc;margin-top:6px}
 @media(max-width:520px){dialog{padding:24px 18px}.copy-actions{width:100%}.copy-actions button{flex:1 1 auto}}
+
+/* Switches replace checkboxes in the research interface. */
+input[type=checkbox]{appearance:none;-webkit-appearance:none;width:42px;height:24px;flex:0 0 42px;border-radius:999px;background:#2a2238;border:1px solid #4a3a5e;position:relative;cursor:pointer;margin:0;vertical-align:middle;transition:background .2s,border-color .2s}
+input[type=checkbox]::before{content:'';position:absolute;top:2px;left:2px;width:18px;height:18px;border-radius:50%;background:#cbbfdc;transition:transform .2s,background .2s}
+input[type=checkbox]:checked{background:linear-gradient(90deg,var(--violet),var(--pink));border-color:transparent}
+input[type=checkbox]:checked::before{transform:translateX(18px);background:#fff}
+input[type=checkbox]:focus-visible{outline:2px solid var(--blue);outline-offset:3px}
+input[type=checkbox]:disabled{opacity:.45;cursor:not-allowed}
+.switch-row{display:flex;gap:12px;align-items:flex-start;cursor:pointer;margin:14px 0 4px}
+.switch-text b{display:block;color:#f2e9fb;font-weight:600}.switch-text small{display:block;color:var(--muted);font-size:12px;margin-top:2px}
+.seed-details{margin-top:14px;border:1px solid var(--line);border-radius:14px;padding:12px 14px;background:#120e19}
+.seed-details summary{cursor:pointer;display:flex;gap:10px;align-items:baseline;flex-wrap:wrap;list-style:none;color:#f2e9fb;font-weight:600}
+.seed-details summary::-webkit-details-marker{display:none}
+.seed-details summary::after{content:'+';margin-left:auto;color:var(--violet);font-size:18px}
+.seed-details[open] summary::after{content:'−'}
+.seed-details summary small{color:var(--muted);font-weight:400;font-size:12px}
+.seed-details .seed-box{margin-top:10px}
+.count-row{display:flex;justify-content:flex-end;font-size:11px;color:var(--muted);margin-top:6px}
+.count-row .near{color:var(--gap)}
+.agent-trace{border:1px solid #3a2d4f;border-radius:16px;padding:18px 20px;margin:0 0 22px;background:linear-gradient(180deg,#171224,#120e19)}
+.agent-trace .trace-head{display:flex;flex-wrap:wrap;justify-content:space-between;gap:14px;align-items:flex-start}
+.agent-trace h3{margin:4px 0 0}
+.trace-totals{display:flex;flex-wrap:wrap;gap:8px 14px;font-size:12px;color:var(--muted)}
+.trace-totals b{color:#f2e9fb;font-size:15px}.trace-totals .bad{color:var(--bad)}
+.trace-model{font-size:12px;color:var(--muted);margin:10px 0 6px}
+.trace-list{list-style:none;margin:0;padding:0;max-height:360px;overflow:auto;position:relative}
+.trace-row{display:grid;grid-template-columns:64px 14px 1fr;gap:10px;align-items:start;padding:7px 0;font-size:13px;color:#e4dbef}
+.trace-row .trace-time{color:var(--muted);font-variant-numeric:tabular-nums;font-size:12px;padding-top:2px}
+.trace-dot{width:10px;height:10px;border-radius:50%;margin-top:5px;background:var(--blue);box-shadow:0 0 0 3px #67c5ff22}
+.trace-row.model .trace-dot{background:var(--violet);box-shadow:0 0 0 3px #b880fa22}
+.trace-row.failed .trace-dot{background:var(--bad);box-shadow:0 0 0 3px #ff7a9022}
+.trace-row.failed .trace-text{color:#f6c5cf}
+.trace-row small{color:var(--muted)}
+@media (prefers-reduced-motion:reduce){input[type=checkbox],input[type=checkbox]::before{transition:none}}
+.hypothesis-box .switch-row{display:flex;flex-direction:row;align-items:flex-start;gap:12px;font-size:13px;font-weight:400;letter-spacing:0;color:#e4dbef;margin:14px 0 4px}
+.hypothesis-box .switch-row .switch-text b{font-size:14px;font-weight:600;color:#f2e9fb;letter-spacing:0}
+.hypothesis-box .switch-row .switch-text small{font-size:12px;color:var(--muted)}
