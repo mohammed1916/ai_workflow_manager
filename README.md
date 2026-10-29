@@ -34,7 +34,7 @@ Start at the **Research desk**. Recent runs show actual retained results, calls,
 For a fresh investigation:
 
 - Enter a question and optional DOI/arXiv references. Choose the model and workload under **Research scope**.
-- Open **Comparisons** to inspect question coverage, hypothesis judgments, and per-paper extraction coverage.
+- Open **Comparisons** to inspect question coverage, hypothesis judgments, and per-paper extraction coverage. **All retained observations** lists every extracted result, including results outside the requested outcome scope and unresolved assignments. Search or filter the inventory, inspect source quotes, and expand pair-outcome reasons. Observation counts, reported metric-label counts, and assessed pair counts are distinct. A result may participate in several different pair outcomes; unassessed pairs are never counted as incompatibilities.
 - Open a paper to inspect retained results, source lines, rejected claims, and retrieval/extraction failures. **Continue / retry unread passages** preserves successful work.
 - Use **Assess pending comparisons** to process more pairs. Viewing or filtering saved pairs does not call a model.
 - Use **Revise criteria in a branch** when the interpretation needs changing. This actually starts the selected agent continuation; it is not merely renaming a saved result.
@@ -114,7 +114,7 @@ Run the software checks:
 
 ```sh
 python3 -m unittest discover -s tests -v
-node --test tests/web/local-projects.test.mjs
+node --test tests/web/*.test.mjs
 node --input-type=module --check < web/research.js
 node --input-type=module --check < web/desk.js
 node --input-type=module --check < web/execution.js
@@ -136,7 +136,7 @@ The first-pass model incorrectly accepted three pairs. Rechecking original table
 
 Token counts in this record are cumulative across development continuations and repairs, not the cost of a single fresh investigation. Earlier development attempts and failed logical calls are retained. This was seed-only validation: it does not demonstrate discovery or Tavily usage.
 
-The software checks currently pass **146 Python tests and nine JavaScript tests**, including API loading of a recorded execution without inference. UI source syntax is checked; visual acceptance is left to the researcher, as requested. A successful provider call or completed source traversal does not prove complete extraction, correct interpretation, or an exhaustive literature review. Quote containment proves that text occurs in the source, not that the model understood it. Plans and semantic judgments can still be wrong and require expert review.
+The software checks currently pass **146 Python tests and 12 JavaScript tests**, including API loading of a recorded execution without inference. UI source syntax is checked; visual acceptance is left to the researcher, as requested. A successful provider call or completed source traversal does not prove complete extraction, correct interpretation, or an exhaustive literature review. Quote containment proves that text occurs in the source, not that the model understood it. Plans and semantic judgments can still be wrong and require expert review.
 
 The retired traffic comparator and its runner have been removed. Historical receipts remain in `eval/results/`; `python3 scripts/verify_evaluation.py` reconstructs their recorded metrics. Those agent-annotated cases share papers between development and held-out sets and were used during tuning. Their scores must not be presented as accuracy for the current generic workflow. Earlier live records in `data/research/` also predate this redesign unless explicitly identified otherwise.
 
