@@ -1,0 +1,143 @@
+{
+  "purpose": "Live classification contract, source extraction, and investigation smoke test; not an accuracy benchmark",
+  "date": "2026-10-29",
+  "provider": "nebius",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "paper": "https://arxiv.org/abs/2012.12877",
+  "plan": {
+    "protocol": {
+      "version": 1,
+      "task": "classification",
+      "factors": [
+        {
+          "key": "factor_model_size",
+          "label": "Model size (number of parameters / depth/width)",
+          "reason": "To isolate architectural improvements, DeiT and ViT must have comparable capacity."
+        },
+        {
+          "key": "factor_input_resolution",
+          "label": "Input image resolution (e.g., 224x224)",
+          "reason": "Resolution affects patch count and compute; matching ensures fair comparison."
+        },
+        {
+          "key": "factor_external_pretraining_data",
+          "label": "External pretraining dataset used before ImageNet fine-tuning",
+          "reason": "Pre-training data influences representation quality; controlling it removes confounds."
+        },
+        {
+          "key": "factor_use_distillation",
+          "label": "Whether distillation token/teacher is employed during training",
+          "reason": "DeiT's main innovation is distillation; matching this factor tests its effect under same settings."
+        }
+      ],
+      "review": "Ready for human review"
+    },
+    "call": {
+      "at": "2026-10-29T10:36:42.467420+00:00",
+      "kind": "comparison-plan",
+      "provider": "nebius",
+      "model": "nvidia/nemotron-3-super-120b-a12b",
+      "attempts": 1,
+      "repaired": false,
+      "promptTokens": 259,
+      "completionTokens": 1002,
+      "totalTokens": 1261,
+      "ok": true,
+      "ms": 6075
+    }
+  },
+  "source": {
+    "sourceKind": "arXiv full text (55,644 characters, tables preserved)",
+    "characters": 55644
+  },
+  "extraction": {
+    "call": {
+      "at": "2026-10-29T10:36:49.004960+00:00",
+      "kind": "extract",
+      "provider": "nebius",
+      "model": "nvidia/nemotron-3-super-120b-a12b",
+      "attempts": 1,
+      "repaired": false,
+      "promptTokens": 13313,
+      "completionTokens": 5267,
+      "totalTokens": 18580,
+      "ok": true,
+      "ms": 29431
+    },
+    "results": [
+      {
+        "method": "DeiT– no distillation",
+        "metric": "top-1 accuracy",
+        "value": "81.8",
+        "missing": [
+          "provenance",
+          "factor_model_size",
+          "factor_input_resolution",
+          "factor_external_pretraining_data"
+        ],
+        "factors": {
+          "factor_model_size": "unknown",
+          "factor_input_resolution": "unknown",
+          "factor_external_pretraining_data": "unknown",
+          "factor_use_distillation": "no"
+        }
+      },
+      {
+        "method": "DeiT: class+distillation",
+        "metric": "top-1 accuracy",
+        "value": "83.4",
+        "missing": [
+          "provenance",
+          "factor_model_size",
+          "factor_external_pretraining_data",
+          "factor_use_distillation"
+        ],
+        "factors": {
+          "factor_model_size": "unknown",
+          "factor_input_resolution": "224",
+          "factor_external_pretraining_data": "unknown",
+          "factor_use_distillation": "unknown"
+        }
+      }
+    ]
+  },
+  "investigation": {
+    "fields": [
+      "factor_model_size",
+      "factor_input_resolution"
+    ],
+    "proposals": [
+      {
+        "field": "factor_model_size",
+        "value": "86M parameters",
+        "quote": "Our reference vision transformer (86M parameters) achieves top-1 accuracy of 83.1% (single-crop) on ImageNet with no external data.",
+        "origin": "paper",
+        "location": "Experimental context",
+        "url": null,
+        "explanation": "This sentence explicitly states the parameter count of the reference vision transformer, which corresponds to the DeiT‑B model used for the \"DeiT– no distillation\" result (81.8% top‑1 accuracy). No conflicting information is present in the provided passages."
+      }
+    ],
+    "unresolved": [],
+    "calls": [
+      {
+        "at": "2026-10-29T10:38:05.892399+00:00",
+        "kind": "investigate",
+        "provider": "nebius",
+        "model": "nvidia/nemotron-3-super-120b-a12b",
+        "attempts": 1,
+        "repaired": false,
+        "promptTokens": 10273,
+        "completionTokens": 1265,
+        "totalTokens": 11538,
+        "ok": true,
+        "ms": 7076
+      }
+    ]
+  },
+  "review": "Ready for human review",
+  "limitations": [
+    "One paper, no independent annotation.",
+    "Proposals were not accepted. Result-to-passage applicability still requires human review.",
+    "Unknown fields remain unresolved. No cross-domain accuracy or comparable-pair success rate is claimed."
+  ]
+}

@@ -30,7 +30,7 @@ const topics = {
   ],
   "question": [
     "Start an investigation",
-    "Describe the methods, task, datasets, and conditions you want to compare. Optional arXiv seeds focus the search; seed-only mode skips discovery. Results depend on available source text. The traffic-forecasting evaluation does not establish accuracy for every research field."
+    "Describe the methods, task, datasets, and conditions you want to compare. Optional arXiv seeds focus the search; seed-only mode skips discovery. Results depend on available source text. Nemotron proposes question-specific comparison criteria. Review them in Comparisons or revise them in a branch. The traffic-forecasting evaluation does not establish accuracy for every research field."
   ],
   "map": [
     "Question and papers",
@@ -70,7 +70,7 @@ const topics = {
   ],
   "model": [
     "Model and web-search roles",
-    "Nebius hosts the selected inference model. Existing investigations retain their chosen model. OpenAlex and arXiv support paper discovery. When configured, Tavily searches for unresolved context during investigation; it is not a replacement model or a static answer fallback. Web results still require source checks and review."
+    "Nebius hosts the selected inference model. Existing investigations retain their chosen model. OpenAlex and arXiv support paper discovery. When configured, Tavily also finds arXiv candidates during initial discovery and searches for unresolved context during investigation; seed-only discovery stays restricted to your papers. It it is not a replacement model or a static answer fallback. Web results still require source checks and review."
   ],
   "support": [
     "Evidence support",

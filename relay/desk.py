@@ -21,7 +21,7 @@ API = [
     {'method':'POST','path':'/api/research/update','purpose':'Review evidence, check a number, add a paper, accept/reject a proposal, apply a correction, amend-draft with structured source-reviewed prose, or save a manuscript. Requires the current revision.',
      'example':{'id':'PROJECT','revision':1,'action':'correct','actor':'agent','paper':'PAPER','metric':'METRIC','field':'metricDefinition','value':'non-standard evaluation','note':'Source-backed reason for this correction.'}},
     {'method':'POST','path':'/api/research/compare','purpose':'Compute comparisons from the current evidence. No model call.', 'example':{'id':'PROJECT','papers':[]}},
-    {'method':'POST','path':'/api/research/branch','purpose':'Copy a checkpoint, or continue with search, assessment, synthesis, or drafting.',
+    {'method':'POST','path':'/api/research/branch','purpose':'Copy a checkpoint, or continue with search, relevance assessment, question-specific re-extraction (next: extract), synthesis, or drafting.',
      'example':{'id':'PROJECT','node':'NODE','next':'snapshot','name':'Alternative experiment'}},
     {'method':'POST','path':'/api/research/draft','purpose':'Generate a proposed-study manuscript from reviewed sources.',
      'example':{'id':'PROJECT','revision':1,'feedback':'Explain incompatible baselines and propose a common evaluation protocol. Do not claim experiments were conducted.'}},
@@ -45,7 +45,7 @@ def evaluation(root):
                      'relay':record['summary'].get('relay'),'baseline':record['summary'].get('baseline'),'cost':record.get('cost',{})})
     return {'runs':runs,'limitations':['Labels were annotated by an AI coding agent; there is no independent domain-researcher validation.',
         'Development and held-out cases share papers. The held-out results are optimistic and are not a clean generalization test.',
-        'Model outputs vary between runs. The evaluation covers traffic forecasting, not all scientific fields.']}
+        'These recorded runs evaluate the earlier traffic comparator, not the new question-specific contracts. Model outputs vary; cross-domain accuracy is not established.']}
 
 
 def overview(root, research):
@@ -59,8 +59,8 @@ def overview(root, research):
                         'calls':len(featured.get('calls',[])),'compiled':bool(featured.get('compile',{}).get('ok'))} if featured else None,
             'recent':[{'id':p['id'],'title':p.get('branchName') or p['hypothesis'],'status':p['status'],'papers':len(p['papers']),'calls':len(p.get('calls',[])),'provider':p['provider'],'model':p['model']} for p in research.projects if p.get('provider')=='nebius' and p.get('studyKey') not in ('nebius-benchmark-audit-v1','nebius-discovery-v1') and not p.get('parentProject')][:4],
             'findings':findings,'evaluation':evaluation(root),
-            'scope':'ML benchmark evidence auditing. Current normalization and evaluation focus on traffic forecasting.',
-            'review':'Source reviews and corrections in the prepared study were made by coding agents and test scripts. Human manuscript approval remains unchecked.',
+            'scope':'Question-specific numeric research comparisons. Recorded accuracy evaluation covers traffic forecasting; other domains require validation.',
+            'review':'Recorded study · Ready for human review.',
             'readiness':{'runtime':'Nebius Token Factory / NVIDIA Nemotron research calls are recorded in the prepared study.',
                          'remaining':['Final public demo-video URL and Devpost submission are still required.','Independent researcher validation has not been performed.']}}
 

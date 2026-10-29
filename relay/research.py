@@ -4,6 +4,7 @@ import xml.etree.ElementTree as ET
 from .core import RelayError, read_config, now, digest
 from .providers import complete, models, with_key
 from . import tavily
+from .protocol import PLAN, contract, factor_keys, forecasting
 from .evidence import (FIELDS, LABELS, check_metric, compare as compare_results, html_to_text, known, norm, passages, cell_context, mentions, window, table_notes, split_key, split_supported,
                        repository_links, code_passages, REPO_FILES, supports, short_id, provenance_key, metric_key)
 
@@ -93,7 +94,7 @@ def canonical_topic(value):
     return topic
 
 
-SETUP = re.compile(r'(?i)split|training set|for training|7\s*:\s*1\s*:\s*2|6\s*:\s*2\s*:\s*2|horizon|averag|missing values|mask|normaliz|z-score|interpolat|reported (?:in|by)|reproduc|original paper|repeat|runs\b|metric|correction')
+SETUP = re.compile(r'(?i)pretrain|resolution|distill|teacher|crop|population|cohort|intervention|randomiz|sample size|confidence interval|parameter|training budget|split|training set|for training|7\s*:\s*1\s*:\s*2|6\s*:\s*2\s*:\s*2|horizon|averag|missing values|mask|normaliz|z-score|interpolat|reported (?:in|by)|reproduc|original paper|repeat|runs\b|metric|correction')
 
 
 def analysis_text(text, budget=36000):
@@ -144,6 +145,8 @@ def _validate_metrics(p, analysis, source):
     for m in analysis.get('metrics', [])[:12]:
         if not isinstance(m, dict): continue
         quote = norm(m.get('quote', '')); value = norm(m.get('value', '')); located = False
+        if quote.startswith('|'): quote = quote.rstrip(' |')
+        if value.endswith('%') and m.get('unit') == '%' and value[:-1] in quote: value = value[:-1]; m = dict(m, value=value)
         if re.search(r'\d', value) and (len(quote) < 15 or quote not in doc or value not in quote):
             # Models often return only the number. Use the source table row instead, but only when the
             # cell's row/column labels name the extracted method and metric.
@@ -153,6 +156,8 @@ def _validate_metrics(p, analysis, source):
         # Numeric evidence must be literally present in a retrieved passage.
         if len(quote) < 15 or quote not in doc or not re.search(r'\d', value) or value not in quote: rejected += 1; continue
         metric = {k: norm(m.get(k, 'unknown'))[:2000] or 'unknown' for k in ('name', 'value', 'unit', 'direction') + FIELDS}
+        metric['protocol'] = copy.deepcopy(p.get('protocol', {}))
+        for key in factor_keys(metric): metric[key] = norm(m.get(key, 'unknown'))[:2000]
         metric['direction'] = {'minimize': 'lower', 'min': 'lower', 'lower is better': 'lower', 'maximize': 'higher', 'max': 'higher', 'higher is better': 'higher'}.get(metric['direction'].lower(), metric['direction'].lower())
         if metric['direction'] not in ('lower', 'higher') and re.search(r'(?i)\b(mae|rmse|mse|mape|error|loss)\b', metric['name']): metric['direction'] = 'lower'
         metric['quote'] = quote; metric['verified'] = False; metric['quoteLocated'] = located
@@ -160,7 +165,7 @@ def _validate_metrics(p, analysis, source):
         evidence = {}
         raw = m.get('evidence') if isinstance(m.get('evidence'), dict) else {}
         for field, q in raw.items():
-            if field in FIELDS and isinstance(q, (str, dict)):
+            if field in FIELDS + tuple(factor_keys(metric)) and isinstance(q, (str, dict)):
                 q = q.get('quote', '') if isinstance(q, dict) else q
                 if norm(q): evidence[field] = {'quote': norm(q)[:1500], 'origin': 'paper'}
         metric['evidence'] = evidence
@@ -212,10 +217,10 @@ def tex_prose(text):
 
 
 CONTROLS = {
-    'dataset': 'Evaluate every method on the same dataset release and state its time range and sensor count.',
-    'split': 'Use one chronological train/validation/test split for all methods and state it explicitly (for example 70/10/20).',
+    'dataset': 'Evaluate methods on the same dataset release or study population and document selection criteria.',
+    'split': 'Use the same evaluation partition or sampling design for all methods and state it explicitly.',
     'horizon': 'Report each forecast horizon separately (for example 15, 30, and 60 minutes) and report the average over horizons as a separate row; never compare one with the other.',
-    'metricDefinition': 'Compute every metric with one stated definition, including how zero or missing targets are masked; report masked and unmasked values when baselines differ.',
+    'metricDefinition': 'Use the same metric definition and evaluation protocol; document any exclusions, averaging, or preprocessing that changes its meaning.',
     'name': 'Compare results only on the same metric.',
 }
 
@@ -225,12 +230,12 @@ def controls(pairs):
     needed = {}
     for x in pairs:
         for c in x['checks']:
-            if c['status'] in ('conflict', 'missing') and c['field'] in CONTROLS: needed.setdefault(c['field'], []).append(x['id'])
+            if c['status'] in ('conflict', 'missing') and (c['field'] in CONTROLS or c['field'].startswith('factor_')): needed.setdefault(c['field'], []).append(x['id'])
         if any('best of' in c for c in x['caveats']): needed.setdefault('runs', []).append(x['id'])
         if not x['independent']: needed.setdefault('independence', []).append(x['id'])
     text = dict(CONTROLS, runs='Re-run baselines with the same seeds and report the mean and standard deviation over runs, not the best run.',
                 independence='Treat a cited copy of a baseline as the original paper\'s result, not as new evidence; re-run baselines under the shared protocol.')
-    return [{'field': k, 'text': text[k], 'pairs': sorted(set(v))[:12]} for k, v in needed.items()]
+    return [{'field': k, 'text': text.get(k, 'Match and report ' + k.removeprefix('factor_').replace('_',' ') + ' before attributing an outcome difference to the method.'), 'pairs': sorted(set(v))[:12]} for k, v in needed.items()]
 
 
 def pair_label(x):
@@ -290,19 +295,26 @@ ASSESS = ('Assess how well this paper fits the research question. Return {"relev
           '"limitations":"missing experimental context and limitations; distinguish what the paper does not state from what extraction did not find"}. A paper covering only part of the question can still be relevant.')
 
 EXTRACT = ('You extract reported experimental results from a paper for an ML researcher who is deciding which published numbers can be compared. '
-           'Return {"metrics":[{"name":"metric such as MAE","value":"number exactly as printed","unit":"unit or unknown","direction":"lower or higher",'
+           'Return {"metrics":[{"name":"metric such as MAE","value":"numeric token exactly as printed, without an appended unit or percent sign","unit":"unit or unknown","direction":"lower or higher",'
            '"method":"model name exactly as printed in the row or column label","provenance":"own (this paper\'s proposed method), reproduced (a baseline the authors ran), cited (copied from another paper), or unknown",'
            '"citedFrom":"source paper when cited, else unknown","dataset":"dataset name","datasetVersion":"time range, sensors, or release if stated",'
-           '"split":"train/val/test percentages such as 70/10/20","horizon":"for one horizon give minutes and steps such as 60 minutes (horizon 12); for an average give the span such as 12 steps",'
-           '"aggregation":"single horizon, or average over N horizons; add run aggregation such as mean of 10 runs or best of 5 runs","preprocessing":"normalization, missing-value handling",'
-           '"metricDefinition":"protocol details beyond the textbook formula: masking of zero or missing targets, original or normalized scale, or a stated deviation or correction; unknown if only the generic formula is given","locator":"table or section",'
+           '"split":"named evaluation partition or train/val/test proportions as stated","horizon":"forecasting only: prediction distance, never epochs or training time; unknown for other tasks",'
+           '"aggregation":"how results are combined: mean over runs, best run, single evaluation, or forecasting horizons if applicable","preprocessing":"normalization, missing-value handling",'
+           '"metricDefinition":"task-specific evaluation protocol: e.g. single-crop top-1 accuracy, micro/macro averaging, masking, scale, or a stated correction; unknown when not specified","locator":"table or section",'
            '"quote":"verbatim contiguous source text containing the value: copy the entire table row line (it starts with |) or the full sentence, never just the number",'
            '"evidence":{"field name":"verbatim quote that states this field, under 200 characters"}}]}. '
            'Use "unknown" for anything the paper does not state about this result. Do not fill a field from convention or from other papers. '
+           'Inside EACH metric object, return a value for EVERY factor key in comparisonProtocol.factors and its corresponding evidence quote. Do not put factors on the outer response object. Copy the shortest supported description verbatim; use unknown when absent. Never turn training epochs into a forecast horizon. '
            'Every non-unknown context field needs a verbatim evidence quote. Read table captions, footnotes, appendices, and corrections. Keep the answer compact. '
            'When the paper later corrects a table, extract the original value and the corrected value as separate results; for the original, put the paper\'s own statement of the problem in metricDefinition and quote it. '
-           'Extract up to 8 results: the paper\'s proposed method and its strongest baselines on its main benchmark datasets, covering short and long horizons. '
+           'Extract up to 8 results: the paper\'s proposed method and its strongest baselines on its main benchmark datasets, covering the conditions relevant to the question. Extract ONLY the requested outcome metrics, not unrelated compute, parameter counts or throughput. '
            'The priority hint only orders what to extract first; never skip a paper because it does not match the hint. An empty list is correct only when the text has no numeric results. Never invent numbers.')
+
+def extraction_system(protocol):
+    keys = [f['key'] for f in protocol.get('factors',[])]
+    fields = ','.join(json.dumps(k)+':'+json.dumps('short verbatim value or unknown') for k in keys)
+    schema = EXTRACT.replace('\"locator\":\"table or section\",', fields + (',' if fields else '') + '\"locator\":\"table or section\",')
+    return schema + ' Required per-result experimental fields (never on the outer object): ' + json.dumps({k:'short verbatim value or unknown' for k in keys}) + '. Include evidence entries for these same keys. Table headers plus row together may supply support; quote the contiguous table block when needed. Do not omit these fields.'
 
 TARGET = ('A researcher pointed at one reported number. Determine its experimental context from the table block that contains it and from passages of the whole paper, including appendices and corrections. '
           'Return one object {"method","name","value","unit","direction","dataset","datasetVersion","split","horizon","aggregation","preprocessing","metricDefinition","provenance","citedFrom","locator","quote","evidence":{"field name":"verbatim quote under 200 characters"}} '
@@ -324,7 +336,7 @@ def table_block(source, cell, limit=6000):
     return block if len(block) <= limit else '\n'.join(lines[max(start, i - 25):min(end, i + 10) + 1])[:limit]
 
 
-def target_context(ask, paper_id, title, source, value, method=''):
+def target_context(ask, paper_id, title, source, value, method='', protocol=None):
     """Experimental context for one number the researcher points at. `ask(system, payload, kind)` returns a dict.
 
     Shared by the app's "check a number" action and the evaluation harness.
@@ -338,11 +350,14 @@ def target_context(ask, paper_id, title, source, value, method=''):
                'statementsAboutThisTable': table_notes(source, cell['caption']) if cell else [],
                'table': table_block(source, cell) if cell else window(source, value, 1500, 600),
                'passages': passages(source, fields, method or (cell['labels'][0] if cell and cell['labels'] else ''), limit=10)}
-    answer = ask(TARGET, payload, 'target')
+    if protocol:
+        payload['comparisonProtocol'] = protocol
+        payload['paperText'] = analysis_text(source,24000)
+    answer = ask(extraction_system(protocol) + ' Extract only the requested numeric target.' if protocol else TARGET, payload, 'target')
     m = answer.get('metrics', [answer])[0] if isinstance(answer.get('metrics'), list) and answer.get('metrics') else answer
     m = dict(m); m['value'] = value
     if cell and not (norm(m.get('quote', '')) in norm(source) and value in norm(m.get('quote', ''))): m['quote'] = cell['row']
-    probe = {'id': paper_id, 'title': title, 'evidence': source, 'metrics': []}
+    probe = {'id': paper_id, 'title': title, 'evidence': source, 'metrics': [], 'protocol':protocol or {}}
     validate_analysis(probe, {'metrics': [m]}, source)
     if not probe['metrics']: raise RelayError('UNVERIFIED_TARGET', 'The model could not tie this number to a verifiable source quote.')
     return probe['metrics'][0]
@@ -352,7 +367,7 @@ INVESTIGATE = ('You are investigating why two reported results may not be compar
                'when available, from the authors\' code repository. For each requested field, propose a value only if a passage states it. '
                'Return {"proposals":[{"field":"field name","value":"proposed value","passage":"passage id","quote":"verbatim text copied from that passage","explanation":"why this settles the field; mention conflicts between paper text and code"}],'
                '"unresolved":[{"field":"field name","reason":"what is missing"}]}. Paper text describes intent; code shows what ran. Report disagreements instead of hiding them. '
-               'For metricDefinition, say whether zero or missing targets are masked. For aggregation, say whether results are per horizon or averaged, and over how many runs. '
+               'Use the supplied comparison protocol. Investigate only applicable conditions. For aggregation, distinguish averaging over runs, samples, or forecast horizons. '
                'In code, follow configuration values into the functions that use them: for example a mask threshold of None passed to a metric function that masks only when the threshold is not None means no masking; '
                'num_train = round(n * 0.7) with num_test = round(n * 0.2) means a 70/10/20 split. Quote the lines you rely on. Never guess.')
 
@@ -365,10 +380,12 @@ def investigate_metric(ask, title, source, metric, fields, repo=None):
     """Ask the model to settle missing or conflicting fields from ranked passages; keep only proposals whose quote
     is copied from a passage and, for numeric fields, supports the value. Shared by the app and the evaluation."""
     found = passages(source, fields, metric.get('method', ''))
+    if factor_keys(metric):
+        found += [{'id':'C'+str(i), 'origin':'paper','location':'Experimental context','text':text} for i,text in enumerate([analysis_text(source,24000)])]
     pool = {x['id']: x for x in found + (repo or [])}
     if not pool: return [], [], found
     target = {k: metric.get(k) for k in ('method', 'name', 'value', 'dataset', 'split', 'horizon', 'aggregation', 'metricDefinition', 'provenance', 'locator', 'quote')}
-    result = ask(INVESTIGATE, {'target': target, 'paper': title, 'fields': fields, 'passages': list(pool.values())}, 'investigate')
+    result = ask(INVESTIGATE, {'target': target, 'comparisonProtocol':metric.get('protocol',{}), 'paper': title, 'fields': fields, 'passages': list(pool.values())}, 'investigate')
     proposals = []
     for prop in result.get('proposals', [])[:8]:
         if not isinstance(prop, dict): continue
@@ -377,7 +394,8 @@ def investigate_metric(ask, title, source, metric, fields, repo=None):
         if field not in fields or not known(value) or not passage or not quote: continue
         if squash(quote) not in squash(passage['text']): continue  # quote must be copied from the passage
         if field in ('horizon', 'datasetVersion', 'dataset') and not supports(value, quote): continue
-        if field == 'split' and passage['origin'] == 'paper' and not split_supported(value, quote): continue
+        if field.startswith('factor_') and norm(value).casefold() not in norm(quote).casefold(): continue
+        if field == 'split' and forecasting(metric) and passage['origin'] == 'paper' and not split_supported(value, quote): continue
         current = metric.get(field, 'unknown')
         if norm(value).lower() == norm(current).lower() or (field == 'split' and split_key(value) and split_key(value) == split_key(current)): continue  # restates the current value
         proposals.append({'field': field, 'value': value[:400], 'quote': squash(quote)[:1500], 'origin': passage['origin'], 'location': passage.get('location', ''),
@@ -588,6 +606,7 @@ class Research(ExecutionHistory):
     def run(self, p):
         try:
             papers = {}
+            self.plan_protocol(p)
             for s in p.get('seeds', []):
                 self.event(p, 'Retrieving your paper ' + s)
                 try:
@@ -596,12 +615,26 @@ class Research(ExecutionHistory):
                     self.event(p, f'Could not retrieve {s}: {str(e)[:120]}')
             if not p.get('seedOnly'):
                 self.event(p, 'Planning two complementary searches from your hypothesis.')
-                plan = self.llm(p, 'You are an academic search planner. Return {"queries":[two concise scholarly search strings, 3 to 6 words each],"criteria":[three experiment comparability criteria]}.', {'hypothesis': p['hypothesis']}, 'plan', 4000)
+                plan = {'queries':p.get('queries',[]), 'criteria':[f['label'] for f in p['protocol']['factors']]}
                 queries = [str(q)[:180] for q in plan.get('queries', [])[:2]]
                 if not queries: raise ValueError('No search queries returned')
                 with self.lock: p['queries'] = queries; p['criteria'] = plan.get('criteria', [])[:5]; self.checkpoint(p, 'plan', 'Search plan generated', details={'queries': queries})
                 titles = {title_key(x['title']) for x in papers.values()}
                 for q in queries:
+                    cfg = self.cfg_for_id(p['id'])
+                    if cfg.get('TAVILY_API_KEY'):
+                        self.event(p, 'Tavily discovery: ' + q)
+                        try:
+                            hits = tavily.search(cfg['TAVILY_API_KEY'], q + ' research paper arxiv', max_results=4)
+                            p.setdefault('searchReceipts',[]).append({'provider':'tavily','query':q,'results':[{'url':h['url'],'title':h['location']} for h in hits]})
+                            for hit in hits:
+                                match = ARXIV_ID.search(hit['url'])
+                                if not match: continue
+                                try:
+                                    paper = arxiv_paper(match[0])
+                                    if title_key(paper['title']) not in titles: papers.setdefault(paper['id'],paper); titles.add(title_key(paper['title']))
+                                except Exception as e: self.event(p, 'Search candidate could not be retrieved: ' + str(e)[:100])
+                        except Exception as e: self.event(p, 'Tavily unavailable; continuing with scholarly discovery. ' + str(e)[:100])
                     self.event(p, 'Searching OpenAlex: ' + q)
                     for paper in discover(q):
                         if title_key(paper['title']) not in titles: papers.setdefault(paper['id'], paper); titles.add(title_key(paper['title']))
@@ -616,22 +649,34 @@ class Research(ExecutionHistory):
             self.synthesize(p)
             with self.lock:
                 p['status'] = 'review'; p['papers'].sort(key=lambda x: x.get('relevance', 0), reverse=True); p['revision'] += 1; self.checkpoint(p, 'ready', 'Research discovery completed')
-            self.event(p, 'Ready for review. Check comparisons, investigate gaps, and verify the numbers you rely on.')
+            self.event(p, 'Ready for human review.')
         except Exception as e:
             with self.lock: p.update(status='error', error=str(e)[:350]); self.checkpoint(p, 'failure', 'Execution failed', status='failed', details={'error': p['error']})
+
+    def plan_protocol(self, p):
+        self.event(p, 'Planning question-specific comparison criteria.')
+        plan = self.llm(p, PLAN, {'hypothesis':p['hypothesis'], 'direction':p.get('feedback','')}, 'comparison-plan', 6000)
+        with self.lock:
+            p['protocol'] = contract(plan.get('protocol'))
+            p['protocol']['question'] = p['hypothesis']
+            p['protocol']['direction'] = p.get('feedback','')
+            if not p['protocol']['factors']: raise RelayError('CRITERIA_REQUIRED','No experimental comparison criteria were returned. Retry with a more specific question.')
+            p['queries'] = [str(q)[:180] for q in plan.get('queries',[])[:2]]
+            self.checkpoint(p,'protocol','Comparison criteria ready for human review',details=p['protocol'])
 
     def assess(self, p, paper):
         self.event(p, 'Extracting experimental evidence: ' + paper['title'][:100])
         source = self.source(paper)
+        paper['protocol'] = copy.deepcopy(p.get('protocol',{}))
         try:
             fit = self.llm(p, ASSESS, {'hypothesis': p['hypothesis'], 'paper': {'title': paper['title'], 'abstract': paper.get('abstract', '')[:3000], 'text': analysis_text(source, 8000)}}, 'assess', 4000)
-            payload = {'priorityHint': p['hypothesis'], 'paper': {'title': paper['title'], 'evidenceKind': paper['evidenceKind'], 'text': analysis_text(source)}}
-            found = self.llm(p, EXTRACT, payload, 'extract', 32000)
+            payload = {'priorityHint': p['hypothesis'], 'direction':p.get('feedback',''), 'comparisonProtocol':p.get('protocol',{}), 'paper': {'title': paper['title'], 'evidenceKind': paper['evidenceKind'], 'text': analysis_text(source)}}
+            found = self.llm(p, extraction_system(p.get('protocol',{})), payload, 'extract', 32000)
             table_rows = sum(1 for line in source.split('\n') if line.startswith('|') and len(re.findall(r'\d+\.\d+', line)) >= 2)
             if not found.get('metrics') and table_rows >= 3:
                 # Recovery: models occasionally decline when a paper only partly matches the question.
                 payload['note'] = f'The text contains {table_rows} numeric table rows. Extract the main reported results from them.'
-                found = self.llm(p, EXTRACT, payload, 'extract-retry', 32000)
+                found = self.llm(p, extraction_system(p.get('protocol',{})), payload, 'extract-retry', 32000)
             with self.lock:
                 validate_analysis(paper, {**fit, 'metrics': found.get('metrics', [])}, source)
                 self.checkpoint(p, 'assessment', 'Assessed ' + paper['title'][:85], details={'paper': paper['id'], 'metrics': len(paper['metrics']), 'rejected': paper.get('rejectedMetrics', 0)})
@@ -686,7 +731,7 @@ class Research(ExecutionHistory):
             targets = []
             for t in (data.get('targets') or [])[:2]:
                 paper = self.paper(p, t.get('paper')); m = self.metric(paper, t.get('metric'))
-                fields = [f for f in (t.get('fields') or m.get('missing') or []) if f in FIELDS and f != 'locator'][:6]
+                fields = [f for f in (t.get('fields') or m.get('missing') or []) if f in FIELDS + tuple(factor_keys(m)) and f != 'locator'][:6]
                 if fields: targets.append((paper['id'], m['id'], fields))
             if not targets: raise RelayError('NOTHING_TO_INVESTIGATE', 'Choose a result with missing or conflicting context.')
             p['status'] = 'investigating'; p['revision'] += 1
@@ -703,7 +748,7 @@ class Research(ExecutionHistory):
                 state['hinted'] = True
                 self.event(p, 'Add a Tavily key in Model settings to let Relay search the web for missing protocol details.')
             return [], None
-        labels = ', '.join(LABELS.get(f, f) for f in fields)
+        labels = ', '.join(next((x['label'] for x in m.get('protocol',{}).get('factors',[]) if x['key']==f), LABELS.get(f,f)) for f in fields)
         dataset = m.get('dataset') if known(m.get('dataset')) else ''
         method = m.get('method') if known(m.get('method')) else ''
         query = squash(f"{paper['title']} {method} {dataset} evaluation protocol {labels}")[:300]
@@ -743,7 +788,7 @@ class Research(ExecutionHistory):
                 if web:
                     web_props, web_unresolved, _ = investigate_metric(ask, paper['title'], source, m, web_fields, (repo or []) + web)
                     # Web text does not get the paper-only split check inside investigate_metric, so apply it here.
-                    web_props = [x for x in web_props if not (x['origin'] == 'web' and x['field'] == 'split' and not split_supported(x['value'], x['quote']))]
+                    web_props = [x for x in web_props if not (forecasting(m) and x['origin'] == 'web' and x['field'] == 'split' and not split_supported(x['value'], x['quote']))]
                     resolved = {x['field'] for x in web_props}
                     unresolved = [u for u in unresolved if u.get('field') not in resolved] + web_unresolved
                     proposals = proposals + web_props
@@ -771,7 +816,7 @@ class Research(ExecutionHistory):
 
     def correct(self, p, paper, m, changes, origin, note='', evidence=None):
         """Apply a context correction and record which comparisons and manuscript claims it affects."""
-        changes = {k: norm(v)[:2000] for k, v in changes.items() if k in CONTEXT_EDITABLE and k not in ('value', 'name') and norm(m.get(k, '')) != norm(v)}
+        changes = {k: norm(v)[:2000] for k, v in changes.items() if k in CONTEXT_EDITABLE + tuple(factor_keys(m)) and k not in ('value', 'name') and norm(m.get(k, '')) != norm(v)}
         if not changes: return None
         before = self.outcomes(p)
         pre = self.checkpoint(p, 'pre-correction', 'State before correction to ' + m['method'], details={'paper': paper['id'], 'metric': m['id']})
@@ -845,7 +890,7 @@ class Research(ExecutionHistory):
                 for i, edit in enumerate(edits[:len(revised)]):
                     if not isinstance(edit, dict): continue
                     for key in ('name', 'value', 'unit', 'direction'): paper['metrics'][i][key] = revised[i][key]
-                    ctx = {k: edit[k] for k in CONTEXT_EDITABLE if k in edit and k not in ('name', 'value', 'unit', 'direction')}
+                    ctx = {k: edit[k] for k in CONTEXT_EDITABLE + tuple(factor_keys(paper['metrics'][i])) if k in edit and k not in ('name', 'value', 'unit', 'direction')}
                     c = self.correct(p, paper, paper['metrics'][i], ctx, 'agent review' if data.get('actor') == 'agent' else 'researcher review', str(data.get('note', '')))
                     if c: corrections.append(c['id'])
                 paper['reviewed'] = bool(data.get('reviewed'))
@@ -860,7 +905,7 @@ class Research(ExecutionHistory):
             elif action == 'correct':
                 paper = self.paper(p, data.get('paper')); m = self.metric(paper, data.get('metric'))
                 field = data.get('field')
-                if field not in CONTEXT_EDITABLE or field in ('value', 'name', 'unit', 'direction'): raise RelayError('INVALID_FIELD', 'Correct an experimental-context field.')
+                if field not in CONTEXT_EDITABLE + tuple(factor_keys(m)) or field in ('value', 'name', 'unit', 'direction'): raise RelayError('INVALID_FIELD', 'Correct an experimental-context field.')
                 note = str(data.get('note', '')).strip()
                 if len(note) < 5: raise RelayError('NOTE_REQUIRED', 'Say why this value is correct, for example the table, appendix, or code line you checked.')
                 c = self.correct(p, paper, m, {field: data.get('value', '')}, 'agent correction' if data.get('actor') == 'agent' else 'researcher correction', note)
@@ -886,7 +931,7 @@ class Research(ExecutionHistory):
             elif action == 'check':
                 paper = self.paper(p, data.get('paper'))
                 value = norm(data.get('value', ''))
-                if not re.fullmatch(r'[-+]?\d+(?:\.\d+)?%?', value): raise RelayError('INVALID_VALUE', 'Enter the number exactly as printed, for example 2.99.')
+                if not re.fullmatch(r'[-+]?\d+(?:\.\d+)?%?', value): raise RelayError('INVALID_VALUE', 'Enter the numeric token exactly as printed, without an appended unit or percent sign, for example 2.99.')
                 if value not in norm(self.source(paper)): raise RelayError('VALUE_NOT_FOUND', f'{value} does not appear in the retrieved text of this paper.')
                 p['revision'] += 1; p['status'] = 'investigating'; self.checkpoint(p, 'input', f'Check requested for {value}', details={'paper': paper['id'], 'value': value})
                 threading.Thread(target=self.check_number, args=(p, paper, value, str(data.get('method', ''))[:120]), daemon=True).start(); return {'ok': True}
@@ -928,7 +973,7 @@ class Research(ExecutionHistory):
     def check_number(self, p, paper, value, method):
         try:
             self.event(p, f'Locating {value} in {paper["title"][:70]} and reading its experimental setup.')
-            m = target_context(lambda system, payload, kind: self.llm(p, system, payload, kind, 16000), paper['id'], paper['title'], self.source(paper), value, method)
+            m = target_context(lambda system, payload, kind: self.llm(p, system, payload, kind, 16000), paper['id'], paper['title'], self.source(paper), value, method, p.get('protocol'))
             with self.lock:
                 m['origin'] = 'researcher-requested check'
                 existing = next((x for x in paper['metrics'] if x.get('value') == m['value'] and norm(x.get('quote')) == norm(m['quote'])), None)
@@ -990,8 +1035,8 @@ class Research(ExecutionHistory):
         ids = {x['id'] for x in papers}
         result = compare([x for x in p['papers'] if x['id'] in ids])
         pairs = result['pairs'][:40]
-        packet = [{'pair': x['id'], 'a': {'paper': x['a']['paper'], 'method': x['a']['method'], 'value': x['a']['value'], 'metric': x['a']['name'], 'dataset': x['a']['dataset'], 'horizon': x['a']['horizon']},
-                   'b': {'paper': x['b']['paper'], 'method': x['b']['method'], 'value': x['b']['value'], 'metric': x['b']['name'], 'dataset': x['b']['dataset'], 'horizon': x['b']['horizon']},
+        packet = [{'pair': x['id'], 'a': {'paper': x['a']['paper'], 'method': x['a']['method'], 'value': x['a']['value'], 'metric': x['a']['name'], 'dataset': x['a']['dataset'], 'context':{k:x['a'].get(k) for k in ('split','metricDefinition','unit') + tuple(factor_keys(x['a'])) + (('horizon',) if forecasting(x['a']) else ())}},
+                   'b': {'paper': x['b']['paper'], 'method': x['b']['method'], 'value': x['b']['value'], 'metric': x['b']['name'], 'dataset': x['b']['dataset'], 'context':{k:x['b'].get(k) for k in ('split','metricDefinition','unit') + tuple(factor_keys(x['b'])) + (('horizon',) if forecasting(x['b']) else ())}},
                    'outcome': x['outcome'], 'why': x['explanation'], 'caveats': x['caveats'][:3], 'independent': x['independent'], 'verified': x['verified']} for x in pairs]
         return pairs, packet
 
@@ -1030,7 +1075,7 @@ class Research(ExecutionHistory):
     DRAFT = ('Write academic prose for a PROPOSED STUDY. No experiments have been conducted. Never invent results or claim the hypothesis is proven. '
              'Return {"abstract":"proposal abstract","relatedWork":[{"text":"paragraph grounded in supplied evidence","citations":[exact paper ids]}],'
              '"comparisons":[{"text":"what the cross-paper comparisons do and do not establish","pairs":[pair ids],"citations":[paper ids]}],'
-             '"study":"the next defensible experiment: controls, baselines to re-run, metrics, horizons, runs, and limitations"}. '
+             '"study":"the next defensible experiment: controls, baselines to re-run, task-specific experimental conditions, outcome metrics, repeated runs, and limitations"}. '
              'Use only reviewed papers. Cite every paragraph. A comparison outcome is comparable, incompatible, or insufficient evidence. '
              'You may say one method performs better than another only when you cite a comparable pair; otherwise explain why the numbers cannot be compared. '
              'Insufficient evidence means context is missing, not that results conflict. A value cited from another paper is not independent evidence. '
@@ -1041,9 +1086,9 @@ class Research(ExecutionHistory):
             for paper in papers: paper['metrics'] = [m for m in paper['metrics'] if m.get('verified')] or paper['metrics']
             pairs, packet = self.evidence_packet(p, papers)
             self.event(p, 'Drafting a proposed-study manuscript from reviewed papers and comparison outcomes.')
-            payload = {'hypothesis': p['hypothesis'], 'feedback': p.get('feedback'), 'comparisons': packet, 'controls': controls(pairs),
+            payload = {'hypothesis': p['hypothesis'], 'comparisonProtocol':p.get('protocol',{}), 'feedback': p.get('feedback'), 'comparisons': packet, 'controls': controls(pairs),
                        'papers': [{'id': x['id'], 'title': x['title'], 'abstract': x['abstract'][:2500], 'sourceText': analysis_text(self.source(x), 9000),
-                                   'verifiedMetrics': [{k: m.get(k) for k in ('method', 'name', 'value', 'dataset', 'horizon', 'aggregation', 'provenance')} for m in x['metrics'] if m.get('verified')],
+                                   'verifiedMetrics': [{k: m.get(k) for k in ('method', 'name', 'value', 'dataset', 'aggregation', 'provenance') + tuple(factor_keys(m)) + (('horizon',) if forecasting(m) else ())} for m in x['metrics'] if m.get('verified')],
                                    'reviewNote': x.get('reviewNote', '')} for x in papers]}
             d = self.llm(p, self.DRAFT, payload, 'draft')
             bad = self.check_draft(d, papers, pairs)

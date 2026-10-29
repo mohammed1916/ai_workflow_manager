@@ -43,17 +43,17 @@ class ExecutionHistory:
 
     def branch(self,data):
         action=data.get('next','snapshot')
-        if action not in ('snapshot','synthesize','draft','assess','search'): raise RelayError('INVALID_STEP','Choose a supported continuation.')
+        if action not in ('snapshot','synthesize','draft','assess','extract','search'): raise RelayError('INVALID_STEP','Choose a supported continuation.')
         node,snapshot=self.get_checkpoint(data.get('id'),data.get('node'))
         hypothesis=str(data.get('hypothesis') or snapshot['hypothesis']).strip()
         if not 10<=len(hypothesis)<=2000: raise RelayError('HYPOTHESIS_REQUIRED','Write a hypothesis between 10 and 2,000 characters.')
         provider=data.get('provider') or snapshot['provider']; model=data.get('model') or snapshot['model']
         if action!='snapshot' and model not in models(self.cfg_for_id(data.get('id')),provider)['models']:
             raise RelayError('INVALID_MODEL','Choose a currently available provider model.')
-        if action in ('synthesize','assess') and not snapshot['papers']: raise RelayError('NO_EVIDENCE','This checkpoint has no papers. Continue with discovery instead.')
+        if action in ('synthesize','assess','extract') and not snapshot['papers']: raise RelayError('NO_EVIDENCE','This checkpoint has no papers. Continue with discovery instead.')
         if action=='draft' and not any(x.get('reviewed') for x in snapshot['papers']): raise RelayError('REVIEW_REQUIRED','Select reviewed papers in the branch before drafting.')
         changed=hypothesis!=snapshot['hypothesis']
-        if changed and action in ('synthesize','draft'): raise RelayError('REASSESS_REQUIRED','For a changed hypothesis, choose Reassess evidence or New discovery first.')
+        if changed and action in ('synthesize','draft'): raise RelayError('REASSESS_REQUIRED','For a changed hypothesis, choose Re-extract evidence or New discovery for new comparison criteria. Reassess updates relevance only.')
         with self.lock:
             if action!='snapshot' and sum(p['status'] in ('discovering','drafting','investigating') for p in self.projects)>=2:
                 raise RelayError('BUSY','Two agents are already running. You can still create an editable checkpoint copy.')
@@ -65,13 +65,13 @@ class ExecutionHistory:
                      inheritedTokens=snapshot.get('tokens',0),draftReviewed=False)
             p.pop('error',None); p.pop('compile',None)
             p['feedback']=str(data.get('feedback',''))[:3000]
-            if changed or action in ('assess','search'):
+            if changed or action in ('assess','extract','search'):
                 p.update(tex='',bib='',suggestions=[],synthesis='',draftReviewed=False)
                 p.pop('draft',None)
             if changed:
                 for paper in p['papers']:
                     paper.update(relevance=0,assessmentStale=True,rationale='Hypothesis changed. Reassess this paper for the new question.')
-            if action=='search': p.update(papers=[],queries=[],criteria=[])
+            if action=='search': p.update(papers=[],queries=[],criteria=[],seedOnly=False,proposals=[],corrections=[])
             if action!='snapshot': p['status']='drafting' if action=='draft' else 'discovering'
             self.keys[p['id']]=self.cfg_for_id(data['id'])
             self.projects.insert(0,p)
@@ -84,6 +84,15 @@ class ExecutionHistory:
         try:
             if action=='search': self.run(p); return
             if action=='draft': self.write(p,[copy.deepcopy(x) for x in p['papers'] if x.get('reviewed')]); return
+            if action=='extract':
+                self.plan_protocol(p)
+                p['proposals'] = []
+                p['corrections'] = []
+                for paper in p['papers']:
+                    paper['reviewed'] = False
+                    for field in ('reviewActor','reviewedAt','reviewNote','assessmentStale'): paper.pop(field,None)
+                    paper['metrics'] = []
+                    self.assess(p,paper)
             if action=='assess':
                 from .research import analysis_text, validate_analysis
                 for paper in p['papers']:

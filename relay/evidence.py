@@ -5,6 +5,7 @@ explicit, checks each field against the retrieved source, and compares results w
 missing context as proof of incompatibility.
 """
 import hashlib, html, math, re
+from .protocol import factor_keys, forecasting, protocol_of
 from html.parser import HTMLParser
 
 # Context fields that travel with every reported number.
@@ -150,7 +151,10 @@ def dataset_key(value):
 
 def metric_key(value):
     s = norm(value).lower()
-    for key, pattern in (('mape', r'\bmape\b|percentage'), ('rmse', r'\brmse\b|root mean squ'), ('mse', r'\bmse\b|mean squared'),
+    if not known(value): return ''
+    top = re.search(r'top[ -]?([15])', s)
+    if top: return 'top' + top[1] + ('error' if 'error' in s else 'accuracy')
+    for key, pattern in (('mape', r'\bmape\b|mean absolute percentage error'), ('rmse', r'\brmse\b|root mean squ'), ('mse', r'\bmse\b|mean squared'),
                          ('mae', r'\bmae\b|mean absolute error'), ('accuracy', r'accura'), ('f1', r'\bf1\b')):
         if re.search(pattern, s): return key
     return re.sub(r'[^a-z0-9]', '', s)
@@ -489,20 +493,29 @@ def check_metric(metric, source, title=''):
     doc = norm(source)
     evidence = metric.get('evidence') if isinstance(metric.get('evidence'), dict) else {}
     support, rejected = {}, dict(metric.get('rejected') or {})
-    for field in ('method', 'dataset', 'datasetVersion', 'split', 'horizon', 'aggregation', 'preprocessing', 'metricDefinition', 'citedFrom'):
+    for field in ('method', 'dataset', 'datasetVersion', 'split', 'horizon', 'aggregation', 'preprocessing', 'metricDefinition', 'citedFrom') + tuple(factor_keys(metric)):
         value = metric.get(field, 'unknown')
+        if field.startswith('factor_'):
+            item = evidence.get(field) or {}
+            fq = norm(item.get('quote',''))
+            if item.get('origin') in ('researcher','repository','web') and fq:
+                support[field] = item['origin']; continue
+            if known(value) and fq and fq in doc and norm(value).casefold() in fq.casefold():
+                support[field] = 'quoted'; continue
+            if known(value): rejected[field] = {'value':value,'reason':'No source quote directly supports this experimental condition.'}
+            metric[field] = 'unknown'; support[field] = 'missing'; continue
         if field == 'dataset' and known(value) and (metric.get('datasetFromColumn') or resolved):
             # Derived from the table column label or the paper's sensor count, not quoted in the result's own quote.
             support['dataset'] = 'derived'; continue
-        if field == 'split' and known(value) and not split_key(value) and (evidence.get('split') or {}).get('origin', 'paper') == 'paper':
+        if field == 'split' and forecasting(metric) and known(value) and not split_key(value) and (evidence.get('split') or {}).get('origin', 'paper') == 'paper':
             rejected['split'] = {'value': value, 'reason': 'Not a train/validation/test split.'}; metric['split'] = value = 'unknown'
         if not known(value):
-            if field == 'split':
+            if field == 'split' and forecasting(metric):
                 stated = dataset_splits(source, metric.get('dataset', '')) or (stated_splits(source) if len(stated_splits(source)) == 1 else [])
                 if len(stated) == 1:
                     metric['split'] = '/'.join(map(str, stated[0])); support['split'] = 'document'; continue
             support[field] = 'missing'; continue
-        if field == 'split' and (evidence.get('split') or {}).get('origin', 'paper') == 'paper':
+        if field == 'split' and forecasting(metric) and (evidence.get('split') or {}).get('origin', 'paper') == 'paper':
             ds = dataset_splits(source, metric.get('dataset', ''))
             if len(ds) == 1 and split_key(value) != ds[0] and len(stated_splits(source)) > 1:
                 rejected['split'] = {'value': value, 'reason': f"The paper states {'/'.join(map(str, ds[0]))} for {metric.get('dataset')}."}
@@ -524,7 +537,7 @@ def check_metric(metric, source, title=''):
         else:
             support[field] = 'unsupported'; rejected[field] = {'value': value, 'reason': 'Not found in the retrieved source text.'}
             metric[field] = 'unknown'
-            if field == 'split':
+            if field == 'split' and forecasting(metric):
                 stated = stated_splits(source)
                 if len(stated) == 1:
                     # Use what the paper states; keep the model's claim visible for review.
@@ -539,7 +552,7 @@ def check_metric(metric, source, title=''):
             rejected['aggregation'] = {'value': agg, 'reason': 'The quote does not mention repeated runs.'}
             metric['aggregation'] = 'unknown'; support['aggregation'] = 'unsupported'
     md = metric.get('metricDefinition', 'unknown')
-    if known(md) and support.get('metricDefinition') not in ('repository', 'researcher') and not re.search(r'(?i)mask|exclud|ignor|missing|zero|null|normaliz|scale|inverse|correct|official|differ(?:s|ent)? from|non-?standard|consistent|thresh|nan|filter', md):
+    if forecasting(metric) and known(md) and support.get('metricDefinition') not in ('repository', 'researcher') and not re.search(r'(?i)mask|exclud|ignor|missing|zero|null|normaliz|scale|inverse|correct|official|differ(?:s|ent)? from|non-?standard|consistent|thresh|nan|filter', md):
         rejected['metricDefinition'] = {'value': md[:300], 'reason': 'Generic metric formula without protocol detail.'}
         metric['metricDefinition'] = 'unknown'; support['metricDefinition'] = 'missing'
     # Averaging over horizons must be stated near the result, in a field quote, or in the table labels.
@@ -579,7 +592,7 @@ def check_metric(metric, source, title=''):
     metric['provenance'] = prov
     cell = cell_context(source, metric.get('value', ''), metric.get('method', ''), metric.get('name', ''), metric.get('horizon', ''))
     METRIC = r'(?i)\b(mae|rmse|mse|mape|wmape|smape|error|accuracy|f1|loss|absolute|squared|percentage)\b'
-    if known(metric.get('name', 'unknown')) and not re.search(METRIC, str(metric.get('name'))):
+    if forecasting(metric) and known(metric.get('name', 'unknown')) and not re.search(METRIC, str(metric.get('name'))):
         # A metric name that names no metric (for example a dataset such as "PeMSD4") is not evidence of a metric.
         metric['name'] = 'unknown'; rejected['name'] = {'value': str(metric.get('name', ''))[:80], 'reason': 'Not a metric name.'}
     if not known(metric.get('name', 'unknown')) and cell:
@@ -609,7 +622,8 @@ def check_metric(metric, source, title=''):
             support['metricDefinition'] = 'quoted'; metric['superseded'] = True
     metric['checks'] = {'support': support, 'cell': cellcheck}
     metric['rejected'] = rejected
-    metric['missing'] = [f for f in ('dataset', 'split', 'horizon', 'aggregation', 'metricDefinition', 'preprocessing', 'provenance') if not known(metric.get(f)) or (f == 'provenance' and metric.get(f) == 'unknown')]
+    required_context = ('dataset', 'split', 'metricDefinition', 'provenance') + (('horizon','aggregation','preprocessing') if forecasting(metric) else ()) + tuple(factor_keys(metric))
+    metric['missing'] = [f for f in required_context if not known(metric.get(f)) or (f == 'provenance' and metric.get(f) == 'unknown')]
     return metric
 
 
@@ -618,7 +632,7 @@ def check_metric(metric, source, title=''):
 def row(paper, metric):
     cell = (metric.get('checks') or {}).get('cell') or {}
     return {'paper': paper['id'], 'title': paper.get('title', ''), 'metric': metric.get('id'), 'verified': bool(metric.get('verified')), 'cellHorizon': cell.get('horizonLabel', ''),
-            **{k: metric.get(k, 'unknown') for k in FIELDS + ('name', 'value', 'unit', 'direction', 'quote')}}
+            'protocol':protocol_of(metric), **{k: metric.get(k, 'unknown') for k in FIELDS + tuple(factor_keys(metric)) + ('name', 'value', 'unit', 'direction', 'quote')}}
 
 
 def month_range(text):
@@ -662,27 +676,47 @@ def compare_pair(a, b):
             k2 = horizon_key(('average over ' if averaged else 'horizon ') + label + ' ' + (r['horizon'] if known(r['horizon']) else ''), 'average' if averaged else 'single horizon', r['dataset'])
             k = dict(k2, mode=k['mode'] or k2['mode'], minutes=k['minutes'] or k2['minutes'], steps=k['steps'] or k2['steps'], fromCell=True)
         return k
-    ha, hb = hkey(a), hkey(b)
-    if not ha['mode'] or not hb['mode']:
-        who = ta if not ha['mode'] else tb
-        add('horizon', 'missing', f"It is not stated whether the result for {who} is a single horizon or an average over horizons.")
-    elif ha['mode'] != hb['mode']:
-        add('horizon', 'conflict', f"These results use different horizon aggregation: {describe_horizon(ha)} vs {describe_horizon(hb)}.")
-    else:
-        la, lb = (ha['minutes'], hb['minutes']) if ha['minutes'] and hb['minutes'] else (ha['steps'], hb['steps'])
-        if not la or not lb: add('horizon', 'missing', f"The horizon length cannot be matched: {describe_horizon(ha)} vs {describe_horizon(hb)}.")
-        elif la != lb: add('horizon', 'conflict', f"These results use different horizons: {describe_horizon(ha)} vs {describe_horizon(hb)}.")
+    if forecasting(a) and forecasting(b):
+        ha, hb = hkey(a), hkey(b)
+        if not ha['mode'] or not hb['mode']:
+            who = ta if not ha['mode'] else tb
+            add('horizon', 'missing', f"It is not stated whether the result for {who} is a single horizon or an average over horizons.")
+        elif ha['mode'] != hb['mode']:
+            add('horizon', 'conflict', f"These results use different horizon aggregation: {describe_horizon(ha)} vs {describe_horizon(hb)}.")
         else:
-            add('horizon', 'match', describe_horizon(ha) + (' (steps converted with the dataset\'s 5-minute interval)' if ha['converted'] or hb['converted'] else '') + (' (horizon read from the table column)' if ha.get('fromCell') or hb.get('fromCell') else ''))
-    ka, kb = metric_definition_key(a['metricDefinition']), metric_definition_key(b['metricDefinition'])
-    if 'nonstandard' in (ka, kb) and ka != kb:
-        add('metricDefinition', 'conflict', f"The source states that one metric was computed differently from the standard protocol: \"{a['metricDefinition'] if ka == 'nonstandard' else b['metricDefinition']}\".")
-    elif ka and kb and ka != kb and not (ka.startswith('other:') or kb.startswith('other:')):
-        add('metricDefinition', 'conflict', f"Different metric definitions: {a['metricDefinition']} vs {b['metricDefinition']}.")
-    elif ka and kb and ka == kb: add('metricDefinition', 'match', a['metricDefinition'])
-    else:
-        add('metricDefinition', 'caveat', 'Metric definition (for example masking of missing values) is not stated for ' + (ta if not ka else tb) + '.')
-        caveats.append(checks[-1]['detail'])
+            la, lb = (ha['minutes'], hb['minutes']) if ha['minutes'] and hb['minutes'] else (ha['steps'], hb['steps'])
+            if not la or not lb: add('horizon', 'missing', f"The horizon length cannot be matched: {describe_horizon(ha)} vs {describe_horizon(hb)}.")
+            elif la != lb: add('horizon', 'conflict', f"These results use different horizons: {describe_horizon(ha)} vs {describe_horizon(hb)}.")
+            else:
+                add('horizon', 'match', describe_horizon(ha) + (' (steps converted with the dataset\'s 5-minute interval)' if ha['converted'] or hb['converted'] else '') + (' (horizon read from the table column)' if ha.get('fromCell') or hb.get('fromCell') else ''))
+    if forecasting(a) and forecasting(b):
+        ka, kb = metric_definition_key(a['metricDefinition']), metric_definition_key(b['metricDefinition'])
+        if 'nonstandard' in (ka, kb) and ka != kb:
+            add('metricDefinition', 'conflict', f"The source states that one metric was computed differently from the standard protocol: \"{a['metricDefinition'] if ka == 'nonstandard' else b['metricDefinition']}\".")
+        elif ka and kb and ka != kb and not (ka.startswith('other:') or kb.startswith('other:')):
+            add('metricDefinition', 'conflict', f"Different metric definitions: {a['metricDefinition']} vs {b['metricDefinition']}.")
+        elif ka and kb and ka == kb: add('metricDefinition', 'match', a['metricDefinition'])
+        else:
+            add('metricDefinition', 'caveat', 'Metric definition (for example masking of missing values) is not stated for ' + (ta if not ka else tb) + '.')
+            caveats.append(checks[-1]['detail'])
+    if not (forecasting(a) and forecasting(b)) or factor_keys(a) or factor_keys(b):
+        if not a.get('protocol') or not b.get('protocol') or a.get('protocol') != b.get('protocol'):
+            add('protocol','missing','Results need re-extraction under the same comparison criteria.')
+        keys = set(factor_keys(a)) | set(factor_keys(b)) | ({'metricDefinition','unit'} if not (forecasting(a) and forecasting(b)) else set())
+        if not factor_keys(a) or not factor_keys(b):
+            add('protocol','missing','No question-specific experimental criteria were established. Re-extract with a comparison plan.')
+        for field in sorted(keys):
+            va, vb = norm(a.get(field,'unknown')), norm(b.get(field,'unknown'))
+            label = next((f['label'] for f in a.get('protocol',{}).get('factors',[]) if f['key']==field), LABELS.get(field,field))
+            if not known(va) or not known(vb): add(field,'missing',label + ' is unresolved for one or both results.')
+            elif va.casefold() == vb.casefold(): add(field,'match',label + ': ' + va)
+            else:
+                na, nb = numbers(va), numbers(vb)
+                # Differing numbers under the same wording identify a concrete protocol mismatch.
+                same_form = re.sub(r'\d+(?:\.\d+)?','#',va).casefold() == re.sub(r'\d+(?:\.\d+)?','#',vb).casefold()
+                status = 'conflict' if na and nb and na != nb and same_form else 'missing'
+                add(field,status,label + ': ' + va + ' vs ' + vb + ('. Recorded settings differ.' if status=='conflict' else '. Equivalence needs review; different wording alone does not prove incompatibility.'))
+        caveats.append('Compatibility is conditional on this question’s selected criteria; it does not establish statistical significance or isolate causality.')
     ra_, rb_ = month_range(str(a.get('datasetVersion', ''))), month_range(str(b.get('datasetVersion', '')))
     if ra_ and rb_ and ra_ != rb_:
         caveats.append(f"Dataset time ranges differ: \"{norm(a['datasetVersion'])[:90]}\" vs \"{norm(b['datasetVersion'])[:90]}\".")
@@ -715,7 +749,7 @@ def compare_pair(a, b):
             delta = round(abs(va - vb), 6); relative = round(100 * delta / max(abs(va), abs(vb)), 2) if max(abs(va), abs(vb)) else None
     except (IndexError, ValueError): pass
     if outcome == 'comparable':
-        explanation = ['Dataset, split, horizon, and metric match.' + (' Values are human-verified.' if a['verified'] and b['verified'] else ' Extraction is not yet human-verified.')]
+        explanation = [('Dataset, split, horizon, and metric match.' if forecasting(a) else 'Metric, evaluation partition, and selected experimental criteria match.') + (' Values are human-verified.' if a['verified'] and b['verified'] else ' Extraction is not yet human-verified.')]
     return {'id': short_id(*sorted([f"{a['paper']}:{a['metric']}", f"{b['paper']}:{b['metric']}"])), 'a': a, 'b': b,
             'outcome': outcome, 'checks': checks, 'explanation': explanation, 'caveats': caveats,
             'independent': independent, 'independence': independence, 'verified': a['verified'] and b['verified'],
@@ -727,8 +761,8 @@ def compare(papers, selected=None):
     pairs, skipped, horizons = [], 0, 0
     for i, a in enumerate(rows):
         for b in rows[i + 1:]:
-            if a['paper'] == b['paper']: continue
-            if metric_key(a['name']) != metric_key(b['name']): continue
+            if a['paper'] == b['paper'] and (not a.get('protocol') or a['method'] == b['method']): continue
+            if not metric_key(a['name']) or not metric_key(b['name']) or metric_key(a['name']) != metric_key(b['name']): continue
             if known(a['dataset']) and known(b['dataset']) and dataset_identity(a['dataset'], a.get('datasetVersion', '')) != dataset_identity(b['dataset'], b.get('datasetVersion', '')): skipped += 1; continue
             pair = compare_pair(a, b)
             hz = next((c for c in pair['checks'] if c['field'] == 'horizon'), None)

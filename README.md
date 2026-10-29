@@ -22,7 +22,7 @@ The workflow is deliberate: **question → source evidence → compare → inves
 
 - **OpenAlex and arXiv:** initial scholarly discovery and available full-text retrieval.
 - **NVIDIA Nemotron on Nebius Token Factory:** assess and extract evidence, reason over experimental context, propose source-linked corrections, and draft or revise the argument.
-- **Tavily, when configured:** web-search fallback for protocol fields that paper/code investigation has not settled. Add its key in Model settings, open a comparison with context gaps, and choose **Investigate**. Web passages retain source links and remain proposals for review.
+- **Tavily, when configured:** initial discovery retrieves web candidates and resolves arXiv paper links alongside OpenAlex; seed-only runs skip both searches. During investigation, Tavily also retrieves evidence for protocol fields that paper/code inspection has not settled. Add its key in Model settings, open a comparison with context gaps, and choose **Investigate**. Web passages retain source links and remain proposals for review.
 - **Relay's deterministic checks:** source/table validation, three-outcome comparisons, revision conflicts, correction impact, and checkpoint integrity.
 
 The Tavily fallback was live-smoke-tested on 28 October 2026 and returned four passages, including the MTGNN author repository. The receipt is in `data/research/tavily-search-receipt.json`. That verifies runtime retrieval; it does not establish a successful correction. The older prepared Nemotron studies predate Tavily integration and must not be presented as Tavily runs.
@@ -57,9 +57,9 @@ The included fresh discovery record contains **four papers, 12 Nemotron calls, a
 
 ## Evidence, not a broad accuracy claim
 
-**103 automated tests pass.** The latest small development evaluation accepted **1 of 13 non-comparable cases incorrectly**, versus **6 of 13** for a single-pass baseline using the same Nemotron model and papers. Relay’s decisive-answer coverage was **80%**, versus **90%** for the baseline. This illustrates the trade-off between caution and coverage.
+**120 automated tests pass.** The latest small development evaluation accepted **1 of 13 non-comparable cases incorrectly**, versus **6 of 13** for a single-pass baseline using the same Nemotron model and papers. Relay’s decisive-answer coverage was **80%**, versus **90%** for the baseline. This illustrates the trade-off between caution and coverage.
 
-The dataset is agent-annotated, development cases informed fixes, and held-out cases share papers with development. These results are demonstration evidence, not independently validated scientific accuracy. Full runs, failures, costs, and caveats are included below and in the app. Current expertise is **ML/time-series benchmark auditing**, particularly traffic forecasting.
+The dataset is agent-annotated, development cases informed fixes, and held-out cases share papers with development. These results are demonstration evidence, not independently validated scientific accuracy. Full runs, failures, costs, and caveats are included below and in the app. The recorded accuracy evaluation covers **ML/time-series benchmark auditing**, particularly traffic forecasting; it does not validate the new question-specific comparison contracts across domains.
 
 ## Open the application
 
@@ -190,7 +190,7 @@ Latest recorded runs after metric-name/dataset recovery fixes:
 
 The held-out set contains only 14 cases. Its perfect score is not evidence of general accuracy. Nemotron output varied across repeated runs. Remaining failures include misread splits, missed horizon/aggregation context, missing masking definitions, and ambiguous cited-result provenance. One development case was refused because its result could not be tied to a supporting quote; it counts as a miss.
 
-Current normalization is specialized for ML/time-series benchmarks, including traffic datasets and forecast horizons. Clinical trials and qualitative studies require different evidence schemas and policies. A relevance score estimates hypothesis fit, not scientific quality. Source-quote and table-cell matching do not prove semantic correctness. Claim checks use heuristics and require review.
+New investigations generate an explicit question-specific comparison contract. Forecasting keeps specialized horizon checks; classification and general tasks use source-backed experimental factors chosen from the question. Named evaluation partitions are supported. Clinical and qualitative research are not independently validated, and non-numeric research is outside the current result-comparison workflow. A relevance score estimates hypothesis fit, not scientific quality. Source-quote and table-cell matching do not prove semantic correctness. Claim checks use heuristics and require review.
 
 No new forecasting experiment, user study, independently validated time saving, or scientific discovery is claimed. A software agent can conduct source analysis, but cannot substitute for independent domain validation by relabeling its own reviews.
 
@@ -213,7 +213,7 @@ python3 eval/run.py --split heldout
 
 These commands call Nebius and consume inference credits. Do not tune on the held-out split and then present it as unseen. API acceptance helpers in `scripts/live/` use `RELAY_URL` (default `http://127.0.0.1:4280`). Their review actions are scripted and must remain labeled accordingly.
 
-Current automated verification: **103 tests pass**. All three JavaScript modules pass syntax checks. Tests cover source checks, comparison rules, provider separation, revision conflicts, correction propagation, stale-claim regeneration, immutable checkpoints, branch isolation, compiler restrictions, API origin/host/token enforcement, and saved-study imports. No GUI automation is required. Current changes have not received a visual browser review; the user will inspect the UI.
+Current automated verification: **120 tests pass**. JavaScript modules pass syntax checks. Tests cover source checks, comparison rules, provider separation, revision conflicts, correction propagation, stale-claim regeneration, immutable checkpoints, branch isolation, compiler restrictions, API origin/host/token enforcement, and saved-study imports. No GUI automation is required. Current changes have not received a visual browser review; the user will inspect the UI.
 
 ## PDF compilation
 
@@ -290,3 +290,13 @@ MIT; see LICENSE. Third-party paper text and author code retain their own rights
 ### Contextual explanations
 
 Use the circled info buttons on the Research Desk, evaluation scores, investigation steps, evidence fields, review controls, and model settings. Explanations open separately from editors so unsaved corrections stay intact. Evaluation help defines denominators and discloses tuning and annotation limitations. “Authors’ own-method result” refers to the source paper’s experiment, never an experiment performed by Relay; unknown provenance remains unresolved until supported by evidence.
+
+### Question-specific comparisons and revised investigations
+
+Nemotron proposes a task and experimental factors from the question and branch direction. The comparison screen shows this contract for human review. Factors are dynamic (for example resolution, pretraining data, distillation, population, or budget), not a fixed traffic schema. Each extracted factor needs its own source quote. Unknown stays unknown; differing wording stays unresolved unless a concrete mismatch can be established. Top-1, top-5, and error metrics remain distinct; unnamed metrics are excluded from pairing. A comparable result is conditional on the selected criteria, not proof of causal superiority or statistical significance.
+
+Use **Revise criteria in a branch → Re-extract evidence with revised criteria** to change the question, add conditions, or explicitly exclude a factor with a reason. Re-extraction resets the branch's reviews, proposals, corrections, and draft while preserving the parent checkpoint. **Reassess** updates relevance only. **New discovery** searches again, even if the original run was seed-only. Existing saved runs retain their original evidence and require re-extraction to adopt the new contract.
+
+Tavily discovery records candidate URLs in `searchReceipts` and resolves arXiv candidates before extraction; search snippets are not treated as paper results. Missing keys or retrieval failures leave OpenAlex discovery available. The earlier traffic evaluation records describe the previous comparator, not a fresh cross-domain evaluation of this redesign.
+
+Live validation on 29 October 2026 used Nemotron on Nebius to plan classification factors, extract two source-linked DeiT results, and propose a model-size correction from a quoted paper passage. The proposal remains ready for human review; unresolved fields were retained. The sanitized receipt is [data/research/protocol-smoke.json](data/research/protocol-smoke.json). This one-paper smoke test is not a cross-domain accuracy evaluation.
