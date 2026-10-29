@@ -6,6 +6,7 @@ missing context as proof of incompatibility.
 """
 import hashlib, html, math, re
 from .protocol import factor_keys, forecasting, protocol_of
+from .matching import kind, partition, match_condition, method_matches, non_distilled_requested, distillation_state
 from html.parser import HTMLParser
 
 # Context fields that travel with every reported number.
@@ -48,14 +49,19 @@ class SourceText(HTMLParser):
     """Plain text that keeps table rows on one line and expands row/column spans into a grid."""
     BLOCK = {'p', 'section', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'figcaption', 'caption', 'li', 'div', 'br', 'dd', 'dt', 'blockquote', 'article'}
 
-    def __init__(self):
+    def __init__(self, preserve_math=True):
+        self.preserve_math=preserve_math
         super().__init__(convert_charrefs=True)
         self.out = []; self.skip = 0; self.tables = []; self.figures = []
 
     def handle_starttag(self, tag, attrs):
         a = dict(attrs)
+        if getattr(self,'math_skip',False): return
         if tag in ('script', 'style', 'annotation', 'annotation-xml', 'nav', 'header', 'footer'): self.skip += 1; return
         if self.skip: return
+        if self.preserve_math and tag=='math' and a.get('alttext'):
+            self.emit(a['alttext']); self.math_skip=True; return
+        if self.preserve_math and tag=='sup': self.emit('^(')
         if tag == 'figure' and not self.tables: self.figures.append([])
         elif tag == 'table': self.tables.append({'rows': [], 'row': None, 'cell': None})
         elif self.tables and tag == 'tr': self.tables[-1]['row'] = []
@@ -67,8 +73,12 @@ class SourceText(HTMLParser):
         elif tag in self.BLOCK: self.emit('\n')
 
     def handle_endtag(self, tag):
+        if getattr(self,'math_skip',False):
+            if tag=='math': self.math_skip=False
+            return
         if tag in ('script', 'style', 'annotation', 'annotation-xml', 'nav', 'header', 'footer'): self.skip = max(0, self.skip - 1); return
         if self.skip: return
+        if self.preserve_math and tag=='sup': self.emit(')')
         if self.tables and tag in ('td', 'th'):
             t = self.tables[-1]
             if t['cell'] is not None and t['row'] is not None:
@@ -88,7 +98,7 @@ class SourceText(HTMLParser):
         elif tag in self.BLOCK: self.emit('\n')
 
     def handle_data(self, data):
-        if not self.skip: self.emit(data.replace('\n', ' '))
+        if not self.skip and not getattr(self,'math_skip',False): self.emit(data.replace('\n', ' '))
 
     def emit(self, text):
         if self.tables and self.tables[-1]['cell'] is not None: self.tables[-1]['cell']['text'].append(text)
@@ -123,8 +133,8 @@ class SourceText(HTMLParser):
         t = re.sub(r'[ \t ]+', ' ', t); t = re.sub(r' *\n *', '\n', t); return re.sub(r'\n{2,}', '\n', t).strip()
 
 
-def html_to_text(markup):
-    parser = SourceText(); parser.feed(markup); parser.close(); return parser.text()
+def html_to_text(markup, preserve_math=True):
+    parser = SourceText(preserve_math); parser.feed(markup); parser.close(); return parser.text()
 
 
 # ---------------------------------------------------------------- normalizers
@@ -631,8 +641,13 @@ def check_metric(metric, source, title=''):
 
 def row(paper, metric):
     cell = (metric.get('checks') or {}).get('cell') or {}
+    metric = dict(metric)
+    partition_factors=[f for f in protocol_of(metric).get('factors',[]) if kind(f['key'],f.get('label',''))=='partition']
+    aliases=[metric.get(f['key'],'unknown') for f in partition_factors if known(metric.get(f['key']))]
+    if not known(metric.get('split')) and len(set(aliases))==1: metric['split']=aliases[0]
+    metric['partitionConflict']=any(known(metric.get('split')) and (partition(v) or norm(v).lower()) != (partition(metric['split']) or norm(metric['split']).lower()) for v in aliases)
     return {'paper': paper['id'], 'title': paper.get('title', ''), 'metric': metric.get('id'), 'verified': bool(metric.get('verified')), 'cellHorizon': cell.get('horizonLabel', ''),
-            'protocol':protocol_of(metric), **{k: metric.get(k, 'unknown') for k in FIELDS + tuple(factor_keys(metric)) + ('name', 'value', 'unit', 'direction', 'quote')}}
+            'partitionConflict':metric.get('partitionConflict',False), 'protocol':protocol_of(metric), **{k: metric.get(k, 'unknown') for k in FIELDS + tuple(factor_keys(metric)) + ('name', 'value', 'unit', 'direction', 'quote')}}
 
 
 def month_range(text):
@@ -659,12 +674,14 @@ def compare_pair(a, b):
         add('dataset', 'missing', f"The dataset is unknown for {ta if not known(a['dataset']) else tb}.")
     elif da != db: add('dataset', 'conflict', f"Different datasets: {a['dataset']} vs {b['dataset']}.")
     else: add('dataset', 'match', a['dataset'])
+    if a.get('partitionConflict') or b.get('partitionConflict'): add('split','conflict','The recorded partition fields contradict each other; review the source.')
     sa, sb = split_key(a['split']), split_key(b['split'])
     if not known(a['split']) or not known(b['split']):
-        add('split', 'missing', f"The train/val/test split is unknown for {ta if not known(a['split']) else tb}.")
+        add('split', 'missing', f"The evaluation partition / split is unknown for {ta if not known(a['split']) else tb}.")
     elif sa and sb:
         if sa != sb: add('split', 'conflict', f"Different splits: {'/'.join(map(str, sa))} vs {'/'.join(map(str, sb))} (train/val/test).")
         else: add('split', 'match', '/'.join(map(str, sa)))
+    elif partition(a['split']) and partition(a['split'])==partition(b['split']): add('split','match','Named evaluation partition: '+partition(a['split']))
     elif norm(a['split']).lower() == norm(b['split']).lower(): add('split', 'match', a['split'])
     else: add('split', 'missing', f"The splits could not be normalized: \"{a['split']}\" vs \"{b['split']}\". Normalize them before comparing.")
     def hkey(r):
@@ -708,14 +725,11 @@ def compare_pair(a, b):
         for field in sorted(keys):
             va, vb = norm(a.get(field,'unknown')), norm(b.get(field,'unknown'))
             label = next((f['label'] for f in a.get('protocol',{}).get('factors',[]) if f['key']==field), LABELS.get(field,field))
+            if kind(field,label)=='partition': continue  # checked once through the canonical split above
             if not known(va) or not known(vb): add(field,'missing',label + ' is unresolved for one or both results.')
-            elif va.casefold() == vb.casefold(): add(field,'match',label + ': ' + va)
             else:
-                na, nb = numbers(va), numbers(vb)
-                # Differing numbers under the same wording identify a concrete protocol mismatch.
-                same_form = re.sub(r'\d+(?:\.\d+)?','#',va).casefold() == re.sub(r'\d+(?:\.\d+)?','#',vb).casefold()
-                status = 'conflict' if na and nb and na != nb and same_form else 'missing'
-                add(field,status,label + ': ' + va + ' vs ' + vb + ('. Recorded settings differ.' if status=='conflict' else '. Equivalence needs review; different wording alone does not prove incompatibility.'))
+                status,detail=match_condition(field,label,va,vb,a,b)
+                add(field,status,label + ': ' + va + ' vs ' + vb + '. ' + detail)
         caveats.append('Compatibility is conditional on this question’s selected criteria; it does not establish statistical significance or isolate causality.')
     ra_, rb_ = month_range(str(a.get('datasetVersion', ''))), month_range(str(b.get('datasetVersion', '')))
     if ra_ and rb_ and ra_ != rb_:
@@ -728,7 +742,7 @@ def compare_pair(a, b):
     independent, independence = True, ''
     same_method = method_key(a['method']) == method_key(b['method']) and method_key(a['method'])
     if a['paper'] == b['paper']:
-        independent, independence = False, 'Both values come from one paper. They share a protocol but are a single source, not independent replication.'
+        independent, independence = False, 'Both values come from one paper. They are a single source, not independent replication; protocol compatibility must still be checked.'
     elif same_method:
         pa, pb = provenance_key(a['provenance']), provenance_key(b['provenance'])
         if 'cited' in (pa, pb) and a['value'] == b['value']:
@@ -737,6 +751,12 @@ def compare_pair(a, b):
             independent, independence = False, 'The values are identical and one paper does not state where its number came from. Treat it as a possible copy.'
         elif 'cited' in (pa, pb):
             independent, independence = False, 'One value is cited from another source but does not match it exactly. Check the transcription.'
+    if non_distilled_requested(a.get('protocol',{})) or non_distilled_requested(b.get('protocol',{})):
+        for r in (a,b):
+            fs=[f for f in r.get('protocol',{}).get('factors',[]) if kind(f['key'],f.get('label',''))=='distillation']
+            state=next((distillation_state(r.get(f['key'],'')) for f in fs if distillation_state(r.get(f['key'],''))),None) or distillation_state(r['method'])
+            field=fs[0]['key'] if fs else 'factor_distillation'
+            if state!='none': add(field,'conflict' if state=='used' else 'missing','Requested subset is non-distilled; '+r['method']+(' uses distillation.' if state=='used' else ' has unresolved distillation eligibility.'))
     statuses = [c['status'] for c in checks]
     outcome = 'incompatible' if 'conflict' in statuses else ('insufficient' if 'missing' in statuses else 'comparable')
     explanation = [c['detail'] for c in checks if c['status'] in ('conflict', 'missing')]
@@ -756,11 +776,13 @@ def compare_pair(a, b):
             'favours': favours, 'delta': delta, 'relative': relative}
 
 
-def compare(papers, selected=None):
+def compare(papers, selected=None, methods=None):
     rows = [row(p, m) for p in papers if not selected or p['id'] in selected for m in p.get('metrics', [])]
-    pairs, skipped, horizons = [], 0, 0
+    pairs, skipped, horizons, outside = [], 0, 0, 0
     for i, a in enumerate(rows):
         for b in rows[i + 1:]:
+            if methods and len(methods)==2 and not ((method_matches(a['method'],methods[0]) and method_matches(b['method'],methods[1])) or (method_matches(b['method'],methods[0]) and method_matches(a['method'],methods[1]))):
+                outside+=1; continue
             if a['paper'] == b['paper'] and (not a.get('protocol') or a['method'] == b['method']): continue
             if not metric_key(a['name']) or not metric_key(b['name']) or metric_key(a['name']) != metric_key(b['name']): continue
             if known(a['dataset']) and known(b['dataset']) and dataset_identity(a['dataset'], a.get('datasetVersion', '')) != dataset_identity(b['dataset'], b.get('datasetVersion', '')): skipped += 1; continue
@@ -770,10 +792,10 @@ def compare(papers, selected=None):
                     and sum(c['status'] == 'conflict' for c in pair['checks']) == 1 and 'single horizon' in hz['detail'] and 'average' not in hz['detail']:
                 horizons += 1; continue  # 15 vs 60 minutes: nobody would compare these; counted, not listed
             pairs.append(pair)
-    order = {'comparable': 0, 'incompatible': 1, 'insufficient': 2}
-    pairs.sort(key=lambda x: (order[x['outcome']], x['a']['dataset'], x['a']['name']))
+    order = {'comparable': 0, 'insufficient': 1, 'incompatible': 2}
+    pairs.sort(key=lambda x: (order[x['outcome']],sum(c['status'] in ('missing','conflict') for c in x['checks']), x['a']['dataset'], x['a']['name']))
     summary = {k: sum(p['outcome'] == k for p in pairs) for k in order}
-    summary['differentDataset'] = skipped; summary['differentHorizon'] = horizons
+    summary['outsideScope'] = outside; summary['differentDataset'] = skipped; summary['differentHorizon'] = horizons
     return {'pairs': pairs[:400], 'summary': summary, 'rows': len(rows)}
 
 
@@ -846,7 +868,7 @@ REPO_FILES = re.compile(r'(?i)(readme|metric|eval|test|config|\.conf$|\.ya?ml$|d
 
 def code_passages(files, fields, limit=8):
     """Relevant lines (with a little context) from repository files."""
-    pattern = re.compile('|'.join(f'(?:{FIELD_QUERIES[f]})' for f in fields if f in FIELD_QUERIES)
+    pattern = re.compile(('|'.join(f'(?:{FIELD_QUERIES[f]})' for f in fields if f in FIELD_QUERIES) or r'input_size|img_size|resolution|distill|teacher|pretrain|num_classes|embed_dim|depth')
                          + r'|ratio|train_?(?:size|rate|ratio)|val(?:id)?_?(?:size|ratio)|test_?(?:size|ratio)|num_(?:train|test|val)|\*\s*0\.[1-9]|horizon|out_steps|mask|null|thresh|mean\(', re.I)
     out = []
     for f in files:

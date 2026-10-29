@@ -7,7 +7,7 @@ from relay.research import validate_analysis
 
 def vision(**changes):
     p = contract({'task':'classification','factors':[{'key':'resolution','label':'Input resolution'}]})
-    r = dict(paper='a',title='Study',metric='m',verified=False,method='ViT',dataset='ImageNet-1K',datasetVersion='unknown',split='validation set',horizon='unknown',aggregation='unknown',metricDefinition='single-crop top-1 accuracy',provenance='own',citedFrom='unknown',locator='Table 1',name='Top-1 accuracy',value='80.0',unit='%',direction='higher',quote='ViT reports 80.0 accuracy.',protocol=p,factor_resolution='224 pixels',preprocessing='unknown')
+    r = dict(paper='a',title='Study',metric='m',verified=False,method='ViT',dataset='ImageNet-1K',datasetVersion='unknown',split='validation set',horizon='unknown',aggregation='unknown',metricDefinition='single-crop top-1 accuracy',provenance='own',citedFrom='unknown',locator='Table 1',name='Top-1 accuracy',value='80.0',unit='%',direction='higher',quote='ViT reports 80.0 accuracy.',protocol=p,factor_resolution='224×224',preprocessing='unknown')
     r.update(changes)
     return r
 
@@ -18,11 +18,11 @@ class ProtocolTests(unittest.TestCase):
         self.assertEqual(result['favours'],'b')
         self.assertNotIn('horizon',[c['field'] for c in result['checks']])
     def test_resolution_conflict_is_not_hidden_by_unknown_horizon(self):
-        self.assertEqual(compare_pair(vision(),vision(paper='b',factor_resolution='384 pixels'))['outcome'],'incompatible')
+        self.assertEqual(compare_pair(vision(),vision(paper='b',factor_resolution='384×384'))['outcome'],'incompatible')
     def test_unknown_factor_stays_insufficient(self):
         self.assertEqual(compare_pair(vision(),vision(paper='b',factor_resolution='unknown'))['outcome'],'insufficient')
     def test_wording_difference_is_not_a_proven_mismatch(self):
-        self.assertEqual(compare_pair(vision(),vision(paper='b',factor_resolution='224 by 224'))['outcome'],'insufficient')
+        self.assertEqual(compare_pair(vision(),vision(paper='b',factor_resolution='224-pixel input'))['outcome'],'insufficient')
     def test_top1_top5_error_and_unknown_are_not_paired(self):
         self.assertNotEqual(metric_key('top-1 accuracy'),metric_key('top-5 accuracy'))
         self.assertNotEqual(metric_key('top-1 error'),metric_key('top-1 accuracy'))
@@ -34,7 +34,7 @@ class ProtocolTests(unittest.TestCase):
         self.assertEqual(m['factor_resolution'],'unknown')
     def test_named_partition_and_factor_survive_extraction(self):
         source='We evaluate on the validation set at 224 pixels. ViT reports 80.0 accuracy.'
-        m=vision(evidence={'split':'validation set','factor_resolution':'224 pixels'})
+        m=vision(factor_resolution='224 pixels',evidence={'split':'validation set','factor_resolution':'224 pixels'})
         paper={'id':'a','protocol':m['protocol'],'evidence':source}
         validate_analysis(paper,{'metrics':[m]})
         self.assertEqual(paper['metrics'][0]['split'],'validation set')
@@ -49,14 +49,14 @@ class ProtocolTests(unittest.TestCase):
         from pathlib import Path
         from relay.research import Research
         with tempfile.TemporaryDirectory() as d:
-            r=Research(Path(d)); a,b=vision(id='m1'),vision(paper='b',id='m2',factor_resolution='384 pixels')
+            r=Research(Path(d)); a,b=vision(id='m1'),vision(paper='b',id='m2',factor_resolution='384×384')
             for m in (a,b):
                 m['evidence']={k:{'origin':'researcher','quote':'Verified source context.'} for k in ('dataset','method','split','metricDefinition','factor_resolution')}
             papers=[{'id':'a','title':'A','metrics':[a],'evidence':a['quote']},{'id':'b','title':'B','metrics':[b],'evidence':b['quote']}]
             p={'id':'p','papers':papers,'revision':1,'status':'review','events':[],'draft':{'relatedWork':[{'id':'claim','text':'Comparison claim','citations':['b']}],'comparisons':[]}}
             r.projects=[p]
             self.assertEqual(r.outcomes(p)[next(iter(r.outcomes(p)))]['outcome'],'incompatible')
-            change=r.correct(p,papers[1],b,{'factor_resolution':'224 pixels'},'researcher review','Table caption states 224 pixels.')
+            change=r.correct(p,papers[1],b,{'factor_resolution':'224×224'},'researcher review','Table caption states 224×224.')
             self.assertTrue(change['comparisonChanges'])
             self.assertEqual(change['comparisonChanges'][0]['after'],'comparable')
             self.assertTrue(p['draft']['relatedWork'][0]['stale'])

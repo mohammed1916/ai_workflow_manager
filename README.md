@@ -57,7 +57,7 @@ The included fresh discovery record contains **four papers, 12 Nemotron calls, a
 
 ## Evidence, not a broad accuracy claim
 
-**120 automated tests pass.** The latest small development evaluation accepted **1 of 13 non-comparable cases incorrectly**, versus **6 of 13** for a single-pass baseline using the same Nemotron model and papers. Relay’s decisive-answer coverage was **80%**, versus **90%** for the baseline. This illustrates the trade-off between caution and coverage.
+**135 automated tests pass.** The latest small development evaluation accepted **1 of 13 non-comparable cases incorrectly**, versus **6 of 13** for a single-pass baseline using the same Nemotron model and papers. Relay’s decisive-answer coverage was **80%**, versus **90%** for the baseline. This illustrates the trade-off between caution and coverage.
 
 The dataset is agent-annotated, development cases informed fixes, and held-out cases share papers with development. These results are demonstration evidence, not independently validated scientific accuracy. Full runs, failures, costs, and caveats are included below and in the app. The recorded accuracy evaluation covers **ML/time-series benchmark auditing**, particularly traffic forecasting; it does not validate the new question-specific comparison contracts across domains.
 
@@ -213,7 +213,7 @@ python3 eval/run.py --split heldout
 
 These commands call Nebius and consume inference credits. Do not tune on the held-out split and then present it as unseen. API acceptance helpers in `scripts/live/` use `RELAY_URL` (default `http://127.0.0.1:4280`). Their review actions are scripted and must remain labeled accordingly.
 
-Current automated verification: **120 tests pass**. JavaScript modules pass syntax checks. Tests cover source checks, comparison rules, provider separation, revision conflicts, correction propagation, stale-claim regeneration, immutable checkpoints, branch isolation, compiler restrictions, API origin/host/token enforcement, and saved-study imports. No GUI automation is required. Current changes have not received a visual browser review; the user will inspect the UI.
+Current automated verification: **135 tests pass**. JavaScript modules pass syntax checks. Tests cover source checks, comparison rules, provider separation, revision conflicts, correction propagation, stale-claim regeneration, immutable checkpoints, branch isolation, compiler restrictions, API origin/host/token enforcement, and saved-study imports. No GUI automation is required. Current changes have not received a visual browser review; the user will inspect the UI.
 
 ## PDF compilation
 
@@ -300,3 +300,13 @@ Use **Revise criteria in a branch → Re-extract evidence with revised criteria*
 Tavily discovery records candidate URLs in `searchReceipts` and resolves arXiv candidates before extraction; search snippets are not treated as paper results. Missing keys or retrieval failures leave OpenAlex discovery available. The earlier traffic evaluation records describe the previous comparator, not a fresh cross-domain evaluation of this redesign.
 
 Live validation on 29 October 2026 used Nemotron on Nebius to plan classification factors, extract two source-linked DeiT results, and propose a model-size correction from a quoted paper passage. The proposal remains ready for human review; unresolved fields were retained. The sanitized receipt is [data/research/protocol-smoke.json](data/research/protocol-smoke.json). This one-paper smoke test is not a cross-domain accuracy evaluation.
+
+### Focus, inspect, investigate, review
+
+Open an existing investigation's **Comparisons** view. Enter two model families (for example `ViT` and `DeiT`) under **Which models should be compared?** and apply the focus. This filters saved evidence without a model call. New comparison plans can supply this focus automatically. All models remains available; the scope count makes excluded pairs visible.
+
+The current comparator consolidates duplicate evaluation-partition fields without rewriting the underlying evidence. Named validation partitions and redundant metric wording are normalized only when supported by the row's existing context. Explicit image dimensions such as `384²`, `384^{2}`, and `384×384` match. Flattened legacy values such as `3842` remain unresolved. Close/rounded parameter counts require review; they are not silently accepted or called incompatible. Non-distilled eligibility remains a separate requirement when the question requests it.
+
+Click **Investigate blockers**, select up to six conditions, and optionally enter instructions. Only the selected one or two results are investigated. The agent inspects paper passages, available author code, and configured Tavily results. For resolution problems it can retrieve the original arXiv HTML again with preserved mathematical notation; the old source snapshot remains intact. Proposed corrections require review, then propagate to comparisons and dependent manuscript claims. Use a branch only when changing the question or experimental criteria; a full re-extraction is unnecessary for these deterministic comparison fixes.
+
+On 29 October, a live Nemotron call proposed replacing the legacy `3842` resolution with the original paper's `384^{2}` notation for ViT-B/16. The focused call used 1,621 tokens. Its unaccepted proposal, quote, and usage receipt are in [data/research/notation-correction-smoke.json](data/research/notation-correction-smoke.json). This does not establish overall extraction accuracy. Legacy recorded studies retain their original parser output and source hashes; new retrieval preserves math notation.

@@ -133,3 +133,9 @@ input[type=checkbox]:disabled{opacity:.45;cursor:not-allowed}
 .sample-section summary small{color:var(--muted);font-weight:400;font-size:11px}
 .sample-row{display:flex;flex-direction:column;gap:4px;margin:6px 0 10px}
 .sample-copy{align-self:flex-start;font-size:12px;padding:6px 10px}
+
+.comparison-focus,.comparison-guidance { border:1px solid #393047;border-radius:16px;padding:22px;margin:18px 0;background:linear-gradient(115deg,#201528,#11141d); }
+.comparison-focus h3 {margin:8px 0}.comparison-focus p,.comparison-guidance small {color:#bdb2cc}
+#method-scope {display:flex;align-items:end;gap:12px;flex-wrap:wrap}#method-scope label {flex:1;min-width:150px;margin:0}#method-scope input {width:100%}
+.investigation-fields {display:grid;gap:10px;border:1px solid #53425f;border-radius:12px;padding:18px;margin:20px 0}.investigation-fields label {margin:0}
+@media(max-width:650px){#method-scope {display:grid;grid-template-columns:1fr}#method-scope>span{display:none}.comparison-focus,.comparison-guidance{padding:16px}}

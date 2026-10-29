@@ -4,7 +4,7 @@ import xml.etree.ElementTree as ET
 from .core import RelayError, read_config, now, digest
 from .providers import complete, models, with_key
 from . import tavily
-from .protocol import PLAN, contract, factor_keys, forecasting
+from .protocol import PLAN, contract, factor_keys, forecasting, enforce_scope
 from .evidence import (FIELDS, LABELS, check_metric, compare as compare_results, html_to_text, known, norm, passages, cell_context, mentions, window, table_notes, split_key, split_supported,
                        repository_links, code_passages, REPO_FILES, supports, short_id, provenance_key, metric_key)
 
@@ -176,8 +176,10 @@ def _validate_metrics(p, analysis, source):
     return p
 
 
-def compare(papers, selected=None):
-    return compare_results(papers, selected)
+def compare(papers, selected=None, methods=None):
+    if methods is None:
+        methods=next((x.get('protocol',{}).get('targetMethods',[]) for x in papers if x.get('protocol',{}).get('targetMethods')),[])
+    return compare_results(papers, selected, methods)
 
 
 SUPERIORITY = re.compile(r'(?i)\b(outperform\w*|better than|superior|beats?|surpass\w*|improv\w* (?:on|over|upon)|lower (?:error|mae|rmse|mape)|advantage over|state[- ]of[- ]the[- ]art|best[- ]performing)\b')
@@ -384,7 +386,7 @@ def investigate_metric(ask, title, source, metric, fields, repo=None):
         found += [{'id':'C'+str(i), 'origin':'paper','location':'Experimental context','text':text} for i,text in enumerate([analysis_text(source,24000)])]
     pool = {x['id']: x for x in found + (repo or [])}
     if not pool: return [], [], found
-    target = {k: metric.get(k) for k in ('method', 'name', 'value', 'dataset', 'split', 'horizon', 'aggregation', 'metricDefinition', 'provenance', 'locator', 'quote')}
+    target = {k: metric.get(k) for k in ('method', 'name', 'value', 'dataset', 'split', 'horizon', 'aggregation', 'metricDefinition', 'provenance', 'locator', 'quote') + tuple(factor_keys(metric))}
     result = ask(INVESTIGATE, {'target': target, 'comparisonProtocol':metric.get('protocol',{}), 'paper': title, 'fields': fields, 'passages': list(pool.values())}, 'investigate')
     proposals = []
     for prop in result.get('proposals', [])[:8]:
@@ -660,6 +662,7 @@ class Research(ExecutionHistory):
             p['protocol'] = contract(plan.get('protocol'))
             p['protocol']['question'] = p['hypothesis']
             p['protocol']['direction'] = p.get('feedback','')
+            enforce_scope(p['protocol'])
             if not p['protocol']['factors']: raise RelayError('CRITERIA_REQUIRED','No experimental comparison criteria were returned. Retry with a more specific question.')
             p['queries'] = [str(q)[:180] for q in plan.get('queries',[])[:2]]
             self.checkpoint(p,'protocol','Comparison criteria ready for human review',details=p['protocol'])
@@ -728,15 +731,21 @@ class Research(ExecutionHistory):
             p = self.get(data.get('id'))
             if p['status'] in BUSY: raise RelayError('BUSY', 'Wait for the agent to finish.')
             if data.get('revision') != p['revision']: raise RelayError('STALE_REVISION', 'This project changed. Refresh and review the latest version.', 409)
+            if p.get('protocol'):
+                enforce_scope(p['protocol'])
+                for paper in p['papers']:
+                    if paper.get('protocol'): enforce_scope(paper['protocol'])
+                    for metric in paper['metrics']:
+                        if metric.get('protocol'): enforce_scope(metric['protocol'])
             targets = []
             for t in (data.get('targets') or [])[:2]:
                 paper = self.paper(p, t.get('paper')); m = self.metric(paper, t.get('metric'))
-                fields = [f for f in (t.get('fields') or m.get('missing') or []) if f in FIELDS + tuple(factor_keys(m)) and f != 'locator'][:6]
+                fields = [f for f in (t.get('fields') or m.get('missing') or []) if f in FIELDS + ('unit',) + tuple(factor_keys(m)) and f != 'locator'][:6]
                 if fields: targets.append((paper['id'], m['id'], fields))
             if not targets: raise RelayError('NOTHING_TO_INVESTIGATE', 'Choose a result with missing or conflicting context.')
             p['status'] = 'investigating'; p['revision'] += 1
-            self.checkpoint(p, 'input', 'Investigation requested', details={'targets': [{'paper': a, 'metric': b, 'fields': c} for a, b, c in targets], 'pair': data.get('pair')})
-        threading.Thread(target=self.run_investigation, args=(p, targets, bool(data.get('repository', True)), data.get('pair')), daemon=True).start()
+            self.checkpoint(p, 'input', 'Investigation requested', details={'targets': [{'paper': a, 'metric': b, 'fields': c} for a, b, c in targets], 'pair': data.get('pair'), 'direction':str(data.get('direction',''))[:1500]})
+        threading.Thread(target=self.run_investigation, args=(p, targets, bool(data.get('repository', True)), data.get('pair'),str(data.get('direction',''))[:1500]), daemon=True).start()
         return {'ok': True}
 
     def web_step(self, p, paper, m, fields, state):
@@ -761,7 +770,7 @@ class Research(ExecutionHistory):
             return [], {'query': query, 'results': 0, 'error': reason}
         return results, {'query': query, 'results': len(results)}
 
-    def run_investigation(self, p, targets, use_repository, pair_id):
+    def run_investigation(self, p, targets, use_repository, pair_id, direction=''):
         created = 0
         state = {}
         try:
@@ -770,7 +779,7 @@ class Research(ExecutionHistory):
                 self.event(p, f"Investigating {', '.join(LABELS.get(f, f) for f in fields)} for {m['method']} in {paper['title'][:70]}")
                 source = self.source(paper)
                 repo, repo_note = [], None
-                if use_repository and any(f in fields for f in ('split', 'horizon', 'aggregation', 'metricDefinition', 'preprocessing')):
+                if use_repository and any(f.startswith('factor_') or f in ('split', 'horizon', 'aggregation', 'metricDefinition', 'preprocessing') for f in fields):
                     links = [l for l in repository_links(source) if l['own']]
                     if links:
                         self.event(p, 'Reading the authors\' code repository: ' + links[0]['url'])
@@ -781,7 +790,13 @@ class Research(ExecutionHistory):
                         except Exception as e:
                             repo_note = {'url': links[0]['url'], 'error': str(e)[:160]}
                             self.event(p, 'Repository retrieval failed; continuing with paper text. ' + str(e)[:100])
-                ask = lambda system, payload, kind: self.llm(p, system, payload, kind, 8000)
+                if any('resolution' in f for f in fields) and re.match(r'^https://arxiv.org/html/\d{4}\.\d{4,5}(?:v\d+)?$',paper.get('evidenceUrl','')):
+                    try:
+                        refreshed=html_to_text(fetch(paper['evidenceUrl']))
+                        repo=(repo or [])+[{'id':'REFRESH','origin':'web','location':'Original paper, refreshed mathematical notation','url':paper['evidenceUrl'],'text':analysis_text(refreshed,24000)}]
+                        self.event(p,'Retrieved the selected original paper with preserved mathematical notation.')
+                    except Exception as e: self.event(p,'Could not refresh source formatting; retaining existing evidence. '+str(e)[:80])
+                ask = lambda system, payload, kind: self.llm(p, system, {**payload,'researcherDirection':direction}, kind, 8000)
                 proposals, unresolved, found = investigate_metric(ask, paper['title'], source, m, fields, repo)
                 web_fields = [f for f in fields if f not in {x['field'] for x in proposals}][:4]
                 web, web_detail = self.web_step(p, paper, m, web_fields, state) if web_fields else ([], None)
@@ -806,7 +821,7 @@ class Research(ExecutionHistory):
                                     **({'web': web_detail} if web_detail else {})})
             with self.lock:
                 p['status'] = 'review'; p['revision'] += 1; self.save()
-            self.event(p, f'Investigation finished with {created} proposed correction{"s" if created != 1 else ""} awaiting your review.' if created else 'Investigation finished. The sources did not state the missing context; the comparison stays insufficient.')
+            self.event(p, f'Investigation finished with {created} proposed correction{"s" if created != 1 else ""} awaiting your review.' if created else 'Investigation finished. No supported change was found; review the remaining blockers.')
         except Exception as e:
             with self.lock: p.update(status='error', error=str(e)[:350]); self.checkpoint(p, 'failure', 'Investigation failed', status='failed', details={'error': p['error']})
 

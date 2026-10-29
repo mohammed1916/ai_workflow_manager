@@ -1,0 +1,42 @@
+{
+  "date": "2026-10-29",
+  "purpose": "Targeted correction of a flattened image-resolution superscript",
+  "source": "https://arxiv.org/html/2012.12877",
+  "input": {
+    "method": "ViT-B/16 [15]",
+    "metric": "top-1 accuracy",
+    "value": "77.9",
+    "factor_input_resolution": "3842"
+  },
+  "result": {
+    "proposals": [
+      {
+        "field": "factor_input_resolution",
+        "value": "384^{2}",
+        "quote": "| ViT-B/16 [15] | 86M | 384^{2} | 0085.9 | 77.9 | 83.6 | _",
+        "origin": "paper",
+        "location": "Experimental context",
+        "url": null,
+        "explanation": "The table row for ViT-B/16 explicitly lists the input resolution as 384^{2}, preserving the superscript notation from the source. This directly provides the factor value without needing inference."
+      }
+    ],
+    "unresolved": [],
+    "calls": [
+      {
+        "at": "2026-10-29T11:43:18.473970+00:00",
+        "kind": "investigate",
+        "provider": "nebius",
+        "model": "nvidia/nemotron-3-super-120b-a12b",
+        "attempts": 1,
+        "repaired": false,
+        "promptTokens": 1267,
+        "completionTokens": 354,
+        "totalTokens": 1621,
+        "ok": true,
+        "ms": 3324
+      }
+    ]
+  },
+  "status": "Ready for human review",
+  "limitations": "One targeted smoke test, not a cross-domain evaluation. The proposal was not accepted or used to claim model superiority."
+}

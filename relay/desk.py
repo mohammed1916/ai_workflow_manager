@@ -16,7 +16,7 @@ API = [
     {'method':'POST','path':'/api/desk/load','purpose':'Load the recorded Nebius study into the workspace. Idempotent; does not call a model. Downloads public source text if not cached.','example':{}},
     {'method':'POST','path':'/api/research/start','purpose':'Discover and assess papers for a new question. Starts background model work.',
      'example':{'hypothesis':'Which traffic-forecasting baselines use comparable experimental protocols?','provider':'nebius','model':'nvidia/nemotron-3-super-120b-a12b','seeds':['2101.06861','1906.00121'],'seedOnly':False,'paperLimit':4}},
-    {'method':'POST','path':'/api/research/investigate','purpose':'Retrieve paper/code evidence for missing or conflicting experimental fields.',
+    {'method':'POST','path':'/api/research/investigate','purpose':'Investigate up to two results and selected fields, with optional direction text. Returns source-backed proposals for human review.',
      'example':{'id':'PROJECT','revision':1,'repository':True,'targets':[{'paper':'PAPER','metric':'METRIC','fields':['split','metricDefinition']}]}},
     {'method':'POST','path':'/api/research/update','purpose':'Review evidence, check a number, add a paper, accept/reject a proposal, apply a correction, amend-draft with structured source-reviewed prose, or save a manuscript. Requires the current revision.',
      'example':{'id':'PROJECT','revision':1,'action':'correct','actor':'agent','paper':'PAPER','metric':'METRIC','field':'metricDefinition','value':'non-standard evaluation','note':'Source-backed reason for this correction.'}},
@@ -77,7 +77,7 @@ def load_study(root, research):
     for paper in records[-1]['papers']:
         path=root/'eval/.cache'/(paper['arxiv']+'.html')
         raw=path.read_text(encoding='utf-8') if path.exists() else fetch(paper['evidenceUrl'])
-        text=html_to_text(raw)[:SOURCE_LIMIT]
+        text=html_to_text(raw, preserve_math=False)[:SOURCE_LIMIT]
         if digest(text)!=paper['sourceRef']:
             raise RelayError('SOURCE_CHANGED','The public source differs from the recorded version. The saved study was not loaded; use a fresh investigation instead.',409)
         texts[paper['sourceRef']]=text
@@ -124,7 +124,7 @@ def load_discovery(root, research):
         aid=ARXIV_ID.search(paper.get('evidenceUrl',''))
         if not aid:raise RelayError('SOURCE_MISSING','Recorded source has no arXiv locator.')
         cache=root/'eval/.cache'/(aid[1]+'.html')
-        text=html_to_text(cache.read_text(encoding='utf-8') if cache.exists() else fetch(paper['evidenceUrl']))[:SOURCE_LIMIT]
+        text=html_to_text(cache.read_text(encoding='utf-8') if cache.exists() else fetch(paper['evidenceUrl']), preserve_math=False)[:SOURCE_LIMIT]
         if digest(text)!=paper['sourceRef']:raise RelayError('SOURCE_CHANGED','The source version differs from the recorded discovery. Start a fresh investigation.',409)
         sources[paper['sourceRef']]=text
     with research.lock:

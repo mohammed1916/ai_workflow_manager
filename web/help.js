@@ -70,7 +70,7 @@ const topics = {
   ],
   "model": [
     "Model and web-search roles",
-    "Nebius hosts the selected inference model. Existing investigations retain their chosen model. OpenAlex and arXiv support paper discovery. When configured, Tavily also finds arXiv candidates during initial discovery and searches for unresolved context during investigation; seed-only discovery stays restricted to your papers. It it is not a replacement model or a static answer fallback. Web results still require source checks and review."
+    "Nebius hosts the selected inference model. Existing investigations retain their chosen model. OpenAlex and arXiv support paper discovery. When configured, Tavily also finds arXiv candidates during initial discovery and searches for unresolved context during investigation; seed-only discovery stays restricted to your papers. It is not a replacement model or a static answer fallback. Web results still require source checks and review."
   ],
   "support": [
     "Evidence support",

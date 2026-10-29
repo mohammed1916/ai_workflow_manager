@@ -62,4 +62,19 @@ class ResearchAPITests(unittest.TestCase):
         self.assertEqual(self.call('/api/research/source?id=missing&paper=missing')[0],404)
 
 
-if __name__=='__main__':unittest.main()
+
+
+    def test_comparison_api_filters_models_without_model_calls(self):
+        from unittest.mock import patch
+        from relay.research import Research
+        from test_protocol import vision
+        research=Research(self.root)
+        research.projects=[{'id':'saved','papers':[{'id':'p','title':'Evidence','metrics':[vision(id='1',method='ViT-B/16'),vision(id='2',method='DeiT-B'),vision(id='3',method='DeiT-S')]}]}]
+        with patch('relay.research.Research',return_value=research):
+            self.server.RequestHandlerClass=make_handler(self.store,self.port)
+        headers={'Authorization':'Bearer '+self.store.token}
+        with patch.object(research,'llm',side_effect=AssertionError('Focus must not call a model')):
+            code,body=self.call('/api/research/compare',{'id':'saved','methods':['ViT','DeiT']},headers)
+            self.assertEqual(code,200)
+            self.assertEqual(len(json.loads(body)['pairs']),2)
+            self.assertEqual(self.call('/api/research/compare',{'id':'saved','methods':'ViT'},headers)[0],400)

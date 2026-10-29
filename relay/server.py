@@ -133,7 +133,9 @@ def make_handler(store,port):
                 elif self.path=='/api/research/compare':
                     with research.lock:
                         p=research.get(data.get('id')); chosen=set(data.get('papers') or [])
-                        result=compare(p['papers'],chosen if len(chosen)>=2 else None)
+                        methods=data.get('methods')
+                        if methods is not None and (not isinstance(methods,list) or len(methods) not in (0,2) or any(not isinstance(x,str) or not x.strip() or len(x)>80 for x in methods)): raise RelayError('INVALID_SCOPE','Use two model family names or clear the model filter.')
+                        result=compare(p['papers'],chosen if len(chosen)>=2 else None,methods)
                 else: raise RelayError('NOT_FOUND','Unknown action.',404)
                 self.respond(result)
             except RelayError as e: self.respond({'error':str(e),'code':e.code},e.status)
