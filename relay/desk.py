@@ -57,7 +57,7 @@ def overview(root, research):
     ]
     return {'featured':{'id':featured['id'],'status':featured['status'],'papers':len(featured['papers']),'tokens':featured.get('tokens',0),
                         'calls':len(featured.get('calls',[])),'compiled':bool(featured.get('compile',{}).get('ok'))} if featured else None,
-            'recent':[{'id':p['id'],'title':p.get('branchName') or p['hypothesis'],'status':p['status'],'papers':len(p['papers']),'calls':len(p.get('calls',[])),'provider':p['provider'],'model':p['model']} for p in research.projects if p.get('provider')=='nebius' and p.get('studyKey')!='nebius-benchmark-audit-v1' and not p.get('parentProject')][:4],
+            'recent':[{'id':p['id'],'title':p.get('branchName') or p['hypothesis'],'status':p['status'],'papers':len(p['papers']),'calls':len(p.get('calls',[])),'provider':p['provider'],'model':p['model']} for p in research.projects if p.get('provider')=='nebius' and p.get('studyKey') not in ('nebius-benchmark-audit-v1','nebius-discovery-v1') and not p.get('parentProject')][:4],
             'findings':findings,'evaluation':evaluation(root),
             'scope':'ML benchmark evidence auditing. Current normalization and evaluation focus on traffic forecasting.',
             'review':'Source reviews and corrections in the prepared study were made by coding agents and test scripts. Human manuscript approval remains unchecked.',
