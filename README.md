@@ -1,69 +1,64 @@
 # Relay Research — Check the Comparison
 
-**Before you build on a paper’s results, check whether the comparison holds.**
+**A research agent that keeps published observations, comparison judgments, and human decisions separate.**
 
-[Open the hosted app](https://relay-research.onrender.com/) · [Public repository](https://github.com/mohammed1916/ai_workflow_manager) · [Download the source](https://github.com/mohammed1916/ai_workflow_manager/archive/refs/heads/main.zip)
+[Open Relay](https://relay-research.onrender.com/) · [Source repository](https://github.com/mohammed1916/ai_workflow_manager)
 
-Built for **Best Apps and Agents** in the Nebius × NVIDIA Global AI Hackathon. Powered by **NVIDIA Nemotron 3 Super on Nebius Token Factory**. MIT licensed.
+Built for the Nebius × NVIDIA Global AI Hackathon, Best Apps and Agents track. Runtime inference uses **NVIDIA Nemotron on Nebius Token Factory**. MIT licensed.
 
-## The research mistake Relay helps you catch
+## Why Relay
 
-A benchmark table shows GTS reporting **2.99 MAE** for a 60-minute METR-LA forecast. A later appendix corrects the metric calculation and reports **3.41**. Treating either number as just another cell in a leaderboard can change the apparent argument for a new experiment.
+Two papers can report the same metric while measuring different things. A result can be valid in its own experiment yet unsuitable for the researcher's comparison. Conversely, missing extracted context is not proof that a paper lacks the information.
 
-Relay keeps the number attached to its table, experimental settings, and provenance. It investigates missing context in papers and author code, explains whether a comparison holds, and tracks which conclusions need revision after a correction. The example comes from [GTS, Appendix D](https://arxiv.org/html/2101.06861); these are reported results, not experiments run by Relay.
+Relay starts with a research question, collects source-addressed observations, and evaluates the conditions under which those observations can support a claim. Researchers inspect the evidence, investigate missing context, approve proposed changes, and carry the consequences into a cited manuscript. Saved executions and branches preserve how the argument changed.
 
-## The lesson from the earlier WebMCP project
+The application does not substitute an example answer when a live run fails. Failed calls, unread passages, rejected extractions, and unresolved criteria remain visible. Recorded executions are explicitly labeled and make no new inference calls when opened.
 
-The strongest lesson from our earlier winner analysis was **validation → feedback → correction**: human and agent should work on the same domain state, and the agent needs meaningful feedback when a result does not hold. Relay applies that lesson to experimental evidence. A source check or comparison conflict becomes an investigation; an accepted correction updates the shared evidence; dependent claims become stale; regeneration and saved branches make the consequences inspectable.
+## The workflow
 
-The workflow is deliberate: **question → source evidence → compare → investigate gaps → review a proposal → propagate the correction → revise the manuscript**. Starting discovery does not fabricate corrections. Investigations can return no answer, proposals require review, and unresolved context remains unresolved.
+1. **Question → comparison plan.** Nemotron proposes the alternatives, requested outcomes, analysis goals, and question-specific criteria. A separate model pass checks coverage against quoted requirements. Invalid structure receives a bounded repair; unresolved requirements stop the run before expensive paper extraction. The plan remains ready for human review.
+2. **Discovery → available sources.** OpenAlex supplies scholarly candidates; arXiv supplies available full text. Optional Tavily search adds web-discovered paper references. DOI and arXiv references can be supplied directly. Seed-only mode intentionally skips discovery.
+3. **Sources → observation inventory.** Relay walks overlapping passages of the retrieved text. The model identifies reported observations before judging their eligibility. Source-line and table-cell addresses are resolved against the actual text. Rejected output gets one repair; accepted observations survive failed repairs.
+4. **Observations → context and scope.** A separate pass uses source-checked notes and table headers to assign entities, requested outcomes, and experimental conditions. Results outside the requested outcome remain saved but are excluded from that comparison queue. Unsupported assignments remain unknown.
+5. **Context → provisional comparisons.** Nemotron assesses each criterion with evidence references from both results. Code checks references and missing required fields. Before a proposed pair can appear comparable, a separate model call rechecks entity identity, outcome meaning, and conditions against the original table blocks and surrounding prose. Missing source context or disagreement with that recheck withholds acceptance. This is another model check, not independent human verification. Outcomes are **comparable within scope**, **incompatible**, or **insufficient evidence**. Pending pairs are explicitly awaiting assessment. A comparable pair alone does not answer a causal hypothesis.
+6. **Agent → human → investigation.** Review question coverage, source evidence, and comparison judgments separately. Investigate missing fields in retrieved papers, supported author repositories, and optionally Tavily web sources. Accept or reject source-linked proposals; unresolved investigations do not fabricate corrections.
+7. **Revision → branch.** Revise criteria using inherited observations without discarding them. Entity/outcome assignments and semantic reviews are reassessed. Alternatively, continue discovery or explicitly re-extract. Checkpoints preserve the parent execution.
+8. **Reviewed evidence → manuscript.** Draft a proposed-study abstract, cited related work, comparison discussion, and experimental controls. Corrections invalidate dependent claims. Review and regenerate them, then export LaTeX, BibTeX, and evidence for Overleaf.
 
-## What each service actually does
+The comparison engine contains no built-in dataset list, metric catalog, model-name prefix rule, scientific conversion, or universal matching tolerance. That is an architectural property, **not evidence of validated accuracy across every research field**.
 
-- **OpenAlex and arXiv:** initial scholarly discovery and available full-text retrieval.
-- **NVIDIA Nemotron on Nebius Token Factory:** assess and extract evidence, reason over experimental context, propose source-linked corrections, and draft or revise the argument.
-- **Tavily, when configured:** initial discovery retrieves web candidates and resolves arXiv paper links alongside OpenAlex; seed-only runs skip both searches. During investigation, Tavily also retrieves evidence for protocol fields that paper/code inspection has not settled. Add its key in Model settings, open a comparison with context gaps, and choose **Investigate**. Web passages retain source links and remain proposals for review.
-- **Relay's deterministic safeguards:** quote containment, required assessment evidence references, revision conflicts, correction impact, and checkpoint integrity. Nemotron supplies provisional semantic comparison judgments; humans review their applicability.
+## What to inspect in the app
 
-The Tavily fallback was live-smoke-tested on 28 October 2026 and returned four passages, including the MTGNN author repository. The receipt is in `data/research/tavily-search-receipt.json`. That verifies runtime retrieval; it does not establish a successful correction. The older prepared Nemotron studies predate Tavily integration and must not be presented as Tavily runs.
+Start at the **Research desk**. Recent runs show actual retained results, calls, and tokens. If a recorded workflow validation is installed, its separate card opens the saved execution without inference. Historical comparator evaluations are labeled separately; they do not measure the current engine.
 
-## Try it in two minutes
+For a fresh investigation:
 
-1. Open the [Research desk](https://relay-research.onrender.com/#screen=desk).
-2. Choose **Load recorded study** or **Open prepared study**. Inspect the five-paper Nemotron study without making a new model call. Public source retrieval may take a moment.
-3. Open **Comparisons** and inspect a result’s dataset, split, horizon, metric definition, and source evidence.
-4. Open **Corrections** to inspect how a correction affected comparisons and manuscript claims. Inspect the saved before/after states through **Execution record**.
-5. Open **Experiment & manuscript** to read the cited proposed study and export its LaTeX, bibliography, and evidence.
-6. Choose **Open recorded discovery** for the separate four-paper search run, or **Run a fresh investigation** with your own Nebius key.
+- Enter a question and optional DOI/arXiv references. Choose the model and workload under **Research scope**.
+- Open **Comparisons** to inspect question coverage, hypothesis judgments, and per-paper extraction coverage.
+- Open a paper to inspect retained results, source lines, rejected claims, and retrieval/extraction failures. **Continue / retry unread passages** preserves successful work.
+- Use **Assess pending comparisons** to process more pairs. Viewing or filtering saved pairs does not call a model.
+- Use **Revise criteria in a branch** when the interpretation needs changing. This actually starts the selected agent continuation; it is not merely renaming a saved result.
+- Inspect **Executions & branches** for checkpoints, model calls, and token usage.
 
-The prepared runs are genuine saved inference records, clearly labeled as recorded studies. Their source reviews were performed by agents/scripts. They are not independent researcher validation. Hosted PDF compilation is disabled; use the local app or export to Overleaf.
+Paper count, results per paper, and comparison workload support preset counts, a custom positive count, or **All available**. Batch sizes limit individual calls, not the selected total. All available means the retrieved candidate/source set, not all published literature. Discovery currently uses two queries, with up to 200 initial candidates per query for All available. Provider output limits and extraction failures can still reduce coverage.
 
-## What makes the workflow useful
+## Where Nebius, NVIDIA, and Tavily are used
 
-| Research decision | What Relay provides |
+| Component | Actual responsibility |
 | --- | --- |
-| Can I reuse this reported baseline? | Three outcomes: comparable, incompatible, or insufficient evidence, with field-by-field reasons. |
-| Why are these results inconsistent? | Paper and author-code investigations produce source-linked proposals. |
-| Is this an independent result? | Own, re-run, cited, or unknown provenance stays attached to each number. |
-| What changed after my correction? | Affected comparisons and manuscript claims are tracked; stale claims can be regenerated. |
-| Can I inspect an earlier conclusion? | Immutable checkpoints and independent branches preserve saved states. |
-| What experiment should I run next? | A proposed evaluation with shared experimental controls and a cited manuscript. |
+| Nebius Token Factory + NVIDIA Nemotron | Search planning, requirement audit, relevance assessment, observation extraction, context completion, semantic comparisons, investigations, hypothesis synthesis, and manuscript drafting/revision |
+| OpenAlex / arXiv | Scholarly discovery, metadata, and available source retrieval |
+| Tavily, optional | Initial web discovery of scholarly references and investigation of unresolved context beyond retrieved papers/code |
+| Relay's Python backend | Source-address checks, evidence fingerprints, queue handling, review attribution, revision conflicts, checkpoint integrity, and stale-claim tracking |
+| Researcher | Review applicability, resolve uncertainty, approve corrections and manuscript claims |
 
-## Where Nebius and NVIDIA are essential
+Provider, model, call type, timing, attempts, and token usage are recorded. Tavily snippets do not become paper results merely because search returned them. Investigation passages retain source URLs and remain proposals.
 
-Nemotron plans searches, assesses relevance, extracts experimental evidence, reasons over missing paper/code context, proposes corrections, synthesizes findings, and drafts or revises the manuscript. These are runtime calls to **Nebius Token Factory**, with provider, model, attempts, token usage, and call timing recorded. Quote containment, assessment-reference checks, revision protection, and file hashes run in Python. The generic comparison judgments come from Nemotron and remain subject to human review.
+The earlier Tavily runtime receipt is in [tavily-search-receipt.json](data/research/tavily-search-receipt.json). It verifies retrieval, not a successful correction. Seed-only validation runs do not demonstrate Tavily discovery. No universal macOS automation or connection to an existing Overleaf account is claimed.
 
-The included fresh discovery record contains **four papers, 12 Nemotron calls, and 114,655 tokens**. The five-paper correction record contains **22 cumulative calls and 312,770 tokens**. The app exposes the actual call records and source evidence; it does not rely on a provider logo as proof of integration.
+## Run locally
 
-## Evidence, not a broad accuracy claim
-
-**The historical comparator evaluation below is separate from the generic engine.** The latest small development evaluation accepted **1 of 13 non-comparable cases incorrectly**, versus **6 of 13** for a single-pass baseline using the same Nemotron model and papers. Relay’s decisive-answer coverage was **80%**, versus **90%** for the baseline. This illustrates the trade-off between caution and coverage.
-
-The dataset is agent-annotated, development cases informed fixes, and held-out cases share papers with development. These results are demonstration evidence, not independently validated scientific accuracy. Full runs, failures, costs, and caveats are included below and in the app. The recorded accuracy evaluation covers **ML/time-series benchmark auditing**, particularly traffic forecasting; it does not validate the new question-specific comparison contracts across domains.
-
-## Open the application
-
-Requires Python 3.10 or later. The application has no pip or npm dependencies.
+Python 3.10 or later; no pip or npm dependencies for the application.
 
 ```sh
 git clone https://github.com/mohammed1916/ai_workflow_manager.git
@@ -71,18 +66,9 @@ cd ai_workflow_manager
 python3 -m relay.server
 ```
 
-Open **http://127.0.0.1:4280/**. The first screen is the **Research desk**. It shows findings, recorded evaluation results, the prepared Nebius study, and the API catalog.
+Open **http://127.0.0.1:4280/**. On Windows, use `py -m relay.server`.
 
-- **Open prepared study:** inspect comparisons, evidence, corrections, the manuscript, and saved execution states.
-- **Run a fresh investigation:** use a question and optional arXiv papers; leave “Only analyze these papers” unchecked for literature discovery.
-- **Executions & branches:** inspect saved checkpoints and continue from a chosen state.
-- **Methods & setup:** opens this README. All project documentation is kept here.
-
-On a clean checkout, choose **Load recorded study**. This imports two recorded live-run snapshots and checks source hashes. It makes no new inference calls. Public arXiv source text is downloaded when the local evaluation cache is absent; if a source version has changed, loading stops rather than silently substituting new text. Historical intermediate checkpoint metadata is retained as provenance, but only the two imported snapshots can be inspected or branched locally.
-
-## Configure live inference
-
-Create `.env` using `.env.example`:
+Create `.env` from `.env.example`:
 
 ```dotenv
 NEBIUS_API_KEY=your_key_here
@@ -91,227 +77,99 @@ NEBIUS_MODEL=nvidia/nemotron-3-super-120b-a12b
 RELAY_PORT=4280
 ```
 
-Use **Choose model** in the application to select Nebius Token Factory and a model from its live catalog. Existing projects retain their original model. Ollama Cloud is an optional development provider; it is not a substitute for the submission's required Nebius/NVIDIA runtime.
+Use **Choose model** to fetch the provider's model catalog and select a model. Existing projects keep their original selection. Add a Tavily key through model settings for optional web search. Inference consumes the provider account's credits; inspect recorded token usage when selecting a workload.
 
-Credentials are never included in saved projects, source bundles, execution records, or API responses. Public paper text, the research question, and selected repository excerpts are sent to the selected model. Locally the server binds to loopback. Provider access and inference incur the account's normal usage.
+Credentials are excluded from project exports, model-call records, and API responses. Research questions and selected source text are sent to the chosen services. Local `.env` configuration remains private. Browser-entered keys stay in tab memory, not browser project storage.
 
-## Research workflow
+## APIs in the application
 
-1. State a question. Optionally supply arXiv IDs or URLs for candidate baselines.
-2. The agent plans complementary OpenAlex searches, retrieves available arXiv HTML, and extracts results with their experimental context.
-3. Inspect source quotations, table cells, model names, datasets, splits, horizons, aggregation, preprocessing, metric definitions, and provenance.
-4. Compare results. Outcomes are **comparable**, **incompatible**, or **insufficient evidence**. Missing evidence does not prove a conflict.
-5. Investigate missing or conflicting settings. The agent searches paper passages and supported author repository files and presents proposals.
-6. Review a proposal or apply a source-backed correction. A correction records before/after values and affected comparisons. Dependent manuscript paragraphs become stale.
-7. Regenerate affected claims. Inspect changes and the saved earlier state. Branch when exploring alternatives.
-8. Draft a proposed-study abstract, cited related work, comparison discussion, and experimental controls. Edit LaTeX and bibliography, compile locally, and export an Overleaf-compatible ZIP.
-
-The agent does not universally control macOS or an existing Overleaf account. The old CSV/document handoff product and Chrome capture extension have been removed. Browser automation is not required to run or test Relay: the UI and API clients use the same backend endpoints.
-
-## APIs inside the application
-
-Open **Research desk → Explore application APIs**. The complete machine-readable catalog is available at `GET /api/schema`, with example request bodies.
+**Research desk → Explore the APIs** displays the machine-readable catalog from `GET /api/schema`. UI and API clients use the same backend state and checks.
 
 | Endpoint | Purpose |
 | --- | --- |
-| `GET /api/state` | Session token and provider availability, without credentials |
-| `GET /api/desk` | Findings, evaluation summaries, prepared-study links |
-| `POST /api/desk/load` | Idempotently load recorded study snapshots |
-| `GET /api/research` | Project state, evidence metadata, corrections, drafts, call records |
+| `GET /api/state` | Session token and provider availability, without provider credentials |
+| `GET /api/desk` | Recent runs and installed recorded validation |
+| `POST /api/desk/load` | Load an explicitly selected recorded study |
+| `GET /api/research` | Projects, evidence metadata, call records, corrections, and drafts |
 | `GET /api/research/source?id=…&paper=…` | Retrieved source text, URL, and hash |
-| `GET /api/research/checkpoint?id=…&node=…` | Inspect saved state with integrity verification |
-| `POST /api/research/start` | Start discovery and extraction |
-| `POST /api/research/compare` | Calculate comparisons from current evidence |
-| `POST /api/research/investigate` | Investigate paper/code context gaps |
-| `POST /api/research/update` | Review, correct, accept/reject, check a number, add paper, amend a draft, save edits |
-| `POST /api/research/branch` | Copy a checkpoint or continue a research path |
+| `GET /api/research/checkpoint?id=…&node=…` | Inspect an integrity-checked saved state |
+| `POST /api/research/start` | Start a question-specific investigation |
+| `POST /api/research/compare` | Render saved comparison assessments |
+| `POST /api/research/assess-comparisons` | Run model assessments for selected pending pairs |
+| `POST /api/research/review-contract` | Record review of question coverage |
+| `POST /api/research/review-comparison` | Review a current semantic assessment |
+| `POST /api/research/investigate` | Investigate evidence gaps |
+| `POST /api/research/update` | Review sources, correct results, decide proposals, retry extraction, add papers, or edit drafts |
+| `POST /api/research/branch` | Branch and continue planning, discovery, extraction, or synthesis |
 | `POST /api/research/draft` | Draft from reviewed sources |
-| `POST /api/research/regenerate` | Rewrite stale claims after corrections |
-| `POST /api/research/compile` | Compile locally in the compiler sandbox |
-| `GET /api/research/export/PROJECT` | Download LaTeX, BibTeX, and research evidence ZIP |
+| `POST /api/research/regenerate` | Rewrite stale claims |
+| `POST /api/research/compile` | Compile locally in the supported sandbox |
+| `GET /api/research/export/PROJECT` | Export manuscript, bibliography, and evidence |
 
-POST requests require `Content-Type: application/json` and `Authorization: Bearer TOKEN`, using the session token returned by `/api/state`. Use the project's current revision for edits. Stale revisions return a conflict rather than overwriting newer work. The token is a local session credential; do not commit it.
+POST requests require JSON and `Authorization: Bearer TOKEN`, using the session token from `/api/state`. Mutations require the current project revision; stale revisions cannot silently overwrite newer work. Review requests can identify `actor: "agent"`. Agent review cannot set a result, question coverage, or semantic assessment to human-verified.
 
-```python
-import json, urllib.request
-base = 'http://127.0.0.1:4280'
-def get(path):
-    return json.load(urllib.request.urlopen(base + path))
-token = get('/api/state')['token']
-body = {'hypothesis': 'Which forecasting baselines use comparable experimental protocols?',
-        'provider': 'nebius', 'model': 'nvidia/nemotron-3-super-120b-a12b',
-        'seeds': ['2101.06861', '1906.00121'], 'seedOnly': False, 'paperLimit': 4}
-request = urllib.request.Request(base + '/api/research/start', data=json.dumps(body).encode(),
-    headers={'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token})
-project_id = json.load(urllib.request.urlopen(request))['id']
-# Poll GET /api/research for status and execution events.
-```
+## Validation and limitations
 
-API reviews may include `actor: "agent"`; these are recorded as agent reviews. A checked review flag permits drafting; it does not turn an agent assessment into independent human validation. The prepared study's manuscript approval remains unchecked.
-
-Research scope controls offer 6, 10, 12, 25, a custom positive count, or **All available** for papers, results per paper, and initial comparisons. Discovery uses two queries. Custom counts request additional OpenAlex pages; All available takes the initial retrieval set (up to 200 candidates per query); All available refers to retrieved candidates, not the entire literature. Result extraction remains limited by supplied source context and the provider response budget; it is not an exhaustive-review guarantee. Additional papers can be added without the old 20-paper ceiling.
-
-## Recorded findings and sources
-
-The prepared study concerns GTS, Graph WaveNet, MTGNN, AGCRN, and STAEformer. Numbers below are reported paper results; Relay has not reproduced the experiments.
-
-- **GTS metric correction:** [GTS](https://arxiv.org/html/2101.06861) Table 1 reports METR-LA 60-minute MAE 2.99. Appendix D explains a different metric calculation; corrected Table 4 gives 3.41. Comparing a headline result without its appendix can change the apparent conclusion.
-- **Paper/code split disagreement:** [MTGNN](https://arxiv.org/html/2005.11650) states training/validation/test percentages of 70/20/10. Its published data-generation code allocates 70% to training and 20% to testing, leaving 10% for validation. The interface retains the conflict and its provenance.
-- **Metric masking:** [AGCRN](https://arxiv.org/html/2007.02842) and [STAEformer](https://arxiv.org/html/2308.10425) require inspection beyond dataset and metric labels. Author code can reveal different handling of zero targets. Matching metric names alone does not settle comparability.
-- [Graph WaveNet](https://arxiv.org/html/1906.00121) provides another candidate baseline and source of protocol context.
-
-Live records in `data/research/` contain real calls to `nvidia/nemotron-3-super-120b-a12b` through Nebius Token Factory, including investigations, proposals, draft generation, a correction, and regeneration. The earlier full journey used five seed papers. Reviews and proposal decisions were performed by coding agents/test scripts. The records explicitly retain that attribution.
-
-The records omit original TeX/BibTeX; importing renders these from the saved structured draft. Compilation must be performed on the installed build. Reconstructed TeX is not represented as the original live-run bytes.
-
-A second saved run in `data/research/discovery-study.json` uses two seed papers plus two OpenAlex search queries, assesses four papers, and records 12 Nemotron calls (114,655 tokens). Two papers were source-reviewed by Codex with agent attribution. A focused check recovered GTS 2.99 with its appendix context. A source-reviewed manuscript amendment removes ambiguous generated claims; numeric results remain unverified. The local application contains a compiled PDF and a branch of this run. Choose **Open recorded discovery** to load its saved snapshot on a clean build.
-
-## Evaluation and limitations
-
-To check every number yourself, run `python3 scripts/verify_evaluation.py`. It rebuilds the table from the recorded run files in `eval/results/`, which are committed in this repository.
-
-
-The evaluation dataset is in `eval/cases.json`; runs are in `eval/results/`. The Research desk displays the recorded metrics and caveats.
-
-- 14 traffic-forecasting papers, 47 target results, 44 comparison cases.
-- Gold labels were annotated by an AI coding agent, without independent domain-researcher validation.
-- Development and held-out cases share papers. Rules were tuned on development material; held-out results are optimistic and are not a clean generalization test.
-- Both Relay and the single-pass baseline use the same Nemotron model and source papers. Relay retrieves focused passages; the baseline receives full papers per case. Token comparisons therefore reflect different input strategies.
-- Comparable precision must be read with recall and coverage. Refusing every comparison is not useful success.
-
-Latest recorded runs after metric-name/dataset recovery fixes:
-
-| Split / run | System | Accuracy | Comparable precision | Comparable recall | Wrongly accepted | Coverage |
-| --- | --- | --- | --- | --- | --- | --- |
-| Dev / 070410 | Relay | 0.80 | 0.93 | 0.77 | 1 / 13 | 0.80 |
-| Dev / 070410 | Single pass | 0.63 | 0.67 | 0.71 | 6 / 13 | 0.90 |
-| Held-out, second look / 070559 | Relay | 1.00 | 1.00 | 1.00 | 0 / 7 | 0.79 |
-| Held-out, second look / 070559 | Single pass | 0.71 | 0.78 | 1.00 | 2 / 7 | 1.00 |
-
-The held-out set contains only 14 cases. Its perfect score is not evidence of general accuracy. Nemotron output varied across repeated runs. Remaining failures include misread splits, missed horizon/aggregation context, missing masking definitions, and ambiguous cited-result provenance. One development case was refused because its result could not be tied to a supporting quote; it counts as a miss.
-
-New investigations use the generic v3 comparison contract described below. No model-family prefix matching, built-in dataset names, metric catalog, resolution conversion, or numeric tolerance decides comparability in that path. Scientific applicability still requires expert review. Source access is uneven: arXiv HTML full text is supported; other DOI records may supply only metadata or abstracts. Researchers can add source excerpts. Missing evidence remains unresolved. Generic support is an architecture, not a claim of validated accuracy in every discipline.
-
-No new forecasting experiment, user study, independently validated time saving, or scientific discovery is claimed. A software agent can conduct source analysis, but cannot substitute for independent domain validation by relabeling its own reviews.
-
-## Verify and reproduce
+Run the software checks:
 
 ```sh
 python3 -m unittest discover -s tests -v
+node --test tests/web/local-projects.test.mjs
 node --input-type=module --check < web/research.js
 node --input-type=module --check < web/desk.js
 node --input-type=module --check < web/execution.js
 ```
 
-The retired comparator and its evaluation runner have been removed. Historical receipts and evidence remain available; the old implementation can be inspected at Git commit `d97893f`. They do not validate the current generic engine. API acceptance helpers in `scripts/live/` use `RELAY_URL`; scripted reviews remain labeled as such.
+Regression coverage includes complete passage traversal, partial-run resumption, preserving accepted evidence after repair failure, source-cell validation, required stratification, outcome scoping, human-review separation, plan failures stopping before extraction, branch preservation, correction propagation, portability, and revision conflicts. Fixtures across several disciplines test software behavior; they do not establish scientific accuracy.
 
-Current automated verification: **116 Python tests pass**, plus the JavaScript local-project tests. JavaScript modules pass syntax checks. Tests cover source checks, comparison rules, provider separation, revision conflicts, correction propagation, stale-claim regeneration, immutable checkpoints, branch isolation, compiler restrictions, API origin/host/token enforcement, and saved-study imports. No GUI automation is required. Current changes have not received a visual browser review; the user will inspect the UI.
+To reproduce a live run on your own question, use the isolated validation command (consumes Nebius credits):
 
-## PDF compilation
+```sh
+python3 scripts/validate_workflow.py --question "$RESEARCH_QUESTION" --seed "$PAPER_REFERENCE" --results 25 --comparisons 6 --output /tmp/relay-validation.json
+```
 
-Install the project-local Tectonic compiler from its official release:
+Set those variables to your question and a DOI/arXiv reference. Repeat `--seed` for additional papers; add `--discover` to include scholarly and configured Tavily search. `--results all` reads all retrieved passages unless a call fails. The command saves failure receipts as well as successful runs and leaves application projects untouched.
+
+The recorded real-paper validation is installed in [workflow-validation.json](data/research/workflow-validation.json) and opens from the Research desk. It contains **95 retained observations from two papers**, complete traversal of their retrieved text, and **six current pair assessments**. Dense-passage response failures were recovered by resuming with smaller source windows. The remaining comparison queue is explicitly pending; it is not counted as insufficient evidence.
+
+The first-pass model incorrectly accepted three pairs. Rechecking original table context changed two to incompatible and one to insufficient evidence. The final current assessments are **zero comparable, five incompatible, and one insufficient**. This is a documented failure-and-recovery example, not an accuracy benchmark or evidence that these papers have no valid comparisons. Human verification remains outstanding. Manuscript wording flags are conservative lexical checks and can flag negated or cautious language; they are prompts for review, not semantic proof of a false claim. Citation-format failures also occurred during manuscript generation; explicit source handles and bounded validation repair were added.
+
+Token counts in this record are cumulative across development continuations and repairs, not the cost of a single fresh investigation. Earlier development attempts and failed logical calls are retained. This was seed-only validation: it does not demonstrate discovery or Tavily usage.
+
+The software checks currently pass **146 Python tests and nine JavaScript tests**, including API loading of a recorded execution without inference. UI source syntax is checked; visual acceptance is left to the researcher, as requested. A successful provider call or completed source traversal does not prove complete extraction, correct interpretation, or an exhaustive literature review. Quote containment proves that text occurs in the source, not that the model understood it. Plans and semantic judgments can still be wrong and require expert review.
+
+The retired traffic comparator and its runner have been removed. Historical receipts remain in `eval/results/`; `python3 scripts/verify_evaluation.py` reconstructs their recorded metrics. Those agent-annotated cases share papers between development and held-out sets and were used during tuning. Their scores must not be presented as accuracy for the current generic workflow. Earlier live records in `data/research/` also predate this redesign unless explicitly identified otherwise.
+
+Source access is uneven. arXiv HTML is supported; other DOI records may provide only abstracts or metadata. Coverage describes retrieved text, not inaccessible content. Users can add source excerpts. Unknown fields are preserved rather than filled from unrelated example studies. No new scientific experiment, independent replication, researcher-validated accuracy, or measured time saving is claimed.
+
+## Projects, hosting, and exports
+
+Browser project copies support local persistence and import/export through **Your projects**. Back up a `.relay-research.json` file before moving machines. Removing a browser copy does not imply deletion of every server-side working copy.
+
+The optional `render.yaml` configures persistent hosting. Hosted mode ignores server-side provider credentials; visitors supply their own key. This is a shared workspace without multi-user account isolation. Use a dedicated deployment for private research. Hosted PDF compilation is disabled.
+
+For local macOS PDF compilation:
 
 ```sh
 python3 scripts/install-tectonic.py
 ```
 
-Then choose **Experiment & manuscript → Compile PDF**. macOS compilation uses a sandbox with restricted file access. LaTeX and evidence can be exported even without the compiler. Hosted compilation is disabled; use local compilation or import the ZIP into Overleaf.
+Then choose **Experiment & manuscript → Compile PDF**. The compiler uses the macOS sandbox. On other systems, or without the compiler, export the Overleaf-compatible ZIP.
 
-## Project structure
+## Repository
 
-- `relay/`: research engine, source checks, comparisons, API server, model providers, checkpoints, compiler.
-- `web/`: research interface, research desk, execution graph, dark design and reduced-motion support.
-- `data/research/`: recorded live study snapshots used by the application.
-- `eval/`: annotated cases, evaluation runner, measured results. Downloaded full-text cache is ignored by Git.
-- `tests/`: automated checks.
-- `scripts/`: compiler installation, API acceptance, submission packaging.
-- `.relay/`: local projects, retrieved source text, checkpoints, compiler and PDFs; never committed.
+- `relay/`: backend, evidence pipeline, providers, API, checkpoints, and compiler.
+- `web/`: research workspace, execution graph, contextual help, and API catalog.
+- `tests/`: software regression checks.
+- `data/research/`: explicitly labeled runtime records, not fallback answers.
+- `eval/`: historical evaluation cases and receipts for the retired comparator.
+- `scripts/`: installation, validation, and packaging utilities.
+- `.relay/`: ignored local working state and source cache.
 
-All documentation is in this README. LICENSE is the software license. `.env` is local configuration and must remain private.
+All project documentation is in this README. `.env` and `.relay/` are not committed. Third-party source text retains its original rights; source URLs and provenance accompany recorded evidence. Software license: [MIT](LICENSE).
 
-## Your data and optional web search
+## Submission story
 
-Projects are saved in your browser, the way Excalidraw and Obsidian keep your work on your own machine. There is no account and no sign-in. Use **Your projects** to export a `.relay-research.json` file for a backup or to move a project to another computer, or to import one. Removing a project deletes only this browser's copy. The hosted server keeps working copies while it runs, and Relay restores them from your browser copy after a restart.
+**Relay makes the research argument inspectable:** what was retrieved, what was extracted, which conditions permit a comparison, what remains unresolved, and which claims change after review. The demo should follow one real execution through those decisions, including a limitation or failed assumption. Label cuts in processing time and distinguish recorded runs from fresh inference. Show a correction only if supported by the actual run; never manufacture one for the story.
 
-Keys are never saved in the browser's storage or in files. Your model key and optional Tavily key stay in this browser tab only and are sent with each request. Tavily is optional: when a paper leaves out a detail such as its evaluation protocol, Relay can search the web for it. Web passages are labelled as web sources with their links, and you still accept or reject every proposal. Without a Tavily key, Relay tells you once that the search is available.
-
-## Running on Windows
-
-The server and the web app use only the Python standard library, so they run on Windows with Python 3.10 or newer:
-
-```
-py -m relay.server
-```
-
-Then open http://127.0.0.1:4280 in Chrome or Edge. Text files are read and written as UTF-8 on every platform.
-
-Local PDF compilation requires the macOS sandbox. On Windows, export the Overleaf ZIP and compile it with an appropriate local toolchain or import it into Overleaf instead.
-
-Back up your work from **Your projects → Export file**. Keep the files in a folder you control, such as OneDrive or an external drive.
-
-## Hosting and judge access
-
-`render.yaml` is an optional hosting blueprint. It requires persistent storage and a service hostname. In hosted mode, server-side provider keys are ignored and visitors bring their own key through the model menu. This build is a shared workspace; it has no multi-user account isolation. Deploy a dedicated judge/test instance rather than storing confidential research in a public instance.
-
-Hosted application: https://relay-research.onrender.com/. Source and local test build: https://github.com/mohammed1916/ai_workflow_manager. The hosted app uses visitor-supplied inference keys; recorded-study inspection does not require a new inference call. A public YouTube demonstration will be added after recording.
-
-## Submission material
-
-**Suggested title:** Relay Research — Check the Comparison
-
-**Tagline:** A Nemotron-powered research agent that audits benchmark evidence, investigates protocol gaps, and revises conclusions when sources change.
-
-**Problem:** ML researchers choose baselines from tables whose dataset versions, splits, forecast horizons, metric definitions, and result provenance can differ. A lower number can look persuasive while supporting a different experiment.
-
-**Solution:** Relay combines Nemotron's paper/code reasoning with deterministic evidence checks, three-outcome comparisons, source-linked proposals, correction propagation, immutable branches, and cited proposed-study manuscripts. The researcher can inspect and revise the shared evidence state.
-
-**Nebius/NVIDIA use:** Runtime calls to Nemotron on Nebius Token Factory power search planning, assessment, extraction, investigation, synthesis and drafting. Provider/model, attempts, tokens and latency are recorded. Comparison arithmetic and source integrity checks run locally.
-
-**What is new in this event build:** The research product replaces the earlier document-handoff prototype. It adds table-aware extraction, source-addressed evidence, protocol investigations, comparison outcomes, dependent-claim invalidation, branching, manuscript/PDF export, an evaluation harness, live Nemotron research records, and the in-app API/research desk.
-
-**Demo outline, under three minutes:** Show the question and live model → open GTS's result and appendix context → inspect an incompatible or uncertain comparison → show the agent's evidence proposal → apply a sourced correction → show affected claims and a prior branch → regenerate → display the cited manuscript and compiled PDF. Trim waiting periods and label shortened processing. Attribute agent reviews honestly; do not invent a successful outcome to fit the script.
-
-**Technology feedback:** Recorded runs exposed empty extractions, response variability, occasional schema/citation issues, and confusion between table labels and protocol settings. Bounded retries, JSON repair, table-context validation and explicit unknowns improve recovery. See call records and evaluation failures for concrete evidence rather than attributing every error to the provider.
-
-**Submission links:** [hosted application](https://relay-research.onrender.com/) · [public MIT-licensed repository](https://github.com/mohammed1916/ai_workflow_manager). The public YouTube video is pending recording. Final entry and eligibility declarations remain the submitter’s responsibility; consult the [event rules](https://nebiusglobalaihackathon.devpost.com/rules).
-
-## License
-
-MIT; see LICENSE. Third-party paper text and author code retain their own rights and licenses. Cached source text is not included in the source submission archive. Citation and source URLs remain attached to research records.
-
-### Contextual explanations
-
-Use the circled info buttons on the Research Desk, evaluation scores, investigation steps, evidence fields, review controls, and model settings. Explanations open separately from editors so unsaved corrections stay intact. Evaluation help defines denominators and discloses tuning and annotation limitations. “Authors’ own-method result” refers to the source paper’s experiment, never an experiment performed by Relay; unknown provenance remains unresolved until supported by evidence.
-
-### Generic evidence contracts and human review
-
-New investigations use a domain-independent pipeline:
-
-1. **Define the comparison.** Nemotron proposes explicit entities and their inclusion definitions, plus criteria derived from the research question. Criteria are `match` (must agree), `eligibility` (both results must qualify), or `context` (describe differences). The contract is visible for review. Change it using **Revise criteria in a branch → Re-extract evidence with revised criteria**.
-2. **Extract source evidence.** Results can contain numeric measurements or qualitative findings. Each entity assignment and criterion value needs source support. Entity IDs are explicit assignments; matching a name prefix never establishes membership. Quotes prove text containment, not that the interpretation is correct.
-3. **Assess meaning.** Nemotron evaluates entity membership, outcome comparability, and every criterion with references to evidence on both sides. Code withholds decisive judgments with absent or invalid references. Missing evidence is distinct from a demonstrated conflict. No universal conversion or tolerance is assumed, and the generic engine does not calculate a scientific winner from two numbers.
-4. **Review or investigate.** Open **Comparisons → Inspect criterion judgments and evidence**. Inspect the supporting passages, review source results, and review the assessment separately. **Investigate blockers** retrieves possible missing evidence; proposals require acceptance. **Reassess this pair** explicitly requests another model judgment. Merely viewing or filtering comparisons makes no model call.
-5. **Track revisions.** Evidence and contract fingerprints invalidate stale assessments. Updated assessments invalidate manuscript claims for review and regeneration. A branch preserves its parent's checkpoint.
-
-The first automatic audit uses the selected comparison count (12 by default). All available processes the full pending queue in calls of at most three; the batch size does not cap total work. **Assess pending comparisons** continues the queue and respects the selected entity focus. Candidate ordering spreads work across paper/entity combinations; it is not a scientific merit ranking. An unassessed pair is labeled **Awaiting assessment**. An assessed pair is **Ready for human review** until reviewed. A supported comparison is conditional on the selected contract, not proof of statistical significance, causality, independent replication, or superiority.
-
-DOIs and arXiv references can be supplied as seeds. Tavily, when configured, also discovers candidate DOI/arXiv links alongside OpenAlex. Search snippets are not extracted as paper results. Seed-only runs deliberately skip discovery. Investigations can use Tavily passages and author repository evidence; source coverage and unresolved fields remain visible.
-
-The old comparator, matcher, extraction prompts, and obsolete comparator evaluation runner have been removed. Older prepared studies retain saved source evidence and checkpoints, but their comparisons are not recomputed using retired rules. To migrate an old study, branch and re-extract once. The earlier traffic benchmark and DeiT smoke receipts do not measure the generic engine's accuracy.
-
-Generic regression tests cover explicit entity IDs, quantitative and qualitative evidence, omitted criteria, invalid references, context versus gating criteria, review separation, evidence-change invalidation, bounded/cached audits, and DOI inputs. Controlled fixtures across education, materials, economics, qualitative research, and ML verify software behavior; they are not independent scientific evaluations. Live provider results are recorded separately in [generic-contract-smoke.json](data/research/generic-contract-smoke.json), with synthetic sources explicitly labeled. The final live check extracted two results per topic: the materials pair was provisionally comparable, while education remained insufficient. Neither is human-reviewed; the unsuccessful earlier attempt is retained. Cross-disciplinary expert evaluation remains outstanding.
-
-Additional APIs:
-
-| Endpoint | Behavior |
-| --- | --- |
-| `POST /api/research/assess-comparisons` | Assess a selected `limit` (positive integer or `all`); optional `entities` scope or `pair` retry; requires current revision |
-| `POST /api/research/review-comparison` | Record review of a current assessment; agent review cannot mark it human-reviewed |
-
-UI changes are checked statically; visual acceptance is left to the researcher, as requested.
-
-### Workload controls
-
-Open **New investigation → Research scope** to set paper count, results per paper, and the initial comparison workload. The comparison view has its own count control for continuing the queue. In **Investigate blockers**, select individual criteria or **Select all**; all selected criteria are processed in groups of six. There is no six-condition total cap. Contracts retain every returned entity and criterion; validated result lists and comparison lists no longer silently truncate at 12 or 400 items.
-
-Tests for the deleted heuristic comparator were retired alongside that implementation. Current coverage includes custom/all workload handling, preservation of larger contracts/results, batched full-queue processing, explicit migration of old evidence, and generic correction-to-manuscript invalidation. Saved source parsing, provenance, portability, and checkpoint protections remain in use.
+[Hosted app](https://relay-research.onrender.com/) · [Repository](https://github.com/mohammed1916/ai_workflow_manager). The final public video and submission declarations remain separate deliverables.

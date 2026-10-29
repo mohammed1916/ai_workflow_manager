@@ -95,6 +95,16 @@ class WorkflowTests(unittest.TestCase):
         self.assertEqual(self.p['draft']['comparisons'][0]['text'], 'New grounded claim.'); self.assertEqual(self.p['draft']['comparisons'][0]['previous'], 'Old claim.')
         self.assertEqual(self.p['corrections'][0]['status'], 'regenerated'); self.assertIn('Evidence assessment', self.p['tex'])
 
+    def test_generated_draft_repairs_invalid_source_ids_once(self):
+        bad={'abstract':'A proposed study.','relatedWork':[{'text':'A paper reports results.','citations':['invented-id']}],'comparisons':[]}
+        good={'abstract':'A proposed study.','study':'Review the evidence.','relatedWork':[{'text':'Graph WaveNet reports results.','citations':['WA']}],'comparisons':[]}
+        with patch.object(self.r,'llm',side_effect=[bad,good]) as call:
+            self.r.write(self.p,copy.deepcopy(self.p['papers']))
+        self.assertEqual(self.p['status'],'review')
+        self.assertEqual(self.p['draft']['relatedWork'][0]['citations'],['WA'])
+        self.assertEqual(call.call_args_list[1].args[3],'draft-validation-repair')
+        self.assertFalse(self.p['draftReviewed'])
+
     def test_draft_drops_citations_outside_reviewed_set(self):
         d = {'abstract': 'A', 'study': 'S', 'relatedWork': [{'text': 'Keeps valid.', 'citations': ['WA', 'arXiv999']}, {'text': 'Only invalid.', 'citations': ['nope']}], 'comparisons': []}
         self.r.check_draft(d, self.p['papers'], [])

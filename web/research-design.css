@@ -25,7 +25,7 @@ body{background:radial-gradient(ellipse at 85% 0%,#2b123b55,transparent 48%),#09
 .proposals{border:1px solid #4b3567;background:#140f1d;border-radius:16px;padding:18px;margin-bottom:22px}.section-title h3{margin:0 0 4px}.section-title p{margin:0 0 12px;font-size:13px}
 .proposal{border-top:1px solid var(--line);padding:14px 0}.proposal:first-of-type{border-top:0}.proposal-head{display:flex;flex-wrap:wrap;gap:8px;align-items:baseline}.proposal-head small{color:var(--muted)}
 .proposal-change{display:flex;gap:10px;align-items:center;margin:10px 0;flex-wrap:wrap}.proposal-change input{flex:1 1 220px}.before{text-decoration:line-through;color:#c79aa5}.after{color:var(--ok)}
-.outcome-summary{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin:6px 0 14px}.outcome-filter{text-align:left;padding:14px;border-radius:12px;display:flex;flex-direction:column;gap:2px}.outcome-filter b{font-size:24px;color:#fff}.outcome-filter small{color:var(--muted);font-size:11px}.outcome-filter.active{border-color:var(--violet);background:#22182f}
+.outcome-summary{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin:6px 0 14px}.outcome-filter{text-align:left;padding:14px;border-radius:12px;display:flex;flex-direction:column;gap:2px}.outcome-filter b{font-size:24px;color:#fff}.outcome-filter small{color:var(--muted);font-size:11px}.outcome-filter.active{border-color:var(--violet);background:#22182f}
 .f-comparable b{color:var(--ok)}.f-incompatible b{color:var(--bad)}.f-insufficient b{color:var(--gap)}
 #pair-search{margin-bottom:14px}
 .pair-card{border:1px solid var(--line);border-left:4px solid var(--line);border-radius:14px;padding:16px;margin:0 0 14px;background:#110e18}.outcome-comparable{border-left-color:var(--ok)}.outcome-incompatible{border-left-color:var(--bad)}.outcome-insufficient{border-left-color:var(--gap)}
@@ -143,3 +143,7 @@ input[type=checkbox]:disabled{opacity:.45;cursor:not-allowed}
 .entity-contract {display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin:16px 0}.entity-contract article,.judgment-evidence article{border:1px solid #45344e;border-radius:12px;padding:14px;margin-bottom:10px}.entity-contract p{font-size:13px}.judgment-evidence blockquote{font-size:13px}.judgment-evidence small{display:block;color:#b5a7c6}#method-scope select{width:100%}
 
 .workload-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:16px;margin:16px 0}.workload-control{display:grid;gap:8px;max-width:320px}.workload-control select,.workload-control input{width:100%;min-height:42px}.workload-control input[hidden]{display:none}.workload-settings{margin:20px 0}.investigation-fields>button{margin:4px 8px 12px 0}
+
+.coverage-panel{margin:20px 0;padding:20px;border:1px solid var(--border,#35313e);border-radius:16px}.coverage-list{display:grid;gap:10px;max-height:420px;overflow:auto}.coverage-list article,.requirements-list article{padding:12px;border-bottom:1px solid var(--border,#35313e)}.coverage-list progress{width:100%;height:6px;accent-color:#d94bdb}.coverage-list button{text-align:left}.requirements-list{margin:14px 0}
+
+.source-text{white-space:pre-wrap;max-height:480px;overflow:auto;font-size:12px;line-height:1.6}.coverage-list .meta{flex-wrap:wrap}

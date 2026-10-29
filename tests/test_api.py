@@ -78,3 +78,24 @@ class ResearchAPITests(unittest.TestCase):
             self.assertEqual(code,200)
             self.assertEqual(len(json.loads(body)['pairs']),1)
             self.assertEqual(self.call('/api/research/compare',{'id':'saved','methods':'ViT'},headers)[0],400)
+
+    def test_recorded_validation_load_is_idempotent_and_returns_project_id(self):
+        from unittest.mock import patch
+        p={'id':'a'*16,'hypothesis':'Compare two interventions fairly','provider':'nebius','model':'test','status':'review','papers':[],'created':'2026-10-29','revision':1}
+        folder=self.root/'data/research';folder.mkdir(parents=True)
+        (folder/'workflow-validation.json').write_text(json.dumps({'kind':'recorded test fixture','calls':[],'project':{'format':'relay-research/1','project':p}}))
+        headers={'Authorization':'Bearer '+self.store.token}
+        with patch('relay.research.Research.llm',side_effect=AssertionError('Opening a record must not call inference')):
+            for _ in range(2):
+                code,body=self.call('/api/desk/load',{'study':'workflow-validation'},headers)
+                self.assertEqual(code,200);self.assertEqual(json.loads(body)['id'],p['id'])
+            code,body=self.call('/api/research/samples')
+            self.assertEqual(json.loads(body)['projects'][0]['studyKey'],'generic-workflow-validation-v1')
+
+    def test_large_api_responses_support_gzip_without_changing_data(self):
+        import gzip
+        code,plain=self.call('/api/schema')
+        code,compressed=self.call('/api/schema',headers={'Accept-Encoding':'gzip'})
+        self.assertEqual(code,200)
+        self.assertEqual(json.loads(gzip.decompress(compressed)),json.loads(plain))
+        self.assertLess(len(compressed),len(plain))

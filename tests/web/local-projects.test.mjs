@@ -56,6 +56,13 @@ test('import checks give a clear reason for each kind of bad file', () => {
   assert.throws(() => L.checkFile(JSON.stringify({ format: 'other/1', project: user }), 10), /uses format "other\/1"/);
   assert.throws(() => L.checkFile(JSON.stringify({ format: 'relay-research/1', project: { ...user, id: '../../x' } }), 10), /id in this file is not valid/);
   assert.throws(() => L.checkFile(JSON.stringify({ format: 'relay-research/1', project: { ...user, hypothesis: 'short' } }), 10), /10 to 2,000 characters/);
-  assert.throws(() => L.checkFile(JSON.stringify({ format: 'relay-research/1', project: { ...user, papers: new Array(21).fill({}) } }), 10), /more than 20 papers/);
+  assert.throws(() => L.checkFile(JSON.stringify({ format: 'relay-research/1', project: { ...user, papers: null } }), 10), /paper list/);
   assert.throws(() => L.checkFile(good, 9000000), /larger than 8 MB/);
+});
+
+
+test('imports retain custom research workloads above twenty papers', () => {
+  const papers = Array.from({length: 30}, (_,i) => ({id: 'paper'+i}));
+  const text = JSON.stringify({format:'relay-research/1',project:{...user,papers}});
+  assert.equal(L.checkFile(text,text.length).project.papers.length,30);
 });

@@ -1,5 +1,5 @@
 from __future__ import annotations
-import argparse, json, mimetypes, os, re, secrets, sys
+import argparse, gzip, json, mimetypes, os, re, secrets, sys
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from urllib.parse import urlsplit, unquote
@@ -21,7 +21,12 @@ def make_handler(store,port):
         def log_message(self,*args): pass
         def respond(self,data,status=200,content_type='application/json'):
             body=json.dumps(data).encode() if content_type=='application/json' else data
+            compressed=content_type=='application/json' and len(body)>4096 and 'gzip' in self.headers.get('Accept-Encoding','')
+            if compressed:body=gzip.compress(body,compresslevel=1)
             self.send_response(status)
+            if compressed:
+                self.send_header('Content-Encoding','gzip')
+                self.send_header('Vary','Accept-Encoding')
             self.send_header('Content-Type',content_type)
             self.send_header('Content-Length',str(len(body)))
             self.send_header('Cache-Control','no-store')
@@ -120,14 +125,15 @@ def make_handler(store,port):
                         if key: research.set_key(data['id'],provider,key)
                         if tkey: research.set_key(data['id'],'tavily',tkey)
                 if self.path=='/api/desk/load':
-                    from .desk import load_study, load_discovery
-                    result=load_discovery(store.root,research) if data.get('study')=='discovery' else load_study(store.root,research)
+                    from .desk import load_study, load_discovery, load_validation
+                    result=load_validation(store.root,research) if data.get('study')=='workflow-validation' else load_discovery(store.root,research) if data.get('study')=='discovery' else load_study(store.root,research)
                 elif self.path=='/api/research/start': result=research.start(data)
                 elif self.path=='/api/research/branch': result=research.branch(data)
                 elif self.path=='/api/research/update': result=research.update(data)
                 elif self.path=='/api/research/draft': result=research.draft(data)
                 elif self.path=='/api/research/import': result=research.import_project(data)
                 elif self.path=='/api/research/assess-comparisons': result=research.assess_comparisons(data)
+                elif self.path=='/api/research/review-contract': result=research.review_contract(data)
                 elif self.path=='/api/research/review-comparison': result=research.review_comparison(data)
                 elif self.path=='/api/research/investigate': result=research.investigate(data)
                 elif self.path=='/api/research/regenerate': result=research.regenerate(data)
@@ -137,7 +143,7 @@ def make_handler(store,port):
                         p=research.get(data.get('id')); chosen=set(data.get('papers') or [])
                         methods=data.get('methods')
                         if methods is not None and (not isinstance(methods,list) or len(methods) not in (0,2) or any(not isinstance(x,str) or not x.strip() or len(x)>80 for x in methods)): raise RelayError('INVALID_SCOPE','Use two model family names or clear the model filter.')
-                        result=compare(p['papers'],chosen if len(chosen)>=2 else None,methods,assessments=p.get('comparisonAssessments',{}))
+                        result=compare(p['papers'],chosen if len(chosen)>=2 else None,methods,assessments=p.get('comparisonAssessments',{}),contract_review=p.get('contractReview'))
                 else: raise RelayError('NOT_FOUND','Unknown action.',404)
                 self.respond(result)
             except RelayError as e: self.respond({'error':str(e),'code':e.code},e.status)

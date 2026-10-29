@@ -43,30 +43,30 @@ class ExecutionHistory:
 
     def branch(self,data):
         action=data.get('next','snapshot')
-        if action not in ('snapshot','synthesize','draft','assess','extract','search'): raise RelayError('INVALID_STEP','Choose a supported continuation.')
+        if action not in ('snapshot','synthesize','draft','assess','extract','plan','search'): raise RelayError('INVALID_STEP','Choose a supported continuation.')
         node,snapshot=self.get_checkpoint(data.get('id'),data.get('node'))
         hypothesis=str(data.get('hypothesis') or snapshot['hypothesis']).strip()
         if not 10<=len(hypothesis)<=2000: raise RelayError('HYPOTHESIS_REQUIRED','Write a hypothesis between 10 and 2,000 characters.')
         provider=data.get('provider') or snapshot['provider']; model=data.get('model') or snapshot['model']
         if action!='snapshot' and model not in models(self.cfg_for_id(data.get('id')),provider)['models']:
             raise RelayError('INVALID_MODEL','Choose a currently available provider model.')
-        if action in ('synthesize','assess','extract') and not snapshot['papers']: raise RelayError('NO_EVIDENCE','This checkpoint has no papers. Continue with discovery instead.')
+        if action in ('synthesize','assess','extract','plan') and not snapshot['papers']: raise RelayError('NO_EVIDENCE','This checkpoint has no papers. Continue with discovery instead.')
         if action=='draft' and not any(x.get('reviewed') for x in snapshot['papers']): raise RelayError('REVIEW_REQUIRED','Select reviewed papers in the branch before drafting.')
         changed=hypothesis!=snapshot['hypothesis']
-        if changed and action in ('synthesize','draft'): raise RelayError('REASSESS_REQUIRED','For a changed hypothesis, choose Re-extract evidence or New discovery for new comparison criteria. Reassess updates relevance only.')
+        if changed and action in ('synthesize','draft'): raise RelayError('REASSESS_REQUIRED','For a changed hypothesis, choose Revise criteria, Re-extract evidence, or New discovery for new comparison criteria. Reassess updates relevance only.')
         with self.lock:
             if action!='snapshot' and sum(p['status'] in ('discovering','drafting','investigating') for p in self.projects)>=2:
                 raise RelayError('BUSY','Two agents are already running. You can still create an editable checkpoint copy.')
             p=copy.deepcopy(snapshot)
             p.update(id=secrets.token_hex(8),created=now(),hypothesis=hypothesis,provider=provider,model=model,
-                     revision=1,tokens=0,events=[],execution=[],status='review',
+                     revision=1,tokens=0,events=[],execution=[],calls=[],status='review',
                      branchName=str(data.get('name') or 'Alternative path')[:100],
                      parentProject=data['id'],parentNode=node['id'],rootProject=snapshot.get('rootProject',data['id']),
                      inheritedTokens=snapshot.get('tokens',0),draftReviewed=False)
-            p.pop('error',None); p.pop('compile',None)
+            p.pop('error',None); p.pop('compile',None); p.pop('archive',None)
             p['feedback']=str(data.get('feedback',''))[:3000]
-            if changed or action in ('assess','extract','search'):
-                p.update(tex='',bib='',suggestions=[],synthesis='',draftReviewed=False)
+            if changed or action in ('assess','extract','plan','search'):
+                p.update(tex='',bib='',suggestions=[],synthesis='',goalAssessments=[],synthesisStale=True,draftReviewed=False)
                 p.pop('draft',None)
             if changed:
                 for paper in p['papers']:
@@ -84,8 +84,11 @@ class ExecutionHistory:
         try:
             if action=='search': self.run(p); return
             if action=='draft': self.write(p,[copy.deepcopy(x) for x in p['papers'] if x.get('reviewed')]); return
+            if action=='plan':
+                if self.plan_protocol(p) is False:return
+                self.rebind_evidence(p)
             if action=='extract':
-                self.plan_protocol(p)
+                if self.plan_protocol(p) is False:return
                 p['comparisonAssessments'] = {}
                 p['proposals'] = []
                 p['corrections'] = []

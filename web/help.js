@@ -1,5 +1,6 @@
 // Contextual help stays separate from editor dialogs so unsaved inputs remain intact.
 const topics = {
+  "source-coverage": ["Retrieved source coverage", "Shows how much retrieved text was supplied to the model, the observations returned, rejected source claims, and retained results. Reading every passage does not prove exhaustive extraction or scientific correctness. Partial coverage can be resumed without discarding accepted results."],
   "evaluations": [
     "How evaluations work",
     "These are recorded comparison-classification runs, not new experiments on forecasting models. Labels were annotated by agents, not independently validated by domain experts. Development cases informed tuning; held-out cases share papers with development, so they are not a clean unseen-domain test. Read accuracy together with coverage and wrong acceptances."

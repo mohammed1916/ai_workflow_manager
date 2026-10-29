@@ -2,7 +2,7 @@
 // Pure functions only, so they can be tested without the page.
 
 // Bundled starter investigations. The server installs them from data/research/.
-export const SAMPLE_KEYS = ['nebius-benchmark-audit-v1', 'nebius-discovery-v1'];
+export const SAMPLE_KEYS = ['nebius-benchmark-audit-v1', 'nebius-discovery-v1', 'generic-workflow-validation-v1'];
 export const REMOVED_KEY = 'relay-removed-copies';
 
 export const idOK = (id) => /^[a-f0-9]{16}$/.test(String(id || ''));
@@ -39,7 +39,7 @@ export function checkFile(text, size) {
   const p = doc.project;
   if (!idOK(p.id)) throw Error('The project id in this file is not valid.');
   if (typeof p.hypothesis !== 'string' || p.hypothesis.length < 10 || p.hypothesis.length > 2000) throw Error('The question in this file must be 10 to 2,000 characters.');
-  if (!Array.isArray(p.papers) || p.papers.length > 20) throw Error('The paper list in this file is missing or has more than 20 papers.');
+  if (!Array.isArray(p.papers)) throw Error('The paper list in this file is missing or invalid.');
   return doc;
 }
 

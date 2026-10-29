@@ -6,7 +6,7 @@ from pathlib import Path
 from .core import RelayError, digest, now
 
 API = [
-    {'method':'GET','path':'/api/desk','purpose':'Saved findings, live-run provenance, evaluations, and readiness.'},
+    {'method':'GET','path':'/api/desk','purpose':'Recent research runs, source coverage, and explicitly recorded validation.'},
     {'method':'GET','path':'/api/submission/export','purpose':'Download the source test build with README, license, data, and tests. Excludes local credentials and private state.'},
     {'method':'GET','path':'/api/schema','purpose':'API catalog and request examples. Mutations use the session bearer token from /api/state.'},
     {'method':'GET','path':'/api/research','purpose':'All research projects, evidence metadata, proposals, drafts, and model-call records.'},
@@ -22,8 +22,9 @@ API = [
      'example':{'id':'PROJECT','revision':1,'action':'correct','actor':'agent','paper':'PAPER','metric':'METRIC','field':'metricDefinition','value':'non-standard evaluation','note':'Source-backed reason for this correction.'}},
     {'method':'POST','path':'/api/research/compare','purpose':'Compute comparisons from the current evidence. No model call.', 'example':{'id':'PROJECT','papers':[]}},
     {'method':'POST','path':'/api/research/assess-comparisons','purpose':'Assess the selected total in small calls; limit accepts a positive count or all.', 'example':{'id':'PROJECT','revision':1,'entities':['e1','e2'],'limit':'all'}},
+    {'method':'POST','path':'/api/research/review-contract','purpose':'Record human review of the question-to-criteria mapping; does not verify results.', 'example':{'id':'PROJECT','revision':1,'approved':True,'note':'Checked every question requirement.'}},
     {'method':'POST','path':'/api/research/review-comparison','purpose':'Record review of the current evidence assessment.', 'example':{'id':'PROJECT','revision':1,'pair':'PAIR','approved':True,'note':'Checked source applicability.'}},
-    {'method':'POST','path':'/api/research/branch','purpose':'Copy a checkpoint, or continue with search, relevance assessment, question-specific re-extraction (next: extract), synthesis, or drafting.',
+    {'method':'POST','path':'/api/research/branch','purpose':'Copy a checkpoint, or continue with search, relevance assessment, criteria revision using inherited observations (next: plan), source re-extraction (next: extract), synthesis, or drafting.',
      'example':{'id':'PROJECT','node':'NODE','next':'snapshot','name':'Alternative experiment'}},
     {'method':'POST','path':'/api/research/draft','purpose':'Generate a proposed-study manuscript from reviewed sources.',
      'example':{'id':'PROJECT','revision':1,'feedback':'Explain incompatible baselines and propose a common evaluation protocol. Do not claim experiments were conducted.'}},
@@ -52,15 +53,15 @@ def evaluation(root):
 
 def overview(root, research):
     featured=next((p for p in research.projects if p.get('studyKey')=='nebius-benchmark-audit-v1' and not p.get('parentProject')),None)
-    findings=[
-      {'title':'An appendix changes the benchmark interpretation','paper':'2101.06861','url':'https://arxiv.org/html/2101.06861','detail':'GTS Table 1 reports METR-LA 60-minute MAE 2.99. Appendix D describes a different metric calculation; the corrected Table 4 reports 3.41. Check the table and appendix before comparing either value with another paper.', 'kind':'Metric definition'},
-      {'title':'Paper and author code disagree on the split','paper':'2005.11650','url':'https://arxiv.org/html/2005.11650','detail':'MTGNN states a 70/20/10 train/validation/test split. Its published data-generation code allocates 70% to training and 20% to testing, leaving 10% for validation. A paper-only conclusion and a code-backed conclusion can differ.', 'kind':'Protocol conflict'},
-      {'title':'Similar metric labels can hide different masking','paper':'2308.10425','url':'https://arxiv.org/html/2308.10425','detail':'Author code provides context absent from headline tables. Zero-target masking and unmasked MAE must be checked before treating AGCRN and STAEformer results as matching evaluations.', 'kind':'Investigation needed'},
-    ]
+    path=root/'data/research/workflow-validation.json'
+    validation=None
+    if path.exists():
+        receipt=json.loads(path.read_text(encoding='utf-8'));project=receipt['project']['project']
+        validation={'title':project['hypothesis'],'description':receipt['kind'],'papers':len(project['papers']),'results':sum(len(x.get('metrics',[])) for x in project['papers']),'tokens':project.get('tokens',0)}
     return {'featured':{'id':featured['id'],'status':featured['status'],'papers':len(featured['papers']),'tokens':featured.get('tokens',0),
                         'calls':len(featured.get('calls',[])),'compiled':bool(featured.get('compile',{}).get('ok'))} if featured else None,
-            'recent':[{'id':p['id'],'title':p.get('branchName') or p['hypothesis'],'status':p['status'],'papers':len(p['papers']),'calls':len(p.get('calls',[])),'provider':p['provider'],'model':p['model']} for p in research.projects if p.get('provider')=='nebius' and p.get('studyKey') not in ('nebius-benchmark-audit-v1','nebius-discovery-v1') and not p.get('parentProject')][:4],
-            'findings':findings,'evaluation':evaluation(root),
+            'recent':[{'id':p['id'],'title':p.get('branchName') or p['hypothesis'],'status':p['status'],'papers':len(p['papers']),'results':sum(len(x.get('metrics',[])) for x in p['papers']),'tokens':p.get('tokens',0),'calls':len(p.get('calls',[])),'provider':p['provider'],'model':p['model']} for p in research.projects if p.get('provider')=='nebius' and p.get('studyKey') not in ('nebius-benchmark-audit-v1','nebius-discovery-v1') and not p.get('parentProject')][:4],
+            'findings':[],'workflowValidation':validation,'evaluation':evaluation(root),
             'scope':'Source-backed quantitative and qualitative comparisons. Recorded accuracy evaluation covers traffic forecasting; other domains require validation.',
             'review':'Recorded study · Ready for human review.',
             'readiness':{'runtime':'Nebius Token Factory / NVIDIA Nemotron research calls are recorded in the prepared study.',
@@ -143,3 +144,21 @@ def load_discovery(root, research):
         research.projects.insert(0,p)
         research.checkpoint(p,'import','Recorded discovery and manuscript',details={'note':'Imported final snapshot of an API-run study, not reconstructed intermediate executions.'})
         return {'id':p['id'],'loaded':True}
+
+
+def load_validation(root,research):
+    path=root/'data/research/workflow-validation.json'
+    if not path.exists():raise RelayError('NOT_FOUND','No recorded workflow validation is installed.',404)
+    receipt=json.loads(path.read_text(encoding='utf-8'));document=copy.deepcopy(receipt['project'])
+    for paper in document['project']['papers']:
+        if paper.get('sourceRef') and digest(paper.get('evidence',''))!=paper['sourceRef']:
+            raise RelayError('SOURCE_CHANGED','Recorded source hash does not match its evidence; import stopped.',409)
+    document['project']['archive']=True
+    document['project']['studyKey']='generic-workflow-validation-v1'
+    result=research.import_project(document)
+    result['id']=document['project']['id']
+    p=research.get(result['id'])
+    if not result.get('existing'):
+        p['calls']=receipt.get('calls',[])
+        research.checkpoint(p,'validation-import','Recorded live validation imported without new inference',details={'receipt':'data/research/workflow-validation.json','humanReviewed':False})
+    return result
