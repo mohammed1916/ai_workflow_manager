@@ -29,27 +29,6 @@ class ResearchTests(unittest.TestCase):
     def test_extraction_never_self_verifies(self):
         p=self.paper();validate_analysis(p,{'metrics':[self.metric()],'relevance':500})
         self.assertFalse(p['metrics'][0]['verified']);self.assertEqual(p['relevance'],100)
-    def test_unknown_context_is_insufficient_not_incompatible(self):
-        a,b=self.paper(),self.paper('W2');a['metrics']=[dict(self.metric(),id='1')];b['metrics']=[dict(self.metric(),id='2',split='unknown')]
-        pair=compare([a,b])['pairs'][0]
-        self.assertEqual(pair['outcome'],'insufficient');self.assertIsNone(pair['favours'])
-    def test_matching_experiments_favour_lower_error(self):
-        a,b=self.paper(),self.paper('W2');a['metrics']=[dict(self.metric(),id='1')];b['metrics']=[dict(self.metric(),id='2',value='19.5')]
-        pair=compare([a,b])['pairs'][0]
-        self.assertEqual(pair['outcome'],'comparable');self.assertEqual(pair['favours'],'a');self.assertTrue(pair['verified'])
-        b['metrics'][0]['horizon']='15 minutes'
-        result=compare([a,b])
-        self.assertEqual(result['pairs'],[]);self.assertEqual(result['summary']['differentHorizon'],1)
-    def test_same_paper_is_not_paired(self):
-        p=self.paper();p['metrics']=[dict(self.metric(),id='1'),dict(self.metric(),id='2')]
-        self.assertEqual(compare([p])['pairs'],[])
-    def test_unverified_comparable_pair_is_marked_unverified(self):
-        a,b=self.paper(),self.paper('W2');a['metrics']=[dict(self.metric(),id='1',verified=False)];b['metrics']=[dict(self.metric(),id='2',value='19.5')]
-        pair=compare([a,b])['pairs'][0]
-        self.assertFalse(pair['verified']);self.assertIn('not yet human-verified',pair['explanation'][0])
-    def test_nan_is_not_ranked(self):
-        a,b=self.paper(),self.paper('W2');a['metrics']=[dict(self.metric(),id='1')];b['metrics']=[dict(self.metric(),id='2',value='nan')]
-        self.assertIsNone(compare([a,b])['pairs'][0]['favours'])
     def test_manuscript_escapes_tex_and_cites_known_papers(self):
         tex,bib=manuscript({'hypothesis':'Does A & B improve 5%?','papers':[self.paper()]},{'abstract':'Proposed study.','relatedWork':[{'text':'Prior work.','citations':['W1','fake']}],'study':'Evaluate.'})
         self.assertIn(r'A \& B',tex);self.assertIn(r'\cite{W1}',tex);self.assertNotIn('fake',tex);self.assertIn(r'A \& B',bib)

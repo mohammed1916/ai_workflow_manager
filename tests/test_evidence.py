@@ -1,6 +1,6 @@
 import unittest
-from relay.evidence import (html_to_text, cell_context, split_key, horizon_key, metric_definition_key, dataset_key, compare_pair,
-                            compare, check_metric, supports, passages, repository_links, code_passages, is_proposed, dataset_splits, stated_splits, horizon_key, resolve_bare_pems)
+from relay.evidence import (html_to_text, cell_context, split_key, horizon_key, metric_definition_key, dataset_key,
+                            check_metric, supports, passages, repository_links, code_passages, is_proposed, dataset_splits, stated_splits, horizon_key, resolve_bare_pems)
 
 
 def row(**kw):
@@ -62,41 +62,6 @@ class NormalizerTests(unittest.TestCase):
         self.assertFalse(supports('60/20/20', '70% for training, 10% for validation and 20% for testing'))
 
 
-class CompareTests(unittest.TestCase):
-    def test_matching_context_is_comparable(self):
-        r = compare_pair(row(), row(paper='B', title='Paper B', method='Graph WaveNet', value='3.53'))
-        self.assertEqual(r['outcome'], 'comparable'); self.assertEqual(r['favours'], 'a'); self.assertAlmostEqual(r['relative'], 3.4, 1)
-
-    def test_missing_context_is_insufficient_not_incompatible(self):
-        r = compare_pair(row(), row(paper='B', split='unknown'))
-        self.assertEqual(r['outcome'], 'insufficient'); self.assertIn('split is unknown', r['explanation'][0]); self.assertIsNone(r['favours'])
-
-    def test_conflicts_are_explained(self):
-        r = compare_pair(row(), row(paper='B', horizon='15 minutes'))
-        self.assertEqual(r['outcome'], 'incompatible'); self.assertIn('different horizons', r['explanation'][0])
-        r = compare_pair(row(horizon='12 steps', aggregation='average over 12 horizons'), row(paper='B', horizon='60 minutes'))
-        self.assertIn('aggregation', r['explanation'][0])
-
-    def test_nonstandard_metric_conflicts_even_when_other_side_is_unknown(self):
-        r = compare_pair(row(metricDefinition='computed in a manner different from the official DCRNN results'), row(paper='B', metricDefinition='unknown'))
-        self.assertEqual(r['outcome'], 'incompatible')
-
-    def test_unknown_metric_definition_is_a_caveat(self):
-        r = compare_pair(row(), row(paper='B', metricDefinition='unknown'))
-        self.assertEqual(r['outcome'], 'comparable'); self.assertTrue(r['caveats'])
-
-    def test_cited_copy_is_not_independent(self):
-        r = compare_pair(row(method='DCRNN', value='3.60'), row(paper='B', method='DCRNN', value='3.60', provenance='cited'))
-        self.assertFalse(r['independent'])
-
-    def test_compare_skips_same_paper_and_counts_other_datasets(self):
-        a = {'id': 'A', 'title': 'A', 'metrics': [dict(row(), id='1'), dict(row(value='2.0'), id='2')]}
-        b = {'id': 'B', 'title': 'B', 'metrics': [dict(row(dataset='PEMS-BAY'), id='3'), dict(row(value='3.5'), id='4')]}
-        result = compare([a, b])
-        self.assertEqual(result['summary']['differentDataset'], 2)
-        self.assertTrue(all(x['a']['paper'] != x['b']['paper'] for x in result['pairs']))
-
-
 class CheckTests(unittest.TestCase):
     source = 'Experiments. We use 70% of data for training, 10% for validation and 20% for testing.\nTable 4: Corrected error (METR-LA).\n| | Metric | GTS\n| 60 min | MAE | 3.41'
 
@@ -131,12 +96,6 @@ class CheckTests(unittest.TestCase):
         check_metric(m2, source)
         self.assertEqual(m2['aggregation'], 'unknown'); self.assertIn('averaged over horizons', m2['rejected']['aggregation']['reason'])
 
-    def test_different_single_horizons_are_counted_not_listed(self):
-        a = {'id': 'A', 'title': 'A', 'metrics': [dict(row(), id='1')]}
-        b = {'id': 'B', 'title': 'B', 'metrics': [dict(row(horizon='15 minutes'), id='2'), dict(row(horizon='12 steps', aggregation='average over 12 horizons'), id='3')]}
-        result = compare([a, b])
-        self.assertEqual(result['summary']['differentHorizon'], 1); self.assertEqual(len(result['pairs']), 1)
-        self.assertIn('aggregation', result['pairs'][0]['explanation'][0])
 
     def test_correction_note_flags_original_table_but_not_the_correction(self):
         source = ('Table 1: Forecasting error (METR-LA).\n| | Metric | GTS\n| 60 min | MAE | 2.99\n'
@@ -172,16 +131,6 @@ class CheckTests(unittest.TestCase):
         self.assertEqual(resolve_bare_pems('The PeMS dataset contains 6 months of data recorded by 325 traffic sensors.', 'PeMS'), 'PEMS-BAY')
         self.assertIsNone(resolve_bare_pems('The PeMS dataset is described below.', 'PeMS'))
 
-    def test_unknown_metric_name_is_missing_not_conflicting_and_recovered_from_column(self):
-        a = {'paper': 'A', 'title': 'A', 'metric': 'm1', 'verified': True, 'method': 'DCRNN', 'dataset': 'PEMS04', 'split': '60/20/20', 'horizon': '60 minutes',
-             'aggregation': 'single horizon', 'metricDefinition': 'masked', 'provenance': 'cited', 'name': 'unknown', 'value': '21.22', 'direction': 'lower', 'quote': 'x', 'citedFrom': 'unknown', 'datasetVersion': 'unknown', 'preprocessing': 'unknown', 'locator': 'Table 1', 'unit': 'unknown'}
-        b = dict(a, paper='B', title='B', name='MAE', value='21.5', provenance='own', method='AGCRN')
-        self.assertEqual(compare_pair(a, b)['outcome'], 'insufficient')
-        source = 'Table 1: Performance.\n| Model | PeMSD4\n| Model | MAE\n| DCRNN [2] | 21.22'
-        m = {'method': 'DCRNN', 'name': 'unknown', 'value': '21.22', 'quote': '| DCRNN [2] | 21.22', 'dataset': 'PeMSD4', 'split': 'unknown', 'horizon': 'unknown',
-             'aggregation': 'unknown', 'preprocessing': 'unknown', 'metricDefinition': 'unknown', 'provenance': 'unknown', 'datasetVersion': 'unknown', 'citedFrom': 'unknown', 'evidence': {}}
-        check_metric(m, source)
-        self.assertEqual(m['name'], 'MAE')
 
     def test_dataset_name_in_metric_field_is_rejected_and_recovered_from_column(self):
         source = 'Table 1: Performance.\n| Model | PeMSD4\n| Model | MAE\n| AGCRN | 19.83'

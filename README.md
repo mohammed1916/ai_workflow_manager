@@ -149,7 +149,7 @@ project_id = json.load(urllib.request.urlopen(request))['id']
 
 API reviews may include `actor: "agent"`; these are recorded as agent reviews. A checked review flag permits drafting; it does not turn an agent assessment into independent human validation. The prepared study's manuscript approval remains unchecked.
 
-Discovery defaults to at most 12 papers and two search queries; `paperLimit` can be 2–12. An investigation can contain up to 20 papers after additions. These are bounded runs, not exhaustive systematic reviews.
+Research scope controls offer 6, 10, 12, 25, a custom positive count, or **All available** for papers, results per paper, and initial comparisons. Discovery uses two queries. Custom counts request additional OpenAlex pages; All available takes the initial retrieval set (up to 200 candidates per query); All available refers to retrieved candidates, not the entire literature. Result extraction remains limited by supplied source context and the provider response budget; it is not an exhaustive-review guarantee. Additional papers can be added without the old 20-paper ceiling.
 
 ## Recorded findings and sources
 
@@ -198,22 +198,14 @@ No new forecasting experiment, user study, independently validated time saving, 
 
 ```sh
 python3 -m unittest discover -s tests -v
-python3 eval/run.py --validate
 node --input-type=module --check < web/research.js
 node --input-type=module --check < web/desk.js
 node --input-type=module --check < web/execution.js
 ```
 
-`--validate` checks 82 gold quotations and 47 table cells against cached/downloaded public sources. It is not a model inference run.
+The retired comparator and its evaluation runner have been removed. Historical receipts and evidence remain available; the old implementation can be inspected at Git commit `d97893f`. They do not validate the current generic engine. API acceptance helpers in `scripts/live/` use `RELAY_URL`; scripted reviews remain labeled as such.
 
-```sh
-python3 eval/run.py --split dev
-python3 eval/run.py --split heldout
-```
-
-These commands call Nebius and consume inference credits. Do not tune on the held-out split and then present it as unseen. API acceptance helpers in `scripts/live/` use `RELAY_URL` (default `http://127.0.0.1:4280`). Their review actions are scripted and must remain labeled accordingly.
-
-Current automated verification: **150 Python tests pass**, plus the JavaScript local-project tests. JavaScript modules pass syntax checks. Tests cover source checks, comparison rules, provider separation, revision conflicts, correction propagation, stale-claim regeneration, immutable checkpoints, branch isolation, compiler restrictions, API origin/host/token enforcement, and saved-study imports. No GUI automation is required. Current changes have not received a visual browser review; the user will inspect the UI.
+Current automated verification: **116 Python tests pass**, plus the JavaScript local-project tests. JavaScript modules pass syntax checks. Tests cover source checks, comparison rules, provider separation, revision conflicts, correction propagation, stale-claim regeneration, immutable checkpoints, branch isolation, compiler restrictions, API origin/host/token enforcement, and saved-study imports. No GUI automation is required. Current changes have not received a visual browser review; the user will inspect the UI.
 
 ## PDF compilation
 
@@ -301,11 +293,11 @@ New investigations use a domain-independent pipeline:
 4. **Review or investigate.** Open **Comparisons → Inspect criterion judgments and evidence**. Inspect the supporting passages, review source results, and review the assessment separately. **Investigate blockers** retrieves possible missing evidence; proposals require acceptance. **Reassess this pair** explicitly requests another model judgment. Merely viewing or filtering comparisons makes no model call.
 5. **Track revisions.** Evidence and contract fingerprints invalidate stale assessments. Updated assessments invalidate manuscript claims for review and regeneration. A branch preserves its parent's checkpoint.
 
-The first automatic audit assesses at most 12 candidate pairs, in calls of at most three. **Assess pending comparisons** continues the queue and respects the selected entity focus. Candidate ordering spreads work across paper/entity combinations; it is not a scientific merit ranking. An unassessed pair is labeled **Awaiting assessment**. An assessed pair is **Ready for human review** until reviewed. A supported comparison is conditional on the selected contract, not proof of statistical significance, causality, independent replication, or superiority.
+The first automatic audit uses the selected comparison count (12 by default). All available processes the full pending queue in calls of at most three; the batch size does not cap total work. **Assess pending comparisons** continues the queue and respects the selected entity focus. Candidate ordering spreads work across paper/entity combinations; it is not a scientific merit ranking. An unassessed pair is labeled **Awaiting assessment**. An assessed pair is **Ready for human review** until reviewed. A supported comparison is conditional on the selected contract, not proof of statistical significance, causality, independent replication, or superiority.
 
 DOIs and arXiv references can be supplied as seeds. Tavily, when configured, also discovers candidate DOI/arXiv links alongside OpenAlex. Search snippets are not extracted as paper results. Seed-only runs deliberately skip discovery. Investigations can use Tavily passages and author repository evidence; source coverage and unresolved fields remain visible.
 
-Older prepared studies retain their **historical comparator** and recorded evaluation. Its specialized rules are isolated in `relay/legacy_matching.py`; they do not run in new generic investigations. To migrate an old study, branch and re-extract once. The earlier traffic benchmark and DeiT smoke receipts do not measure the generic engine's accuracy.
+The old comparator, matcher, extraction prompts, and obsolete comparator evaluation runner have been removed. Older prepared studies retain saved source evidence and checkpoints, but their comparisons are not recomputed using retired rules. To migrate an old study, branch and re-extract once. The earlier traffic benchmark and DeiT smoke receipts do not measure the generic engine's accuracy.
 
 Generic regression tests cover explicit entity IDs, quantitative and qualitative evidence, omitted criteria, invalid references, context versus gating criteria, review separation, evidence-change invalidation, bounded/cached audits, and DOI inputs. Controlled fixtures across education, materials, economics, qualitative research, and ML verify software behavior; they are not independent scientific evaluations. Live provider results are recorded separately in [generic-contract-smoke.json](data/research/generic-contract-smoke.json), with synthetic sources explicitly labeled. The final live check extracted two results per topic: the materials pair was provisionally comparable, while education remained insufficient. Neither is human-reviewed; the unsuccessful earlier attempt is retained. Cross-disciplinary expert evaluation remains outstanding.
 
@@ -313,7 +305,13 @@ Additional APIs:
 
 | Endpoint | Behavior |
 | --- | --- |
-| `POST /api/research/assess-comparisons` | Assess up to 12 pending pairs; optional `entities` scope or `pair` for explicit retry; requires current revision |
+| `POST /api/research/assess-comparisons` | Assess a selected `limit` (positive integer or `all`); optional `entities` scope or `pair` retry; requires current revision |
 | `POST /api/research/review-comparison` | Record review of a current assessment; agent review cannot mark it human-reviewed |
 
 UI changes are checked statically; visual acceptance is left to the researcher, as requested.
+
+### Workload controls
+
+Open **New investigation → Research scope** to set paper count, results per paper, and the initial comparison workload. The comparison view has its own count control for continuing the queue. In **Investigate blockers**, select individual criteria or **Select all**; all selected criteria are processed in groups of six. There is no six-condition total cap. Contracts retain every returned entity and criterion; validated result lists and comparison lists no longer silently truncate at 12 or 400 items.
+
+Tests for the deleted heuristic comparator were retired alongside that implementation. Current coverage includes custom/all workload handling, preservation of larger contracts/results, batched full-queue processing, explicit migration of old evidence, and generic correction-to-manuscript invalidation. Saved source parsing, provenance, portability, and checkpoint protections remain in use.
