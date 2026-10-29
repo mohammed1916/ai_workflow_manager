@@ -64,6 +64,7 @@ def make_handler(store,port):
                         text=research.source(paper)
                         self.respond({'text':text,'sha256':digest(text),'url':paper.get('evidenceUrl'),'kind':paper.get('evidenceKind')})
                 elif route=='/README.md': self.respond((ROOT/'README.md').read_bytes(),content_type='text/plain; charset=utf-8')
+                elif route=='/api/research/samples': self.respond(research.samples())
                 elif route=='/api/research':
                     # Only projects the browser names by id are returned; nothing is listed globally.
                     from urllib.parse import parse_qs

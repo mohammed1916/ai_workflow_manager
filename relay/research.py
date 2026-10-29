@@ -473,6 +473,19 @@ class Research(ExecutionHistory):
                 if digest(text) == ref: return text
         return paper.get('evidence', '')
 
+    SAMPLE_KEYS = ('nebius-benchmark-audit-v1', 'nebius-discovery-v1')
+
+    def samples(self):
+        """Starter investigations installed from data/research/. Summaries only; no evidence text."""
+        with self.lock:
+            out = []
+            for p in self.projects:
+                if p.get('studyKey') in self.SAMPLE_KEYS and not p.get('parentProject'):
+                    last = (p.get('execution') or [None])[-1]
+                    out.append({'id': p['id'], 'hypothesis': p['hypothesis'], 'branchName': p.get('branchName'), 'status': p['status'],
+                                'papers': len(p['papers']), 'studyKey': p['studyKey'], 'execution': [{'id': last['id']}] if last else []})
+            return {'projects': out}
+
     def state(self, ids=None):
         """Projects named by id (None means all, for local use only)."""
         with self.lock:

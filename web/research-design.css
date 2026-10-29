@@ -126,3 +126,10 @@ input[type=checkbox]:disabled{opacity:.45;cursor:not-allowed}
 .help-close { position:absolute; top:12px; right:12px; font-size:22px; }
 .desk-metrics .info-button { display:inline-flex; }
 @media (pointer:coarse) { .info-button { min-width:36px; width:36px; height:36px; } }
+/* Sample investigations: a collapsible starter list, separate from the user's own investigations. */
+.sample-section{margin:14px 0 0;border-top:1px solid var(--line);padding-top:10px}
+.sample-section summary{cursor:pointer;list-style:none;display:flex;flex-direction:column;gap:2px;color:#f2e9fb;font-weight:600;font-size:13px;padding:6px 2px}
+.sample-section summary::-webkit-details-marker{display:none}
+.sample-section summary small{color:var(--muted);font-weight:400;font-size:11px}
+.sample-row{display:flex;flex-direction:column;gap:4px;margin:6px 0 10px}
+.sample-copy{align-self:flex-start;font-size:12px;padding:6px 10px}

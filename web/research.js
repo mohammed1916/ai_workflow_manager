@@ -1,9 +1,11 @@
 import {info} from '/help.js';
+import * as LP from '/local-projects.js';
 import {executionUI} from '/execution.js';
 import {researchDesk} from '/desk.js';
 import * as store from '/store.js';
 const $=s=>document.querySelector(s), esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const initialRoute=new URLSearchParams(location.hash.slice(1));
+let samples=[],removed=LP.readRemoved(localStorage);
 let screen=initialRoute.get('screen')||(!location.hash?'desk':'project');
 let token='',projects=[],active=initialRoute.get('screen')==='new'?null:(initialRoute.get('id')||localStorage.getItem('research-project')),tab=initialRoute.get('view')||'compare',selected=new Set(),provider=localStorage.getItem('relay-provider'),model=localStorage.getItem('relay-model'),signature='',dirty=false,editorFile='tex',zoom=1,expandedTopics=new Set(),pairFilter='all',pairQuery='',comparisonCache={key:'',data:null};
 const example='Do graph neural networks improve traffic forecasting over transformer models under comparable datasets and forecast horizons?';
@@ -23,13 +25,13 @@ async function api(path,data){const r=await fetch('/api/'+path,{method:data?'POS
 function toast(s){$('#toast').textContent=s;$('#toast').hidden=false;clearTimeout(toast.t);toast.t=setTimeout(()=>$('#toast').hidden=true,6000)}
 function modal(html){$('#dialog-content').innerHTML=html;if(!$('#dialog').open)$('#dialog').showModal()}
 $('.close').onclick=()=>$('#dialog').close();
-async function refresh(force=false){try{await loadProjects();local.down=false;await restoreMissing();syncCopies();const sig=JSON.stringify(projects);sidebar();if((force||sig!==signature)&&!dirty){signature=sig;const y=window.scrollY;render();requestAnimationFrame(()=>window.scrollTo(0,y))}}catch(e){if(isNetworkError(e)){local.down=true;sidebar();return}toast(e.message)}}
+async function refresh(force=false){try{await loadProjects();local.down=false;try{samples=(await api('research/samples')).projects}catch{}await dropSampleCopies();await restoreMissing();syncCopies();const sig=JSON.stringify(projects);sidebar();if((force||sig!==signature)&&!dirty){signature=sig;const y=window.scrollY;render();requestAnimationFrame(()=>window.scrollTo(0,y))}}catch(e){if(isNetworkError(e)){local.down=true;sidebar();return}toast(e.message)}}
 async function beforeNavigate(){if(!dirty)return true;try{await saveEditor();return true}catch(e){toast(e.message);return false}}
 function routeTo(node){const q=new URLSearchParams();if(['history','desk'].includes(screen))q.set('screen',screen);else if(active){q.set('id',active);q.set('view',tab);if(node)q.set('node',node)}else q.set('screen','new');window.history.pushState({},'',location.pathname+'#'+q.toString())}
 async function openProject(id,view='compare',node){if(!await beforeNavigate())return;if(!projects.some(p=>p.id===id))await loadProjects([id]);active=id;screen='project';tab=view;localStorage.setItem('research-project',id);selected.clear();if(node)executions.setNode(node);routeTo(node);render();sidebar()}
 async function openTab(view){if(!await beforeNavigate())return;tab=view;routeTo();render()}
 async function showHistory(){if(!await beforeNavigate())return;screen='history';routeTo();render();sidebar()}
-function sidebar(){const have=new Set(projects.map(p=>p.id));const notes=[];if(local.down)notes.push(`<p class="side-note warn">Relay's server is not responding. Your saved projects are still here; try again in a moment.</p>`);if(local.restored)notes.push('<button class="side-note ok" id="dismiss-restored">Restored from your browser copy after the server restarted.</button>');const waiting=local.copies.filter(c=>!have.has(c.id)).map(c=>`<div class="project-link unrestored">${esc(c.hypothesis.slice(0,90))}<small>${esc(local.errors.get(c.id)||(local.down?'Waiting for the server.':'Restoring from your browser copy…'))}</small></div>`);if(!projects.length&&!waiting.length)notes.push(`<p class="side-note">${local.ready?'Start an investigation. It is saved in this browser.':'Start an investigation. This browser window cannot keep it after you close the window.'}</p>`);$('#projects').innerHTML=notes.join('')+projects.map(p=>`<button class="project-link ${p.id===active&&screen==='project'?'active':''}" data-project="${p.id}">${p.parentProject?'⑂ ':''}${esc((p.branchName||p.hypothesis).slice(0,90))}<small>${p.papers.length} papers · ${esc(p.status)} · ${(p.proposals||[]).filter(x=>x.status==='pending').length} proposals</small></button>`).join('');$('#projects').insertAdjacentHTML('beforeend',waiting.join(''));document.querySelectorAll('[data-project]').forEach(b=>b.onclick=()=>openProject(b.dataset.project));if($('#dismiss-restored'))$('#dismiss-restored').onclick=()=>{local.restored=false;sidebar()};$('#model-button').textContent=(model||'Choose model')+' ⌄';$('#executions').classList.toggle('active',screen==='history');$('#desk-nav').classList.toggle('active',screen==='desk')}
+function sidebar(){const have=new Set(projects.map(p=>p.id));const notes=[];if(local.down)notes.push(`<p class="side-note warn">Relay's server is not responding. Your saved projects are still here; try again in a moment.</p>`);if(local.restored)notes.push('<button class="side-note ok" id="dismiss-restored">Restored from your browser copy after the server restarted.</button>');const waiting=local.copies.filter(c=>!have.has(c.id)).map(c=>`<div class="project-link unrestored">${esc(c.hypothesis.slice(0,90))}<small>${esc(local.errors.get(c.id)||(local.down?'Waiting for the server.':'Restoring from your browser copy…'))}</small></div>`);if(!projects.length&&!waiting.length)notes.push(`<p class="side-note">${local.ready?'Start an investigation. It is saved in this browser.':'Start an investigation. This browser window cannot keep it after you close the window.'}</p>`);$('#projects').innerHTML=notes.join('')+projects.filter(p=>!LP.isSample(p)&&!removed.has(p.id)&&(copyOf(p.id)||p.id===active)).map(p=>`<button class="project-link ${p.id===active&&screen==='project'?'active':''}" data-project="${p.id}">${p.parentProject?'⑂ ':''}${esc((p.branchName||p.hypothesis).slice(0,90))}<small>${p.papers.length} papers · ${esc(p.status)} · ${(p.proposals||[]).filter(x=>x.status==='pending').length} proposals</small></button>`).join('');$('#projects').insertAdjacentHTML('beforeend',waiting.join(''));renderSamples();document.querySelectorAll('[data-project]').forEach(b=>b.onclick=()=>openProject(b.dataset.project));if($('#dismiss-restored'))$('#dismiss-restored').onclick=()=>{local.restored=false;sidebar()};$('#model-button').textContent=(model||'Choose model')+' ⌄';$('#executions').classList.toggle('active',screen==='history');$('#desk-nav').classList.toggle('active',screen==='desk')}
 $('#executions').onclick=showHistory;
 $('#desk-nav').onclick=async()=>{if(!await beforeNavigate())return;screen='desk';routeTo();sidebar();render()};
 const closeNavigation=()=>{document.body.classList.remove('nav-open');$('#nav-toggle').setAttribute('aria-expanded','false')};
@@ -135,6 +137,7 @@ async function saveCopy(id,{auto=false}={}){
   local.saving.add(id);
   try{
     const doc=await api('research/project?id='+id);
+    if(!LP.mayKeepCopy(doc.project,removed)){local.saving.delete(id);return false}
     const ok=await store.saveProject(doc);
     if(ok){local.copies=[{id,hypothesis:doc.project.hypothesis,savedAt:new Date().toISOString()},...local.copies.filter(c=>c.id!==id)];local.saved.set(id,doc.project.revision+':'+doc.project.status)}
     else{local.retryAt.set(id,Date.now()+30000);if(!local.warnedSave){local.warnedSave=true;toast('This browser could not keep a copy of the project. Export a file to keep it.')}}
@@ -157,7 +160,7 @@ function autosaveTick(){for(const p of projects)if(!busy(p)&&local.saved.get(p.i
 async function restoreMissing(){
   const have=new Set(projects.map(p=>p.id));
   for(const id of have){local.tried.delete(id);local.errors.delete(id)}
-  const missing=local.copies.map(c=>c.id).filter(id=>!have.has(id)&&!local.tried.has(id));
+  const missing=local.copies.map(c=>c.id).filter(id=>!have.has(id)&&!local.tried.has(id)&&!removed.has(id));
   let restored=false;
   for(const id of missing){
     const doc=await store.getProject(id);
@@ -178,16 +181,7 @@ const panelMsg=t=>{const m=$('#panel-msg');if(m)m.textContent=t};
 const when=iso=>{const d=new Date(iso);return isNaN(d)?'':d.toLocaleDateString(undefined,{year:'numeric',month:'short',day:'numeric'})};
 const fmtBytes=n=>n>=1e6?(n/1e6).toFixed(1)+' MB':Math.round(n/1e3)+' KB';
 const slug=s=>String(s||'').toLowerCase().normalize('NFKD').replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'').slice(0,60).replace(/-+$/,'')||'investigation';
-function checkCopy(text,size){
-  if(size>8000000)throw Error('This file is too large to be a Relay Research project.');
-  let doc;try{doc=JSON.parse(text)}catch{throw Error('This file is not a Relay Research project.')}
-  const p=doc&&doc.project;
-  if(!doc||doc.format!=='relay-research/1'||!p||typeof p!=='object')throw Error('This file is not a Relay Research project.');
-  if(!idOK(p.id))throw Error('The project id in this file is not valid.');
-  if(typeof p.hypothesis!=='string'||p.hypothesis.length<10||p.hypothesis.length>2000)throw Error('The question in this file is not valid.');
-  if(!Array.isArray(p.papers)||p.papers.length>20)throw Error('The paper list in this file is not valid.');
-  return doc;
-}
+function checkCopy(text,size){return LP.checkFile(text,size)}
 async function exportCopy(id){
   let doc;
   try{doc=await api('research/project?id='+id)}catch(e){doc=await store.getProject(id);if(!doc)throw e}
@@ -197,8 +191,31 @@ async function exportCopy(id){
   setTimeout(()=>URL.revokeObjectURL(url),2000);
   panelMsg('Exported '+name+'.');
 }
+async function dropSampleCopies(){
+  // Starter investigations are never the user's: remove any browser copy saved by an earlier version.
+  const sampleIds=new Set([...samples.map(s=>s.id),...projects.filter(LP.isSample).map(p=>p.id)]);
+  for(const c of local.copies.filter(c=>sampleIds.has(c.id))){await store.deleteProject(c.id);local.copies=local.copies.filter(x=>x.id!==c.id);local.saved.delete(c.id)}
+}
+function renderSamples(){
+  const box=$('#samples');if(!box)return;
+  const open=localStorage.getItem('relay-samples-open')==='1';
+  box.innerHTML=`<details class="sample-section" id="samples-details" ${open?'open':''}><summary><span>Sample investigations</span><small>starter examples · start your own copy to change them</small></summary>${samples.length?samples.map(s=>`<div class="sample-row"><button class="project-link" data-project="${s.id}">${esc((s.branchName||s.hypothesis).slice(0,90))}<small>${s.papers} papers · ${esc(s.status)} · sample</small></button><button class="sample-copy" data-copy-sample="${s.id}">Start my own copy</button></div>`).join(''):'<p class="side-note">Samples appear here after the Research desk loads them.</p>'}</details>`;
+  $('#samples-details').addEventListener('toggle',e=>localStorage.setItem('relay-samples-open',e.target.open?'1':'0'));
+  box.querySelectorAll('[data-copy-sample]').forEach(b=>b.onclick=()=>startFromSample(b.dataset.copySample));
+}
+async function startFromSample(id){
+  const sample=samples.find(x=>x.id===id);
+  if(!sample)return toast('This sample is not available. Open the Research desk to load it.');
+  try{
+    const r=await api('research/branch',LP.copyFromSampleBody(sample));
+    await saveCopy(r.id);await loadProjects([r.id]);
+    active=r.id;screen='project';tab='compare';localStorage.setItem('research-project',active);routeTo();render();sidebar();
+    toast('Your copy is ready. Changes stay in this browser.');
+  }catch(e){toast(e.message)}
+}
 async function removeCopy(id){
   if(!confirm('Remove this copy from this browser? Files you exported are not affected. The server copy is removed when the server restarts.'))return;
+  removed=LP.markRemoved(localStorage,id);projects=projects.filter(p=>p.id!==id);
   await store.deleteProject(id);
   local.copies=local.copies.filter(c=>c.id!==id);local.tried.delete(id);local.errors.delete(id);local.saved.delete(id);local.status.delete(id);
   if(active===id){active=null;localStorage.removeItem('research-project');screen='project';routeTo();render()}
@@ -210,6 +227,7 @@ async function importFile(file){
     const doc=checkCopy(await file.text(),file.size);
     const id=doc.project.id;
     const r=await api('research/import',doc);
+    removed=LP.unmarkRemoved(localStorage,id);
     await saveCopy(id);
     await loadProjects([id]);
     $('#dialog').close();
