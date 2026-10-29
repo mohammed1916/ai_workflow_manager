@@ -1,4 +1,4 @@
-"""Conservative semantic matching. Raw evidence is never overwritten."""
+"""Archived v1/v2 comparator helpers. Never used for new generic investigations."""
 import re
 
 
@@ -85,8 +85,8 @@ def match_condition(field, label, a, b, row_a=None, row_b=None):
 
 
 def method_matches(value, target):
-    # Prefix boundary distinguishes ViT from SP-ViT, while allowing ViT-B/16.
-    return bool(re.match(r'^'+re.escape(target.strip())+r'(?=$|[\s\-/\[(])',str(value).strip().replace('–','-').replace('—','-'),re.I))
+    # Historical views can select an exact reported label; no inferred family membership.
+    return str(value).strip().casefold() == str(target).strip().casefold()
 
 
 def non_distilled_requested(protocol):

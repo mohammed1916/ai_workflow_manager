@@ -1,13 +1,15 @@
 """Question-specific comparison contracts. Never infer missing result values from a contract."""
 import re
-from .matching import kind, non_distilled_requested
+from .legacy_matching import kind, non_distilled_requested
 
-PLAN = '''Plan a source-grounded comparison for this research question and researcher direction.
-Return {"queries":[two scholarly search strings],"protocol":{"task":"forecasting, classification, or general","targetMethods":["first model family","second model family"],"factors":[{"key":"short_snake_case","label":"Readable experimental condition","reason":"Why matching it is needed for this question"}]}}.
-Use targetMethods only for an explicit two-family comparison, otherwise return an empty list. Restrictions such as non-distilled must be represented as a factor even when both sides must have the same value. Choose 2 to 8 essential experimental conditions, not outcome metrics. For image classification consider external pretraining data, input resolution, model capacity, distillation/teacher, and evaluation protocol. For other research choose the relevant population, intervention, evaluation design, budget or protocol. Forecasting horizon is handled separately ONLY for forecasting. Dataset, metric identity, units, evaluation partition and provenance are handled separately. Do not invent experimental values. If the user explicitly excludes a factor, omit it and explain the narrowed scope in the search queries only if relevant. These are proposed criteria, not verified facts.'''
+from .semantics import PLAN
+
 
 def contract(raw):
     raw = raw if isinstance(raw, dict) else {}
+    if raw.get('version')==3:
+        from .semantics import contract as generic_contract
+        return generic_contract(raw)
     task = raw.get('task') if raw.get('task') in ('forecasting','classification','general') else 'general'
     factors = []
     for f in (raw.get('factors') or [])[:8]:
@@ -35,6 +37,7 @@ def forecasting(metric):
 
 def enforce_scope(protocol):
     """Add an explicit eligibility field for a requested subset; never populate its value."""
+    if protocol.get('version')==3: return protocol
     if non_distilled_requested(protocol) and not any(kind(f['key'],f.get('label',''))=='distillation' for f in protocol.get('factors',[])):
         protocol.setdefault('factors',[]).append({'key':'factor_distillation','label':'Distillation','reason':'The question restricts comparison to non-distilled results.'})
     return protocol

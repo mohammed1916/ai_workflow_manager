@@ -21,6 +21,8 @@ API = [
     {'method':'POST','path':'/api/research/update','purpose':'Review evidence, check a number, add a paper, accept/reject a proposal, apply a correction, amend-draft with structured source-reviewed prose, or save a manuscript. Requires the current revision.',
      'example':{'id':'PROJECT','revision':1,'action':'correct','actor':'agent','paper':'PAPER','metric':'METRIC','field':'metricDefinition','value':'non-standard evaluation','note':'Source-backed reason for this correction.'}},
     {'method':'POST','path':'/api/research/compare','purpose':'Compute comparisons from the current evidence. No model call.', 'example':{'id':'PROJECT','papers':[]}},
+    {'method':'POST','path':'/api/research/assess-comparisons','purpose':'Bounded semantic assessment or explicit pair retry; ready for human review.', 'example':{'id':'PROJECT','revision':1,'entities':['e1','e2']}},
+    {'method':'POST','path':'/api/research/review-comparison','purpose':'Record review of the current evidence assessment.', 'example':{'id':'PROJECT','revision':1,'pair':'PAIR','approved':True,'note':'Checked source applicability.'}},
     {'method':'POST','path':'/api/research/branch','purpose':'Copy a checkpoint, or continue with search, relevance assessment, question-specific re-extraction (next: extract), synthesis, or drafting.',
      'example':{'id':'PROJECT','node':'NODE','next':'snapshot','name':'Alternative experiment'}},
     {'method':'POST','path':'/api/research/draft','purpose':'Generate a proposed-study manuscript from reviewed sources.',

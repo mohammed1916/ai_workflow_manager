@@ -1,6 +1,6 @@
 import copy
 import unittest
-from relay.matching import match_condition, resolution
+from relay.legacy_matching import match_condition, resolution
 from relay.protocol import contract, enforce_scope
 from relay.evidence import compare, compare_pair, html_to_text, row
 from test_protocol import vision
@@ -45,11 +45,11 @@ class MatchingTests(unittest.TestCase):
         a=vision(metricDefinition='top-1 accuracy');b=vision(metricDefinition='top-1 accuracy on ImageNet-1K validation set')
         self.assertEqual(compare_pair(a,b)['outcome'],'comparable')
         self.assertEqual(compare_pair(vision(metricDefinition='single-crop top-1 accuracy'),b)['outcome'],'insufficient')
-    def test_method_focus_excludes_same_family_and_sp_vit(self):
+    def test_historical_focus_uses_exact_labels(self):
         metrics=[vision(id='a',method='ViT-B/16'),vision(id='b',method='DeiT-B'),vision(id='c',method='DeiT-S'),vision(id='d',method='SP-ViT')]
-        r=compare([{'id':'p','metrics':metrics}],methods=['ViT','DeiT'])
-        self.assertEqual(len(r['pairs']),2)
-        self.assertEqual(r['summary']['outsideScope'],4)
+        r=compare([{'id':'p','metrics':metrics}],methods=['ViT-B/16','DeiT-B'])
+        self.assertEqual(len(r['pairs']),1)
+        self.assertEqual(r['summary']['outsideScope'],5)
     def test_non_distilled_restriction_is_enforced_without_guessing(self):
         a,b=vision(),vision(method='DeiT')
         for m in (a,b):
@@ -95,6 +95,6 @@ class MatchingTests(unittest.TestCase):
         self.assertEqual(text,'Evidence')
 
     def test_separating_distilled_groups_does_not_exclude_one_group(self):
-        from relay.matching import non_distilled_requested
+        from relay.legacy_matching import non_distilled_requested
         self.assertFalse(non_distilled_requested({'question':'Separate distilled from non-distilled models.'}))
         self.assertTrue(non_distilled_requested({'direction':'Compare non-distilled DeiT and ViT results.'}))

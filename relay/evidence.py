@@ -6,7 +6,7 @@ missing context as proof of incompatibility.
 """
 import hashlib, html, math, re
 from .protocol import factor_keys, forecasting, protocol_of
-from .matching import kind, partition, match_condition, method_matches, non_distilled_requested, distillation_state
+from .legacy_matching import kind, partition, match_condition, method_matches, non_distilled_requested, distillation_state
 from html.parser import HTMLParser
 
 # Context fields that travel with every reported number.
@@ -491,6 +491,9 @@ def check_metric(metric, source, title=''):
     - unsupported fields are demoted to unknown; the model's claim is kept for review.
     - the table cell path is compared with method, metric, and horizon.
     """
+    if protocol_of(metric).get('version')==3:
+        from .semantics import validate_metric
+        return validate_metric(metric,source)
     if not known(metric.get('dataset', 'unknown')):
         # The table's column path often names the dataset (for example "PeMS / GMAN / 1 hour / MAE").
         cell0 = cell_context(source, metric.get('value', ''), metric.get('method', ''), metric.get('name', ''), metric.get('horizon', ''))

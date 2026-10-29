@@ -86,6 +86,7 @@ class ExecutionHistory:
             if action=='draft': self.write(p,[copy.deepcopy(x) for x in p['papers'] if x.get('reviewed')]); return
             if action=='extract':
                 self.plan_protocol(p)
+                p['comparisonAssessments'] = {}
                 p['proposals'] = []
                 p['corrections'] = []
                 for paper in p['papers']:

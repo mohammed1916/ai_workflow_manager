@@ -139,3 +139,5 @@ input[type=checkbox]:disabled{opacity:.45;cursor:not-allowed}
 #method-scope {display:flex;align-items:end;gap:12px;flex-wrap:wrap}#method-scope label {flex:1;min-width:150px;margin:0}#method-scope input {width:100%}
 .investigation-fields {display:grid;gap:10px;border:1px solid #53425f;border-radius:12px;padding:18px;margin:20px 0}.investigation-fields label {margin:0}
 @media(max-width:650px){#method-scope {display:grid;grid-template-columns:1fr}#method-scope>span{display:none}.comparison-focus,.comparison-guidance{padding:16px}}
+
+.entity-contract {display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin:16px 0}.entity-contract article,.judgment-evidence article{border:1px solid #45344e;border-radius:12px;padding:14px;margin-bottom:10px}.entity-contract p{font-size:13px}.judgment-evidence blockquote{font-size:13px}.judgment-evidence small{display:block;color:#b5a7c6}#method-scope select{width:100%}

@@ -3,14 +3,14 @@ import concurrent.futures, copy, io, json, re, secrets, shutil, subprocess, thre
 import xml.etree.ElementTree as ET
 from .core import RelayError, read_config, now, digest
 from .providers import complete, models, with_key
-from . import tavily
-from .protocol import PLAN, contract, factor_keys, forecasting, enforce_scope
+from . import tavily, semantics
+from .protocol import PLAN, contract, factor_keys, forecasting, enforce_scope, protocol_of
 from .evidence import (FIELDS, LABELS, check_metric, compare as compare_results, html_to_text, known, norm, passages, cell_context, mentions, window, table_notes, split_key, split_supported,
                        repository_links, code_passages, REPO_FILES, supports, short_id, provenance_key, metric_key)
 
 BUSY = ('discovering', 'drafting', 'investigating')
 CONTEXT_EDITABLE = ('name', 'value', 'unit', 'direction', 'method', 'dataset', 'datasetVersion', 'split', 'horizon', 'aggregation',
-                    'preprocessing', 'metricDefinition', 'provenance', 'citedFrom', 'locator')
+                    'preprocessing', 'metricDefinition', 'provenance', 'citedFrom', 'locator', 'entityId', 'entityQuote', 'measurementQuote')
 SOURCE_LIMIT = 400000
 
 
@@ -31,20 +31,20 @@ def title_key(title):
     return re.sub(r'[^a-z0-9]', '', str(title).lower())[:80]
 
 
+def paper_from_work(w):
+    loc = w.get('primary_location') or {}
+    url = w.get('doi') or loc.get('landing_page_url') or w['id']
+    if not str(url).startswith('https://'): url = w['id']
+    abstract = abstract_text(w.get('abstract_inverted_index'))
+    return {'id': w['id'].split('/')[-1], 'title': w['display_name'], 'year': w.get('publication_year'), 'url': url, 'doi': w.get('doi'),
+                   'authors': [a['author']['display_name'] for a in w.get('authorships', [])[:8]], 'venue': (loc.get('source') or {}).get('display_name', ''),
+                   'citations': w.get('cited_by_count', 0), 'abstract': abstract, 'evidence': abstract, 'evidenceKind': 'abstract' if abstract else 'metadata only',
+                   'evidenceUrl': url, 'topics': [t['display_name'] for t in w.get('topics', [])[:3]], 'metrics': [],
+                   'locations': [l.get('landing_page_url') or '' for l in w.get('locations', [])], 'reviewed': False, 'origin': 'search'}
+
 def discover(query):
     raw = json.loads(fetch('https://api.openalex.org/works?' + urllib.parse.urlencode({'search': query, 'per-page': 8})))
-    papers = []
-    for w in raw.get('results', []):
-        loc = w.get('primary_location') or {}
-        url = w.get('doi') or loc.get('landing_page_url') or w['id']
-        if not str(url).startswith('https://'): url = w['id']
-        abstract = abstract_text(w.get('abstract_inverted_index'))
-        papers.append({'id': w['id'].split('/')[-1], 'title': w['display_name'], 'year': w.get('publication_year'), 'url': url, 'doi': w.get('doi'),
-                       'authors': [a['author']['display_name'] for a in w.get('authorships', [])[:8]], 'venue': (loc.get('source') or {}).get('display_name', ''),
-                       'citations': w.get('cited_by_count', 0), 'abstract': abstract, 'evidence': abstract, 'evidenceKind': 'abstract' if abstract else 'metadata only',
-                       'evidenceUrl': url, 'topics': [t['display_name'] for t in w.get('topics', [])[:3]], 'metrics': [],
-                       'locations': [l.get('landing_page_url') or '' for l in w.get('locations', [])], 'reviewed': False, 'origin': 'search'})
-    return papers
+    return [paper_from_work(w) for w in raw.get('results',[])]
 
 
 ARXIV_ID = re.compile(r'(?:arxiv\.org/(?:abs|pdf|html)/|arxiv:\s*)?(\d{4}\.\d{4,5})(?:v\d+)?', re.I)
@@ -53,7 +53,7 @@ ARXIV_ID = re.compile(r'(?:arxiv\.org/(?:abs|pdf|html)/|arxiv:\s*)?(\d{4}\.\d{4,
 def arxiv_paper(identifier):
     """Metadata for a researcher-supplied arXiv paper (the papers they are considering as baselines)."""
     m = ARXIV_ID.search(str(identifier).strip())
-    if not m: raise RelayError('INVALID_PAPER', 'Use an arXiv ID such as 2101.06861 or an arxiv.org link.')
+    if not m: raise RelayError('INVALID_PAPER', 'Use a DOI, arXiv ID, or arxiv.org link.')
     aid = m[1]
     feed = ET.fromstring(fetch('https://export.arxiv.org/api/query?' + urllib.parse.urlencode({'id_list': aid}), 500000))
     ns = {'a': 'http://www.w3.org/2005/Atom'}
@@ -66,6 +66,16 @@ def arxiv_paper(identifier):
             'url': f'https://arxiv.org/abs/{aid}', 'doi': None, 'authors': [norm(a.findtext('a:name', '', ns)) for a in entry.findall('a:author', ns)][:8],
             'venue': 'arXiv', 'citations': 0, 'abstract': abstract, 'evidence': abstract, 'evidenceKind': 'abstract', 'evidenceUrl': f'https://arxiv.org/abs/{aid}',
             'topics': [], 'metrics': [], 'locations': [f'https://arxiv.org/abs/{aid}'], 'reviewed': False, 'origin': 'researcher'}
+
+
+DOI_ID = re.compile(r'(?:https?://(?:dx\.)?doi\.org/)?(10\.\d{4,9}/[^\s]+)$',re.I)
+
+def referenced_paper(identifier):
+    value=str(identifier).strip(); doi=DOI_ID.fullmatch(value)
+    if doi and not doi[1].lower().startswith('10.48550/arxiv.'):
+        w=json.loads(fetch('https://api.openalex.org/works/https://doi.org/'+urllib.parse.quote(doi[1],safe='/')))
+        paper=paper_from_work(w);paper['origin']='researcher';return paper
+    return arxiv_paper(value)
 
 
 def enrich(p):
@@ -97,9 +107,14 @@ def canonical_topic(value):
 SETUP = re.compile(r'(?i)pretrain|resolution|distill|teacher|crop|population|cohort|intervention|randomiz|sample size|confidence interval|parameter|training budget|split|training set|for training|7\s*:\s*1\s*:\s*2|6\s*:\s*2\s*:\s*2|horizon|averag|missing values|mask|normaliz|z-score|interpolat|reported (?:in|by)|reproduc|original paper|repeat|runs\b|metric|correction')
 
 
-def analysis_text(text, budget=36000):
+def analysis_text(text, budget=36000, generic=False):
     """Bounded model input that keeps result tables and experimental-setup sentences from the whole paper."""
     if len(text) <= budget: return text
+    if generic:
+        # Distribute a bounded excerpt across the document without a domain keyword catalog.
+        width=budget//8
+        starts=[round(i*(len(text)-width)/7) for i in range(8)]
+        return '\n[Excerpt boundary; context omitted]\n'.join(text[i:i+width] for i in starts)
     lines = text.split('\n'); priority = {}
     caption_rank = 0
     for i, line in enumerate(lines):
@@ -134,7 +149,7 @@ def validate_analysis(p, analysis, source=None):
     score = analysis.get('relevance', 0)
     p['relevance'] = max(0, min(100, int(score))) if isinstance(score, (int, float)) else 0
     p['rationale'] = str(analysis.get('rationale', 'No relevance assessment returned.'))[:1500]
-    p['topic'] = canonical_topic(analysis.get('topic', 'Other approaches'))
+    p['topic'] = str(analysis.get('topic','Other approaches'))[:100] if p.get('protocol',{}).get('version')==3 else canonical_topic(analysis.get('topic', 'Other approaches'))
     p['limitations'] = str(analysis.get('limitations', 'Experimental context requires review.'))[:1800]
     return _validate_metrics(p, analysis, source)
 
@@ -142,24 +157,29 @@ def validate_analysis(p, analysis, source=None):
 def _validate_metrics(p, analysis, source):
     p['metrics'] = []; rejected = 0
     doc = norm(source)
+    generic = p.get('protocol',{}).get('version')==3
     for m in analysis.get('metrics', [])[:12]:
         if not isinstance(m, dict): continue
         quote = norm(m.get('quote', '')); value = norm(m.get('value', '')); located = False
         if quote.startswith('|'): quote = quote.rstrip(' |')
         if value.endswith('%') and m.get('unit') == '%' and value[:-1] in quote: value = value[:-1]; m = dict(m, value=value)
-        if re.search(r'\d', value) and (len(quote) < 15 or quote not in doc or value not in quote):
+        if not generic and re.search(r'\d', value) and (len(quote) < 15 or quote not in doc or value not in quote):
             # Models often return only the number. Use the source table row instead, but only when the
             # cell's row/column labels name the extracted method and metric.
             cell = cell_context(source, value, str(m.get('method', '')), str(m.get('name', '')), str(m.get('horizon', '')))
             if cell and mentions(str(m.get('method', '')), cell['path']) and metric_key(str(m.get('name', ''))) in cell['path'].lower():
                 quote, located = norm(cell['row']), True
         # Numeric evidence must be literally present in a retrieved passage.
-        if len(quote) < 15 or quote not in doc or not re.search(r'\d', value) or value not in quote: rejected += 1; continue
+        if len(quote) < 15 or quote not in doc or (not generic and not re.search(r'\d', value)) or not value or value not in quote: rejected += 1; continue
         metric = {k: norm(m.get(k, 'unknown'))[:2000] or 'unknown' for k in ('name', 'value', 'unit', 'direction') + FIELDS}
+        if generic:
+            metric['entityId']=str(m.get('entityId','unknown'))[:80]
+            metric['entityQuote']=norm(m.get('entityQuote',''))[:2000]
+            metric['measurementQuote']=norm(m.get('measurementQuote',''))[:4000]
         metric['protocol'] = copy.deepcopy(p.get('protocol', {}))
         for key in factor_keys(metric): metric[key] = norm(m.get(key, 'unknown'))[:2000]
         metric['direction'] = {'minimize': 'lower', 'min': 'lower', 'lower is better': 'lower', 'maximize': 'higher', 'max': 'higher', 'higher is better': 'higher'}.get(metric['direction'].lower(), metric['direction'].lower())
-        if metric['direction'] not in ('lower', 'higher') and re.search(r'(?i)\b(mae|rmse|mse|mape|error|loss)\b', metric['name']): metric['direction'] = 'lower'
+        if not generic and metric['direction'] not in ('lower', 'higher') and re.search(r'(?i)\b(mae|rmse|mse|mape|error|loss)\b', metric['name']): metric['direction'] = 'lower'
         metric['quote'] = quote; metric['verified'] = False; metric['quoteLocated'] = located
         metric['provenance'] = provenance_key(metric['provenance'])
         evidence = {}
@@ -176,7 +196,9 @@ def _validate_metrics(p, analysis, source):
     return p
 
 
-def compare(papers, selected=None, methods=None):
+def compare(papers, selected=None, methods=None, assessments=None):
+    if any(p.get('protocol',{}).get('version')==3 or any(protocol_of(m).get('version')==3 for m in p.get('metrics',[])) for p in papers):
+        return semantics.compare(papers,selected,methods,assessments)
     if methods is None:
         methods=next((x.get('protocol',{}).get('targetMethods',[]) for x in papers if x.get('protocol',{}).get('targetMethods')),[])
     return compare_results(papers, selected, methods)
@@ -313,6 +335,7 @@ EXTRACT = ('You extract reported experimental results from a paper for an ML res
            'The priority hint only orders what to extract first; never skip a paper because it does not match the hint. An empty list is correct only when the text has no numeric results. Never invent numbers.')
 
 def extraction_system(protocol):
+    if protocol.get('version')==3: return semantics.extraction_system(protocol)
     keys = [f['key'] for f in protocol.get('factors',[])]
     fields = ','.join(json.dumps(k)+':'+json.dumps('short verbatim value or unknown') for k in keys)
     schema = EXTRACT.replace('\"locator\":\"table or section\",', fields + (',' if fields else '') + '\"locator\":\"table or section\",')
@@ -354,7 +377,7 @@ def target_context(ask, paper_id, title, source, value, method='', protocol=None
                'passages': passages(source, fields, method or (cell['labels'][0] if cell and cell['labels'] else ''), limit=10)}
     if protocol:
         payload['comparisonProtocol'] = protocol
-        payload['paperText'] = analysis_text(source,24000)
+        payload['paperText'] = analysis_text(source,24000,generic=protocol.get('version')==3)
     answer = ask(extraction_system(protocol) + ' Extract only the requested numeric target.' if protocol else TARGET, payload, 'target')
     m = answer.get('metrics', [answer])[0] if isinstance(answer.get('metrics'), list) and answer.get('metrics') else answer
     m = dict(m); m['value'] = value
@@ -381,13 +404,15 @@ def squash(text):
 def investigate_metric(ask, title, source, metric, fields, repo=None):
     """Ask the model to settle missing or conflicting fields from ranked passages; keep only proposals whose quote
     is copied from a passage and, for numeric fields, supports the value. Shared by the app and the evaluation."""
-    found = passages(source, fields, metric.get('method', ''))
+    generic=protocol_of(metric).get('version')==3
+    found = [] if generic else passages(source, fields, metric.get('method', ''))
     if factor_keys(metric):
-        found += [{'id':'C'+str(i), 'origin':'paper','location':'Experimental context','text':text} for i,text in enumerate([analysis_text(source,24000)])]
+        found += [{'id':'C'+str(i), 'origin':'paper','location':'Experimental context','text':text} for i,text in enumerate([analysis_text(source,24000,generic=generic)])]
     pool = {x['id']: x for x in found + (repo or [])}
     if not pool: return [], [], found
-    target = {k: metric.get(k) for k in ('method', 'name', 'value', 'dataset', 'split', 'horizon', 'aggregation', 'metricDefinition', 'provenance', 'locator', 'quote') + tuple(factor_keys(metric))}
-    result = ask(INVESTIGATE, {'target': target, 'comparisonProtocol':metric.get('protocol',{}), 'paper': title, 'fields': fields, 'passages': list(pool.values())}, 'investigate')
+    target = {k: metric.get(k) for k in ('method', 'name', 'value', 'dataset', 'split', 'horizon', 'aggregation', 'metricDefinition', 'provenance', 'locator', 'quote','entityId','entityQuote') + tuple(factor_keys(metric))}
+    instruction=INVESTIGATE.split(' For aggregation,')[0]+' Quote applicable source evidence. Never guess.' if generic else INVESTIGATE
+    result = ask(instruction, {'target': target, 'comparisonProtocol':metric.get('protocol',{}), 'paper': title, 'fields': fields, 'passages': list(pool.values())}, 'investigate')
     proposals = []
     for prop in result.get('proposals', [])[:8]:
         if not isinstance(prop, dict): continue
@@ -455,7 +480,7 @@ class Research(ExecutionHistory):
         self.projects = json.loads(self.path.read_text(encoding='utf-8')) if self.path.exists() else []
         for p in self.projects:
             for paper in p['papers']:
-                if 'topic' in paper: paper['topic'] = canonical_topic(paper['topic'])
+                if 'topic' in paper and paper.get('protocol',{}).get('version')!=3: paper['topic'] = canonical_topic(paper['topic'])
                 for m in paper.get('metrics', []):
                     m.setdefault('id', metric_id(paper['id'], m)); m.setdefault('history', [])
             if p['status'] in BUSY: p.update(status='interrupted', error='Companion restarted. Branch from a saved checkpoint to continue.')
@@ -594,7 +619,7 @@ class Research(ExecutionHistory):
         if not isinstance(limit, int) or isinstance(limit, bool) or not 2 <= limit <= 12: raise RelayError('INVALID_LIMIT', 'Choose between 2 and 12 papers per discovery run.')
         seeds = [str(s).strip() for s in (data.get('seeds') or []) if str(s).strip()][:12]
         for s in seeds:
-            if not ARXIV_ID.search(s): raise RelayError('INVALID_PAPER', f'"{s[:60]}" is not an arXiv ID or arXiv link.')
+            if not ARXIV_ID.search(s) and not DOI_ID.fullmatch(s): raise RelayError('INVALID_PAPER', f'"{s[:60]}" is not a DOI or arXiv reference.')
         seed_only = bool(data.get('seedOnly')) and bool(seeds)
         if model not in models(cfg, provider)['models']: raise RelayError('INVALID_MODEL', 'Choose a model from the live catalog.')
         with self.lock:
@@ -612,7 +637,7 @@ class Research(ExecutionHistory):
             for s in p.get('seeds', []):
                 self.event(p, 'Retrieving your paper ' + s)
                 try:
-                    paper = arxiv_paper(s); papers.setdefault(paper['id'], paper)
+                    paper = referenced_paper(s); papers.setdefault(paper['id'], paper)
                 except Exception as e:
                     self.event(p, f'Could not retrieve {s}: {str(e)[:120]}')
             if not p.get('seedOnly'):
@@ -630,10 +655,10 @@ class Research(ExecutionHistory):
                             hits = tavily.search(cfg['TAVILY_API_KEY'], q + ' research paper arxiv', max_results=4)
                             p.setdefault('searchReceipts',[]).append({'provider':'tavily','query':q,'results':[{'url':h['url'],'title':h['location']} for h in hits]})
                             for hit in hits:
-                                match = ARXIV_ID.search(hit['url'])
+                                match = ARXIV_ID.search(hit['url']) or DOI_ID.fullmatch(hit['url'])
                                 if not match: continue
                                 try:
-                                    paper = arxiv_paper(match[0])
+                                    paper = referenced_paper(hit['url'])
                                     if title_key(paper['title']) not in titles: papers.setdefault(paper['id'],paper); titles.add(title_key(paper['title']))
                                 except Exception as e: self.event(p, 'Search candidate could not be retrieved: ' + str(e)[:100])
                         except Exception as e: self.event(p, 'Tavily unavailable; continuing with scholarly discovery. ' + str(e)[:100])
@@ -641,7 +666,7 @@ class Research(ExecutionHistory):
                     for paper in discover(q):
                         if title_key(paper['title']) not in titles: papers.setdefault(paper['id'], paper); titles.add(title_key(paper['title']))
             selected = list(papers.values())[:p.get('paperLimit', 12)]
-            if not selected: raise ValueError('No papers found. Try a broader hypothesis or add arXiv IDs.')
+            if not selected: raise ValueError('No papers found. Try a broader hypothesis or add DOI/arXiv references.')
             self.event(p, f'Found {len(selected)} papers. Retrieving available arXiv full text and abstracts.')
             with concurrent.futures.ThreadPoolExecutor(max_workers=4) as pool: selected = list(pool.map(enrich, selected))
             with self.lock:
@@ -659,7 +684,7 @@ class Research(ExecutionHistory):
         self.event(p, 'Planning question-specific comparison criteria.')
         plan = self.llm(p, PLAN, {'hypothesis':p['hypothesis'], 'direction':p.get('feedback','')}, 'comparison-plan', 6000)
         with self.lock:
-            p['protocol'] = contract(plan.get('protocol'))
+            p['protocol'] = contract({**(plan.get('protocol') or {}),'version':3})
             p['protocol']['question'] = p['hypothesis']
             p['protocol']['direction'] = p.get('feedback','')
             enforce_scope(p['protocol'])
@@ -672,14 +697,20 @@ class Research(ExecutionHistory):
         source = self.source(paper)
         paper['protocol'] = copy.deepcopy(p.get('protocol',{}))
         try:
-            fit = self.llm(p, ASSESS, {'hypothesis': p['hypothesis'], 'paper': {'title': paper['title'], 'abstract': paper.get('abstract', '')[:3000], 'text': analysis_text(source, 8000)}}, 'assess', 4000)
-            payload = {'priorityHint': p['hypothesis'], 'direction':p.get('feedback',''), 'comparisonProtocol':p.get('protocol',{}), 'paper': {'title': paper['title'], 'evidenceKind': paper['evidenceKind'], 'text': analysis_text(source)}}
+            fit = self.llm(p, ASSESS, {'hypothesis': p['hypothesis'], 'paper': {'title': paper['title'], 'abstract': paper.get('abstract', '')[:3000], 'text': analysis_text(source, 8000, generic=p.get('protocol',{}).get('version')==3)}}, 'assess', 4000)
+            payload = {'priorityHint': p['hypothesis'], 'direction':p.get('feedback',''), 'comparisonProtocol':p.get('protocol',{}), 'paper': {'title': paper['title'], 'evidenceKind': paper['evidenceKind'], 'text': analysis_text(source,generic=p.get('protocol',{}).get('version')==3)}}
             found = self.llm(p, extraction_system(p.get('protocol',{})), payload, 'extract', 32000)
             table_rows = sum(1 for line in source.split('\n') if line.startswith('|') and len(re.findall(r'\d+\.\d+', line)) >= 2)
-            if not found.get('metrics') and table_rows >= 3:
+            if p.get('protocol',{}).get('version')!=3 and not found.get('metrics') and table_rows >= 3:
                 # Recovery: models occasionally decline when a paper only partly matches the question.
                 payload['note'] = f'The text contains {table_rows} numeric table rows. Extract the main reported results from them.'
                 found = self.llm(p, extraction_system(p.get('protocol',{})), payload, 'extract-retry', 32000)
+            if p.get('protocol',{}).get('version')==3:
+                checked=validate_analysis(copy.deepcopy(paper),found,source)
+                rejected=[{'result':m.get('method'),'fields':m.get('rejected')} for m in checked['metrics'] if m.get('rejected')]
+                if rejected or checked.get('rejectedMetrics'):
+                    payload['validationFeedback']={'rejectedFields':rejected,'rejectedResults':checked.get('rejectedMetrics',0),'instruction':'Repair once using verbatim source passages without ellipses. Preserve all supported results. Return unknown where evidence cannot support the field; never invent context to pass validation.'}
+                    found=self.llm(p,extraction_system(p['protocol']),payload,'extract-evidence-repair',32000)
             with self.lock:
                 validate_analysis(paper, {**fit, 'metrics': found.get('metrics', [])}, source)
                 self.checkpoint(p, 'assessment', 'Assessed ' + paper['title'][:85], details={'paper': paper['id'], 'metrics': len(paper['metrics']), 'rejected': paper.get('rejectedMetrics', 0)})
@@ -689,8 +720,9 @@ class Research(ExecutionHistory):
                 self.checkpoint(p, 'assessment', 'Assessment failed: ' + paper['title'][:70], status='failed', details={'paper': paper['id'], 'error': str(e)[:180]})
 
     def synthesize(self, p):
+        if p.get('protocol',{}).get('version')==3: self.audit_comparisons(p)
         self.event(p, 'Updating research questions from the latest evidence coverage.')
-        outcomes = compare(p['papers'])
+        outcomes = compare(p['papers'],assessments=p.get('comparisonAssessments',{}))
         result = self.llm(p, 'Return {"suggestions":[{"topic":"specific next research question","why":"why investigate this; distinguish missing retrieved evidence from absence in the paper","paperIds":[supporting paper ids]}],"synthesis":"cautious hypothesis assessment"}. All extracted metrics are provisional unless verified. Use the comparison outcomes: comparable, incompatible, or insufficient evidence. Never assert experimental superiority from an incompatible or insufficient comparison. Never infer that an entire paper or literature lacks experiments, statistical tests, or baselines from missing extracted data. Recommend tests, not conclusions. Cite paper IDs in synthesis.',
                           {'hypothesis': p['hypothesis'], 'branchDirection': p.get('feedback', ''), 'comparisonSummary': outcomes['summary'],
                            'comparisons': [{'pair': pair_label(x), 'outcome': x['outcome'], 'why': x['explanation'][:2]} for x in outcomes['pairs'][:30]],
@@ -740,7 +772,7 @@ class Research(ExecutionHistory):
             targets = []
             for t in (data.get('targets') or [])[:2]:
                 paper = self.paper(p, t.get('paper')); m = self.metric(paper, t.get('metric'))
-                fields = [f for f in (t.get('fields') or m.get('missing') or []) if f in FIELDS + ('unit',) + tuple(factor_keys(m)) and f != 'locator'][:6]
+                fields = [f for f in (t.get('fields') or m.get('missing') or []) if f in FIELDS + ('unit','entityId','entityQuote','measurementQuote') + tuple(factor_keys(m)) and f != 'locator'][:6]
                 if fields: targets.append((paper['id'], m['id'], fields))
             if not targets: raise RelayError('NOTHING_TO_INVESTIGATE', 'Choose a result with missing or conflicting context.')
             p['status'] = 'investigating'; p['revision'] += 1
@@ -826,8 +858,73 @@ class Research(ExecutionHistory):
             with self.lock: p.update(status='error', error=str(e)[:350]); self.checkpoint(p, 'failure', 'Investigation failed', status='failed', details={'error': p['error']})
 
     # ------------------------------------------------------------ corrections and propagation
+    def audit_comparisons(self,p,retry_pair=None,entities=None):
+        """Bound work to 12 pending pairs; never rerun current fingerprints automatically."""
+        _,pairs=semantics.candidate_pairs(p['papers'],entities=entities)
+        pending=[x for x in pairs if x['id']==retry_pair or (not retry_pair and p.get('comparisonAssessments',{}).get(x['id'],{}).get('fingerprint')!=x['fingerprint'])][:12]
+        for offset in range(0,len(pending),3):
+            batch=pending[offset:offset+3]
+            self.event(p,'Assessing comparison evidence: '+str(offset+1)+'–'+str(offset+len(batch))+' of '+str(len(pending))+' queued pairs.')
+            payload=semantics.audit_payload(p['protocol'],batch)
+            answer=self.llm(p,semantics.AUDIT,payload,'semantic-comparison',10000)
+            returned={x.get('pair'):x for x in answer.get('assessments',[]) if isinstance(x,dict)}
+            with self.lock:
+                for pair in batch:
+                    record=semantics.validate_assessment(pair,returned.get(pair['id'],{}),p['model'])
+                    record['at']=now(); p.setdefault('comparisonAssessments',{})[pair['id']]=record
+                    if p.get('draft'):
+                        for section in ('relatedWork','comparisons'):
+                            for claim in p['draft'].get(section,[]):
+                                claim.update(stale=True,staleReason='Comparison assessment updated; review and regenerate dependent claims.')
+                        p['draft'].update(tableStale=True,summaryStale=True)
+                    p['synthesisStale']=True
+                p['revision']+=1
+                self.checkpoint(p,'comparison','Semantic assessments ready for human review',details={'pairs':[x['id'] for x in batch]})
+
+    def assess_comparisons(self,data):
+        with self.lock:
+            p=self.get(data.get('id'))
+            if p['status'] in BUSY: raise RelayError('BUSY','Wait for the current investigation.')
+            if data.get('revision')!=p['revision']: raise RelayError('STALE_REVISION','Refresh before assessing comparisons.',409)
+            if p.get('protocol',{}).get('version')!=3: raise RelayError('LEGACY_CONTRACT','Branch and re-extract to use a generic comparison contract.')
+            entities=data.get('entities')
+            if entities is not None and (not isinstance(entities,list) or len(entities) not in (0,2) or any(not isinstance(e,str) or e not in {x['id'] for x in p['protocol']['entities']} for e in entities)):
+                raise RelayError('INVALID_ENTITIES','Select two defined entities or all entities.')
+            if data.get('pair') and data['pair'] not in {x['id'] for x in semantics.candidate_pairs(p['papers'])[1]}:
+                raise RelayError('NOT_FOUND','Comparison pair not found.')
+            p['status']='investigating';p['revision']+=1
+            self.checkpoint(p,'input','Comparison assessment requested')
+        def run():
+            try:
+                self.audit_comparisons(p,retry_pair=data.get('pair'),entities=data.get('entities'))
+                with self.lock:
+                    p['status']='review';p['revision']+=1;self.checkpoint(p,'ready','Ready for human review')
+            except Exception as e:
+                with self.lock:
+                    p.update(status='error',error=str(e)[:300]);self.checkpoint(p,'failure','Comparison assessment failed',status='failed')
+        threading.Thread(target=run,daemon=True).start()
+        return {'ok':True}
+
+    def review_comparison(self,data):
+        with self.lock:
+            p=self.get(data.get('id'))
+            if p['status'] in BUSY: raise RelayError('BUSY','Wait for the current investigation.')
+            if data.get('revision')!=p['revision']:raise RelayError('STALE_REVISION','Refresh and review the current evidence.',409)
+            pair=next((x for x in semantics.compare(p['papers'],assessments=p.get('comparisonAssessments',{}))['pairs'] if x['id']==data.get('pair')),None)
+            if not pair or not pair['assessed']:raise RelayError('ASSESSMENT_REQUIRED','Assess the current evidence before reviewing it.')
+            record=p['comparisonAssessments'][pair['id']]
+            record['reviewed']=bool(data.get('approved')) and data.get('actor')!='agent'
+            record['reviewNote']=str(data.get('note',''))[:1500];record['reviewedAt']=now()
+            if p.get('draft'):
+                for section in ('relatedWork','comparisons'):
+                    for claim in p['draft'].get(section,[]):
+                        claim.update(stale=True,staleReason='Comparison review changed; regenerate dependent claims.')
+                p['draft'].update(tableStale=True,summaryStale=True)
+            p['revision']+=1;self.checkpoint(p,'comparison-review','Comparison review recorded',details={'pair':pair['id'],'approved':record['reviewed']})
+        return {'ok':True}
+
     def outcomes(self, p):
-        return {x['id']: x for x in compare(p['papers'])['pairs']}
+        return {x['id']: x for x in compare(p['papers'],assessments=p.get('comparisonAssessments',{}))['pairs']}
 
     def correct(self, p, paper, m, changes, origin, note='', evidence=None):
         """Apply a context correction and record which comparisons and manuscript claims it affects."""
@@ -838,6 +935,7 @@ class Research(ExecutionHistory):
         for field, value in changes.items():
             m.setdefault('history', []).append({'at': now(), 'field': field, 'before': m.get(field, 'unknown'), 'after': value, 'origin': origin, 'note': note[:500]})
             m[field] = value if field != 'provenance' else provenance_key(value)
+            if field=='entityId' and evidence and evidence.get(field,{}).get('quote'): m['entityQuote']=evidence[field]['quote']
             if evidence and field in evidence: m.setdefault('evidence', {})[field] = evidence[field]
             elif origin.startswith('researcher'): m.setdefault('evidence', {})[field] = {'quote': note[:1500], 'origin': 'researcher'}
         check_metric(m, self.source(paper), paper.get('title', ''))
@@ -908,10 +1006,16 @@ class Research(ExecutionHistory):
                     ctx = {k: edit[k] for k in CONTEXT_EDITABLE + tuple(factor_keys(paper['metrics'][i])) if k in edit and k not in ('name', 'value', 'unit', 'direction')}
                     c = self.correct(p, paper, paper['metrics'][i], ctx, 'agent review' if data.get('actor') == 'agent' else 'researcher review', str(data.get('note', '')))
                     if c: corrections.append(c['id'])
+                if p.get('protocol',{}).get('version')==3 and any(x['stale'] for x in semantics.compare(p['papers'],assessments=p.get('comparisonAssessments',{}))['pairs']):
+                    draft=p.get('draft') or {}
+                    for section in ('relatedWork','comparisons'):
+                        for claim in draft.get(section,[]):
+                            claim['stale']=True;claim['staleReason']='Source evidence changed; semantic comparisons require reassessment.'
+                    if draft: draft.update(tableStale=True,summaryStale=True)
                 paper['reviewed'] = bool(data.get('reviewed'))
                 paper['reviewActor'] = 'agent' if data.get('actor') == 'agent' else 'researcher'
                 for i, m in enumerate(paper['metrics']): m['verified'] = i in data.get('verified', [])
-                paper['topic'] = canonical_topic(data.get('topic', paper.get('topic', 'Other approaches')))
+                paper['topic'] = str(data.get('topic',paper.get('topic','Other approaches')))[:100] if p.get('protocol',{}).get('version')==3 else canonical_topic(data.get('topic', paper.get('topic', 'Other approaches')))
                 for field in ('rationale', 'limitations'):
                     if field in data: paper[field] = str(data[field])[:3000]
                 paper['reviewedAt'] = now(); p['synthesisStale'] = True
@@ -953,7 +1057,7 @@ class Research(ExecutionHistory):
             elif action == 'add-paper':
                 if len(p['papers']) >= 20: raise RelayError('PAPER_LIMIT', 'A project holds up to 20 papers. Branch to explore a different set.')
                 ident = str(data.get('arxiv', '')).strip()
-                if not ARXIV_ID.search(ident): raise RelayError('INVALID_PAPER', 'Use an arXiv ID such as 2101.06861 or an arxiv.org link.')
+                if not ARXIV_ID.search(ident) and not DOI_ID.fullmatch(ident): raise RelayError('INVALID_PAPER', 'Use a DOI, arXiv ID, or arxiv.org link.')
                 p['revision'] += 1; p['status'] = 'discovering'; self.checkpoint(p, 'input', 'Paper requested: ' + ident[:60], details={'arxiv': ident[:80]})
                 threading.Thread(target=self.add_paper, args=(p, ident), daemon=True).start(); return {'ok': True}
             elif action == 'amend-draft':
@@ -1002,7 +1106,7 @@ class Research(ExecutionHistory):
 
     def add_paper(self, p, ident):
         try:
-            paper = arxiv_paper(ident)
+            paper = referenced_paper(ident)
             with self.lock:
                 if any(x['id'] == paper['id'] or title_key(x['title']) == title_key(paper['title']) for x in p['papers']): raise RelayError('DUPLICATE_PAPER', 'This paper is already in the project.')
             self.event(p, 'Retrieving full text: ' + paper['title'][:90])
@@ -1048,7 +1152,7 @@ class Research(ExecutionHistory):
 
     def evidence_packet(self, p, papers):
         ids = {x['id'] for x in papers}
-        result = compare([x for x in p['papers'] if x['id'] in ids])
+        result = compare([x for x in p['papers'] if x['id'] in ids],assessments=p.get('comparisonAssessments',{}))
         pairs = result['pairs'][:40]
         packet = [{'pair': x['id'], 'a': {'paper': x['a']['paper'], 'method': x['a']['method'], 'value': x['a']['value'], 'metric': x['a']['name'], 'dataset': x['a']['dataset'], 'context':{k:x['a'].get(k) for k in ('split','metricDefinition','unit') + tuple(factor_keys(x['a'])) + (('horizon',) if forecasting(x['a']) else ())}},
                    'b': {'paper': x['b']['paper'], 'method': x['b']['method'], 'value': x['b']['value'], 'metric': x['b']['name'], 'dataset': x['b']['dataset'], 'context':{k:x['b'].get(k) for k in ('split','metricDefinition','unit') + tuple(factor_keys(x['b'])) + (('horizon',) if forecasting(x['b']) else ())}},

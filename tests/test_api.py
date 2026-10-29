@@ -74,7 +74,7 @@ class ResearchAPITests(unittest.TestCase):
             self.server.RequestHandlerClass=make_handler(self.store,self.port)
         headers={'Authorization':'Bearer '+self.store.token}
         with patch.object(research,'llm',side_effect=AssertionError('Focus must not call a model')):
-            code,body=self.call('/api/research/compare',{'id':'saved','methods':['ViT','DeiT']},headers)
+            code,body=self.call('/api/research/compare',{'id':'saved','methods':['ViT-B/16','DeiT-B']},headers)
             self.assertEqual(code,200)
-            self.assertEqual(len(json.loads(body)['pairs']),2)
+            self.assertEqual(len(json.loads(body)['pairs']),1)
             self.assertEqual(self.call('/api/research/compare',{'id':'saved','methods':'ViT'},headers)[0],400)

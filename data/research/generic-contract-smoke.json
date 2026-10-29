@@ -1,0 +1,1812 @@
+{
+  "kind": "Controlled synthetic fixtures with live Nebius calls; not scientific accuracy validation",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "cases": [
+    {
+      "topic": "education",
+      "source": "This fictional controlled fixture compares peer-led seminars and lectures in adult students. Both groups used identical randomized assignment and the same validated belonging scale from 0 to 100, measured after eight weeks. Peer-led seminars reported a mean belonging score of 72 points. Lectures reported a mean belonging score of 65 points. Both groups attended the same institution.",
+      "protocol": {
+        "version": 3,
+        "task": "Compare the effect of peer-led seminars versus lectures on belonging outcomes among adult students.",
+        "entities": [
+          {
+            "id": "e1",
+            "label": "peer-led seminars",
+            "definition": "Instructional sessions where students facilitate learning activities for peers, excluding pure lecture formats."
+          },
+          {
+            "id": "e2",
+            "label": "lectures",
+            "definition": "Instructor\u2011centered presentations where students primarily listen, excluding interactive peer\u2011led components."
+          }
+        ],
+        "factors": [
+          {
+            "key": "factor_f1",
+            "label": "direct comparative study",
+            "role": "match",
+            "rule": "Study must allocate adult students to a peer-led seminar condition and a lecture condition (randomized or non\u2011randomized) and assess belonging outcome after the intervention.",
+            "reason": "Required to directly test whether peer-led seminars improve belonging compared with lectures."
+          },
+          {
+            "key": "factor_f2",
+            "label": "adult student population",
+            "role": "eligibility",
+            "rule": "Participants must be enrolled in post\u2011secondary education (e.g., university, college) and be considered adult learners (typically \u226518 years or self\u2011identified as adult).",
+            "reason": "Ensures the comparison pertains to the target group specified in the hypothesis."
+          },
+          {
+            "key": "factor_f3",
+            "label": "equivalent content and duration",
+            "role": "context",
+            "rule": "The peer-led seminar and lecture interventions should cover the same topic/material and have comparable total contact time (e.g., same number of sessions or hours).",
+            "reason": "Isolates the effect of instructional format from differences in content or exposure."
+          },
+          {
+            "key": "factor_f4",
+            "label": "educational setting consistency",
+            "role": "context",
+            "rule": "Studies should be conducted in comparable educational environments (e.g., same institution type, same course level) to reduce confounding.",
+            "reason": "Prevents institutional or course\u2011level factors from biasing the comparison."
+          }
+        ],
+        "review": "Ready for human review"
+      },
+      "papers": [
+        {
+          "id": "education",
+          "title": "Synthetic education fixture",
+          "protocol": {
+            "version": 3,
+            "task": "Compare the effect of peer-led seminars versus lectures on belonging outcomes among adult students.",
+            "entities": [
+              {
+                "id": "e1",
+                "label": "peer-led seminars",
+                "definition": "Instructional sessions where students facilitate learning activities for peers, excluding pure lecture formats."
+              },
+              {
+                "id": "e2",
+                "label": "lectures",
+                "definition": "Instructor\u2011centered presentations where students primarily listen, excluding interactive peer\u2011led components."
+              }
+            ],
+            "factors": [
+              {
+                "key": "factor_f1",
+                "label": "direct comparative study",
+                "role": "match",
+                "rule": "Study must allocate adult students to a peer-led seminar condition and a lecture condition (randomized or non\u2011randomized) and assess belonging outcome after the intervention.",
+                "reason": "Required to directly test whether peer-led seminars improve belonging compared with lectures."
+              },
+              {
+                "key": "factor_f2",
+                "label": "adult student population",
+                "role": "eligibility",
+                "rule": "Participants must be enrolled in post\u2011secondary education (e.g., university, college) and be considered adult learners (typically \u226518 years or self\u2011identified as adult).",
+                "reason": "Ensures the comparison pertains to the target group specified in the hypothesis."
+              },
+              {
+                "key": "factor_f3",
+                "label": "equivalent content and duration",
+                "role": "context",
+                "rule": "The peer-led seminar and lecture interventions should cover the same topic/material and have comparable total contact time (e.g., same number of sessions or hours).",
+                "reason": "Isolates the effect of instructional format from differences in content or exposure."
+              },
+              {
+                "key": "factor_f4",
+                "label": "educational setting consistency",
+                "role": "context",
+                "rule": "Studies should be conducted in comparable educational environments (e.g., same institution type, same course level) to reduce confounding.",
+                "reason": "Prevents institutional or course\u2011level factors from biasing the comparison."
+              }
+            ],
+            "review": "Ready for human review"
+          },
+          "metrics": [
+            {
+              "name": "mean belonging score",
+              "value": "72",
+              "unit": "points",
+              "direction": "unknown",
+              "method": "peer-led seminars",
+              "dataset": "unknown",
+              "datasetVersion": "unknown",
+              "split": "unknown",
+              "horizon": "unknown",
+              "aggregation": "unknown",
+              "preprocessing": "unknown",
+              "metricDefinition": "unknown",
+              "provenance": "own",
+              "citedFrom": "unknown",
+              "locator": "text",
+              "entityId": "e1",
+              "entityQuote": "This fictional controlled fixture compares peer-led seminars and lectures in adult students.",
+              "measurementQuote": "Both groups used identical randomized assignment and the same validated belonging scale from 0 to 100, measured after eight weeks.",
+              "protocol": {
+                "version": 3,
+                "task": "Compare the effect of peer-led seminars versus lectures on belonging outcomes among adult students.",
+                "entities": [
+                  {
+                    "id": "e1",
+                    "label": "peer-led seminars",
+                    "definition": "Instructional sessions where students facilitate learning activities for peers, excluding pure lecture formats."
+                  },
+                  {
+                    "id": "e2",
+                    "label": "lectures",
+                    "definition": "Instructor\u2011centered presentations where students primarily listen, excluding interactive peer\u2011led components."
+                  }
+                ],
+                "factors": [
+                  {
+                    "key": "factor_f1",
+                    "label": "direct comparative study",
+                    "role": "match",
+                    "rule": "Study must allocate adult students to a peer-led seminar condition and a lecture condition (randomized or non\u2011randomized) and assess belonging outcome after the intervention.",
+                    "reason": "Required to directly test whether peer-led seminars improve belonging compared with lectures."
+                  },
+                  {
+                    "key": "factor_f2",
+                    "label": "adult student population",
+                    "role": "eligibility",
+                    "rule": "Participants must be enrolled in post\u2011secondary education (e.g., university, college) and be considered adult learners (typically \u226518 years or self\u2011identified as adult).",
+                    "reason": "Ensures the comparison pertains to the target group specified in the hypothesis."
+                  },
+                  {
+                    "key": "factor_f3",
+                    "label": "equivalent content and duration",
+                    "role": "context",
+                    "rule": "The peer-led seminar and lecture interventions should cover the same topic/material and have comparable total contact time (e.g., same number of sessions or hours).",
+                    "reason": "Isolates the effect of instructional format from differences in content or exposure."
+                  },
+                  {
+                    "key": "factor_f4",
+                    "label": "educational setting consistency",
+                    "role": "context",
+                    "rule": "Studies should be conducted in comparable educational environments (e.g., same institution type, same course level) to reduce confounding.",
+                    "reason": "Prevents institutional or course\u2011level factors from biasing the comparison."
+                  }
+                ],
+                "review": "Ready for human review"
+              },
+              "factor_f1": "Both groups used identical randomized assignment and the same validated belonging scale from 0 to 100, measured after eight weeks.",
+              "factor_f2": "unknown",
+              "factor_f3": "unknown",
+              "factor_f4": "Both groups attended the same institution.",
+              "quote": "Peer-led seminars reported a mean belonging score of 72 points.",
+              "verified": false,
+              "quoteLocated": false,
+              "evidence": {
+                "factor_f1": {
+                  "quote": "Both groups used identical randomized assignment and the same validated belonging scale from 0 to 100, measured after eight weeks.",
+                  "origin": "paper"
+                },
+                "factor_f2": {
+                  "quote": "...in adult students.",
+                  "origin": "paper"
+                },
+                "factor_f3": {
+                  "quote": "unknown",
+                  "origin": "paper"
+                },
+                "factor_f4": {
+                  "quote": "Both groups attended the same institution.",
+                  "origin": "paper"
+                }
+              },
+              "missing": [
+                "factor_f2"
+              ],
+              "checks": {
+                "support": {
+                  "factor_f1": "quoted",
+                  "factor_f2": "missing",
+                  "factor_f3": "missing",
+                  "factor_f4": "quoted"
+                },
+                "cell": null
+              },
+              "rejected": {
+                "factor_f2": {
+                  "value": "...in adult students.",
+                  "reason": "No applicable source quote directly supports this value."
+                }
+              },
+              "id": "b95187f2ac49",
+              "history": []
+            },
+            {
+              "name": "mean belonging score",
+              "value": "65",
+              "unit": "points",
+              "direction": "unknown",
+              "method": "lectures",
+              "dataset": "unknown",
+              "datasetVersion": "unknown",
+              "split": "unknown",
+              "horizon": "unknown",
+              "aggregation": "unknown",
+              "preprocessing": "unknown",
+              "metricDefinition": "unknown",
+              "provenance": "own",
+              "citedFrom": "unknown",
+              "locator": "text",
+              "entityId": "e2",
+              "entityQuote": "This fictional controlled fixture compares peer-led seminars and lectures in adult students.",
+              "measurementQuote": "Both groups used identical randomized assignment and the same validated belonging scale from 0 to 100, measured after eight weeks.",
+              "protocol": {
+                "version": 3,
+                "task": "Compare the effect of peer-led seminars versus lectures on belonging outcomes among adult students.",
+                "entities": [
+                  {
+                    "id": "e1",
+                    "label": "peer-led seminars",
+                    "definition": "Instructional sessions where students facilitate learning activities for peers, excluding pure lecture formats."
+                  },
+                  {
+                    "id": "e2",
+                    "label": "lectures",
+                    "definition": "Instructor\u2011centered presentations where students primarily listen, excluding interactive peer\u2011led components."
+                  }
+                ],
+                "factors": [
+                  {
+                    "key": "factor_f1",
+                    "label": "direct comparative study",
+                    "role": "match",
+                    "rule": "Study must allocate adult students to a peer-led seminar condition and a lecture condition (randomized or non\u2011randomized) and assess belonging outcome after the intervention.",
+                    "reason": "Required to directly test whether peer-led seminars improve belonging compared with lectures."
+                  },
+                  {
+                    "key": "factor_f2",
+                    "label": "adult student population",
+                    "role": "eligibility",
+                    "rule": "Participants must be enrolled in post\u2011secondary education (e.g., university, college) and be considered adult learners (typically \u226518 years or self\u2011identified as adult).",
+                    "reason": "Ensures the comparison pertains to the target group specified in the hypothesis."
+                  },
+                  {
+                    "key": "factor_f3",
+                    "label": "equivalent content and duration",
+                    "role": "context",
+                    "rule": "The peer-led seminar and lecture interventions should cover the same topic/material and have comparable total contact time (e.g., same number of sessions or hours).",
+                    "reason": "Isolates the effect of instructional format from differences in content or exposure."
+                  },
+                  {
+                    "key": "factor_f4",
+                    "label": "educational setting consistency",
+                    "role": "context",
+                    "rule": "Studies should be conducted in comparable educational environments (e.g., same institution type, same course level) to reduce confounding.",
+                    "reason": "Prevents institutional or course\u2011level factors from biasing the comparison."
+                  }
+                ],
+                "review": "Ready for human review"
+              },
+              "factor_f1": "Both groups used identical randomized assignment and the same validated belonging scale from 0 to 100, measured after eight weeks.",
+              "factor_f2": "unknown",
+              "factor_f3": "unknown",
+              "factor_f4": "Both groups attended the same institution.",
+              "quote": "Lectures reported a mean belonging score of 65 points.",
+              "verified": false,
+              "quoteLocated": false,
+              "evidence": {
+                "factor_f1": {
+                  "quote": "Both groups used identical randomized assignment and the same validated belonging scale from 0 to 100, measured after eight weeks.",
+                  "origin": "paper"
+                },
+                "factor_f2": {
+                  "quote": "...in adult students.",
+                  "origin": "paper"
+                },
+                "factor_f3": {
+                  "quote": "unknown",
+                  "origin": "paper"
+                },
+                "factor_f4": {
+                  "quote": "Both groups attended the same institution.",
+                  "origin": "paper"
+                }
+              },
+              "missing": [
+                "factor_f2"
+              ],
+              "checks": {
+                "support": {
+                  "factor_f1": "quoted",
+                  "factor_f2": "missing",
+                  "factor_f3": "missing",
+                  "factor_f4": "quoted"
+                },
+                "cell": null
+              },
+              "rejected": {
+                "factor_f2": {
+                  "value": "...in adult students.",
+                  "reason": "No applicable source quote directly supports this value."
+                }
+              },
+              "id": "858d0c2e71e4",
+              "history": []
+            }
+          ],
+          "rejectedMetrics": 0
+        }
+      ],
+      "assessments": {
+        "bb5efc0babed": {
+          "fingerprint": "a210fc0763feffdf0f9da36caf966dc26b73db85b67e8a43b3f251a28b0a004f",
+          "checks": [
+            {
+              "field": "entity",
+              "label": "Entity membership",
+              "role": "eligibility",
+              "status": "missing",
+              "detail": "The entity quotes for both sides describe the fixture as comparing peer-led seminars and lectures in adult students, but do not explicitly confirm that side a corresponds to peer-led seminars or side b to lectures.",
+              "refs": [
+                {
+                  "quote": "This fictional controlled fixture compares peer-led seminars and lectures in adult students.",
+                  "source": "education",
+                  "id": "a.entity"
+                },
+                {
+                  "quote": "This fictional controlled fixture compares peer-led seminars and lectures in adult students.",
+                  "source": "education",
+                  "id": "b.entity"
+                }
+              ]
+            },
+            {
+              "field": "measurement",
+              "label": "Outcome comparability",
+              "role": "match",
+              "status": "match",
+              "detail": "Both sides report using identical randomized assignment and the same validated belonging scale from 0 to 100, measured after eight weeks, indicating comparable construct, scale, timing, and study design.",
+              "refs": [
+                {
+                  "quote": "Both groups used identical randomized assignment and the same validated belonging scale from 0 to 100, measured after eight weeks.",
+                  "source": "education",
+                  "id": "a.measurement"
+                },
+                {
+                  "quote": "Both groups used identical randomized assignment and the same validated belonging scale from 0 to 100, measured after eight weeks.",
+                  "source": "education",
+                  "id": "b.measurement"
+                }
+              ]
+            },
+            {
+              "field": "factor_f1",
+              "label": "direct comparative study",
+              "role": "match",
+              "status": "match",
+              "detail": "Each side notes identical randomized assignment and the same validated belonging scale, indicating allocation to both peer-led seminar and lecture conditions and assessment of belonging after intervention.",
+              "refs": [
+                {
+                  "quote": "Both groups used identical randomized assignment and the same validated belonging scale from 0 to 100, measured after eight weeks.",
+                  "source": "education",
+                  "origin": "paper",
+                  "id": "a.factor_f1"
+                },
+                {
+                  "quote": "Both groups used identical randomized assignment and the same validated belonging scale from 0 to 100, measured after eight weeks.",
+                  "source": "education",
+                  "origin": "paper",
+                  "id": "b.factor_f1"
+                }
+              ]
+            },
+            {
+              "field": "factor_f2",
+              "label": "adult student population",
+              "role": "eligibility",
+              "status": "missing",
+              "detail": "No evidence provided regarding participants being adult learners enrolled in post-secondary education.",
+              "refs": []
+            },
+            {
+              "field": "factor_f3",
+              "label": "equivalent content and duration",
+              "role": "context",
+              "status": "missing",
+              "detail": "No evidence provided about equivalent content or duration between the peer-led seminar and lecture interventions.",
+              "refs": []
+            },
+            {
+              "field": "factor_f4",
+              "label": "educational setting consistency",
+              "role": "context",
+              "status": "match",
+              "detail": "Both sides state that the groups attended the same institution, satisfying the educational setting consistency requirement.",
+              "refs": [
+                {
+                  "quote": "Both groups attended the same institution.",
+                  "source": "education",
+                  "origin": "paper",
+                  "id": "a.factor_f4"
+                },
+                {
+                  "quote": "Both groups attended the same institution.",
+                  "source": "education",
+                  "origin": "paper",
+                  "id": "b.factor_f4"
+                }
+              ]
+            }
+          ],
+          "model": "nvidia/nemotron-3-super-120b-a12b",
+          "reviewed": false,
+          "reviewNote": ""
+        }
+      },
+      "summary": {
+        "comparable": 0,
+        "incompatible": 0,
+        "insufficient": 1,
+        "differentDataset": 0,
+        "differentHorizon": 0,
+        "outsideScope": 0,
+        "pending": 0,
+        "assessed": 1,
+        "total": 1
+      },
+      "calls": [
+        {
+          "at": "2026-10-29T12:15:57.852946+00:00",
+          "kind": "comparison-plan",
+          "provider": "nebius",
+          "model": "nvidia/nemotron-3-super-120b-a12b",
+          "attempts": 1,
+          "repaired": false,
+          "promptTokens": 374,
+          "completionTokens": 1545,
+          "totalTokens": 1919,
+          "ok": true,
+          "ms": 10047
+        },
+        {
+          "at": "2026-10-29T12:16:07.906182+00:00",
+          "kind": "extract",
+          "provider": "nebius",
+          "model": "nvidia/nemotron-3-super-120b-a12b",
+          "attempts": 1,
+          "repaired": false,
+          "promptTokens": 1017,
+          "completionTokens": 1478,
+          "totalTokens": 2495,
+          "ok": true,
+          "ms": 9178
+        },
+        {
+          "at": "2026-10-29T12:16:17.086903+00:00",
+          "kind": "semantic-comparison",
+          "provider": "nebius",
+          "model": "nvidia/nemotron-3-super-120b-a12b",
+          "attempts": 1,
+          "repaired": false,
+          "promptTokens": 2846,
+          "completionTokens": 1314,
+          "totalTokens": 4160,
+          "ok": true,
+          "ms": 9150
+        }
+      ]
+    },
+    {
+      "topic": "materials",
+      "source": "This fictional controlled fixture compares coating A and coating B on identical steel coupons. Both coatings were tested using the same salt spray exposure at 35 degrees Celsius for 100 hours. Corrosion mass loss was measured using the same gravimetric procedure in milligrams per square centimetre. Coating A reported a mass loss of 4 milligrams per square centimetre. Coating B reported a mass loss of 9 milligrams per square centimetre.",
+      "protocol": {
+        "version": 3,
+        "task": "Determine whether coating A exhibits superior corrosion resistance compared to coating B when subjected to the same exposure protocol.",
+        "entities": [
+          {
+            "id": "e1",
+            "label": "Coating A",
+            "definition": "Includes the specific formulation referred to as coating A; excludes any other coatings or variants not labeled as coating A."
+          },
+          {
+            "id": "e2",
+            "label": "Coating B",
+            "definition": "Includes the specific formulation referred to as coating B; excludes any other coatings or variants not labeled as coating B."
+          }
+        ],
+        "factors": [
+          {
+            "key": "factor_exposure_protocol",
+            "label": "Exposure Protocol",
+            "role": "match",
+            "rule": "The exposure protocol (environment, temperature, duration, etc.) must be identical for both coatings to enable a fair comparison.",
+            "reason": "Ensures that any observed difference in corrosion resistance is attributable to the coating rather than differing test conditions."
+          }
+        ],
+        "review": "Ready for human review"
+      },
+      "papers": [
+        {
+          "id": "materials",
+          "title": "Synthetic materials fixture",
+          "protocol": {
+            "version": 3,
+            "task": "Determine whether coating A exhibits superior corrosion resistance compared to coating B when subjected to the same exposure protocol.",
+            "entities": [
+              {
+                "id": "e1",
+                "label": "Coating A",
+                "definition": "Includes the specific formulation referred to as coating A; excludes any other coatings or variants not labeled as coating A."
+              },
+              {
+                "id": "e2",
+                "label": "Coating B",
+                "definition": "Includes the specific formulation referred to as coating B; excludes any other coatings or variants not labeled as coating B."
+              }
+            ],
+            "factors": [
+              {
+                "key": "factor_exposure_protocol",
+                "label": "Exposure Protocol",
+                "role": "match",
+                "rule": "The exposure protocol (environment, temperature, duration, etc.) must be identical for both coatings to enable a fair comparison.",
+                "reason": "Ensures that any observed difference in corrosion resistance is attributable to the coating rather than differing test conditions."
+              }
+            ],
+            "review": "Ready for human review"
+          },
+          "metrics": [
+            {
+              "name": "Corrosion mass loss",
+              "value": "4",
+              "unit": "milligrams per square centimetre",
+              "direction": "lower",
+              "method": "gravimetric procedure",
+              "dataset": "unknown",
+              "datasetVersion": "unknown",
+              "split": "unknown",
+              "horizon": "unknown",
+              "aggregation": "unknown",
+              "preprocessing": "unknown",
+              "metricDefinition": "unknown",
+              "provenance": "own",
+              "citedFrom": "unknown",
+              "locator": "unknown",
+              "entityId": "e1",
+              "entityQuote": "Coating A reported a mass loss of 4 milligrams per square centimetre.",
+              "measurementQuote": "Corrosion mass loss was measured using the same gravimetric procedure in milligrams per square centimetre.",
+              "protocol": {
+                "version": 3,
+                "task": "Determine whether coating A exhibits superior corrosion resistance compared to coating B when subjected to the same exposure protocol.",
+                "entities": [
+                  {
+                    "id": "e1",
+                    "label": "Coating A",
+                    "definition": "Includes the specific formulation referred to as coating A; excludes any other coatings or variants not labeled as coating A."
+                  },
+                  {
+                    "id": "e2",
+                    "label": "Coating B",
+                    "definition": "Includes the specific formulation referred to as coating B; excludes any other coatings or variants not labeled as coating B."
+                  }
+                ],
+                "factors": [
+                  {
+                    "key": "factor_exposure_protocol",
+                    "label": "Exposure Protocol",
+                    "role": "match",
+                    "rule": "The exposure protocol (environment, temperature, duration, etc.) must be identical for both coatings to enable a fair comparison.",
+                    "reason": "Ensures that any observed difference in corrosion resistance is attributable to the coating rather than differing test conditions."
+                  }
+                ],
+                "review": "Ready for human review"
+              },
+              "factor_exposure_protocol": "same salt spray exposure at 35 degrees Celsius for 100 hours",
+              "quote": "Coating A reported a mass loss of 4 milligrams per square centimetre.",
+              "verified": false,
+              "quoteLocated": false,
+              "evidence": {
+                "factor_exposure_protocol": {
+                  "quote": "Both coatings were tested using the same salt spray exposure at 35 degrees Celsius for 100 hours.",
+                  "origin": "paper"
+                }
+              },
+              "missing": [],
+              "checks": {
+                "support": {
+                  "factor_exposure_protocol": "quoted"
+                },
+                "cell": null
+              },
+              "rejected": {},
+              "id": "62839456820f",
+              "history": []
+            },
+            {
+              "name": "Corrosion mass loss",
+              "value": "9",
+              "unit": "milligrams per square centimetre",
+              "direction": "higher",
+              "method": "gravimetric procedure",
+              "dataset": "unknown",
+              "datasetVersion": "unknown",
+              "split": "unknown",
+              "horizon": "unknown",
+              "aggregation": "unknown",
+              "preprocessing": "unknown",
+              "metricDefinition": "unknown",
+              "provenance": "own",
+              "citedFrom": "unknown",
+              "locator": "unknown",
+              "entityId": "e2",
+              "entityQuote": "Coating B reported a mass loss of 9 milligrams per square centimetre.",
+              "measurementQuote": "Corrosion mass loss was measured using the same gravimetric procedure in milligrams per square centimetre.",
+              "protocol": {
+                "version": 3,
+                "task": "Determine whether coating A exhibits superior corrosion resistance compared to coating B when subjected to the same exposure protocol.",
+                "entities": [
+                  {
+                    "id": "e1",
+                    "label": "Coating A",
+                    "definition": "Includes the specific formulation referred to as coating A; excludes any other coatings or variants not labeled as coating A."
+                  },
+                  {
+                    "id": "e2",
+                    "label": "Coating B",
+                    "definition": "Includes the specific formulation referred to as coating B; excludes any other coatings or variants not labeled as coating B."
+                  }
+                ],
+                "factors": [
+                  {
+                    "key": "factor_exposure_protocol",
+                    "label": "Exposure Protocol",
+                    "role": "match",
+                    "rule": "The exposure protocol (environment, temperature, duration, etc.) must be identical for both coatings to enable a fair comparison.",
+                    "reason": "Ensures that any observed difference in corrosion resistance is attributable to the coating rather than differing test conditions."
+                  }
+                ],
+                "review": "Ready for human review"
+              },
+              "factor_exposure_protocol": "same salt spray exposure at 35 degrees Celsius for 100 hours",
+              "quote": "Coating B reported a mass loss of 9 milligrams per square centimetre.",
+              "verified": false,
+              "quoteLocated": false,
+              "evidence": {
+                "factor_exposure_protocol": {
+                  "quote": "Both coatings were tested using the same salt spray exposure at 35 degrees Celsius for 100 hours.",
+                  "origin": "paper"
+                }
+              },
+              "missing": [],
+              "checks": {
+                "support": {
+                  "factor_exposure_protocol": "quoted"
+                },
+                "cell": null
+              },
+              "rejected": {},
+              "id": "97f59b4d52b9",
+              "history": []
+            }
+          ],
+          "rejectedMetrics": 0
+        }
+      ],
+      "assessments": {
+        "5ed70adbd53f": {
+          "fingerprint": "6b3877ab0081e05cf9f64976858940a7b5663a110de4e0a19d9dc59db771f77a",
+          "checks": [
+            {
+              "field": "entity",
+              "label": "Entity membership",
+              "role": "eligibility",
+              "status": "match",
+              "detail": "Both a.entity and b.entity quotes explicitly refer to Coating A and Coating B respectively, matching the contract definitions.",
+              "refs": [
+                {
+                  "quote": "Coating A reported a mass loss of 4 milligrams per square centimetre.",
+                  "source": "materials",
+                  "id": "a.entity"
+                },
+                {
+                  "quote": "Coating B reported a mass loss of 9 milligrams per square centimetre.",
+                  "source": "materials",
+                  "id": "b.entity"
+                }
+              ]
+            },
+            {
+              "field": "measurement",
+              "label": "Outcome comparability",
+              "role": "match",
+              "status": "match",
+              "detail": "Both a.measurement and b.measurement describe the same gravimetric procedure measuring mass loss in milligrams per square centimetre, ensuring comparable scale and method.",
+              "refs": [
+                {
+                  "quote": "Corrosion mass loss was measured using the same gravimetric procedure in milligrams per square centimetre.",
+                  "source": "materials",
+                  "id": "a.measurement"
+                },
+                {
+                  "quote": "Corrosion mass loss was measured using the same gravimetric procedure in milligrams per square centimetre.",
+                  "source": "materials",
+                  "id": "b.measurement"
+                }
+              ]
+            },
+            {
+              "field": "factor_exposure_protocol",
+              "label": "Exposure Protocol",
+              "role": "match",
+              "status": "match",
+              "detail": "Both a.factor_exposure_protocol and b.factor_exposure_protocol state that both coatings were tested using the same salt spray exposure at 35\u00b0C for 100 hours, satisfying identical exposure protocol.",
+              "refs": [
+                {
+                  "quote": "Both coatings were tested using the same salt spray exposure at 35 degrees Celsius for 100 hours.",
+                  "source": "materials",
+                  "origin": "paper",
+                  "id": "a.factor_exposure_protocol"
+                },
+                {
+                  "quote": "Both coatings were tested using the same salt spray exposure at 35 degrees Celsius for 100 hours.",
+                  "source": "materials",
+                  "origin": "paper",
+                  "id": "b.factor_exposure_protocol"
+                }
+              ]
+            }
+          ],
+          "model": "nvidia/nemotron-3-super-120b-a12b",
+          "reviewed": false,
+          "reviewNote": ""
+        }
+      },
+      "summary": {
+        "comparable": 1,
+        "incompatible": 0,
+        "insufficient": 0,
+        "differentDataset": 0,
+        "differentHorizon": 0,
+        "outsideScope": 0,
+        "pending": 0,
+        "assessed": 1,
+        "total": 1
+      },
+      "calls": [
+        {
+          "at": "2026-10-29T12:16:26.247839+00:00",
+          "kind": "comparison-plan",
+          "provider": "nebius",
+          "model": "nvidia/nemotron-3-super-120b-a12b",
+          "attempts": 1,
+          "repaired": false,
+          "promptTokens": 372,
+          "completionTokens": 854,
+          "totalTokens": 1226,
+          "ok": true,
+          "ms": 7019
+        },
+        {
+          "at": "2026-10-29T12:16:33.267310+00:00",
+          "kind": "extract",
+          "provider": "nebius",
+          "model": "nvidia/nemotron-3-super-120b-a12b",
+          "attempts": 1,
+          "repaired": false,
+          "promptTokens": 711,
+          "completionTokens": 1758,
+          "totalTokens": 2469,
+          "ok": true,
+          "ms": 12108
+        },
+        {
+          "at": "2026-10-29T12:16:45.378632+00:00",
+          "kind": "semantic-comparison",
+          "provider": "nebius",
+          "model": "nvidia/nemotron-3-super-120b-a12b",
+          "attempts": 1,
+          "repaired": false,
+          "promptTokens": 1929,
+          "completionTokens": 865,
+          "totalTokens": 2794,
+          "ok": true,
+          "ms": 7455
+        }
+      ]
+    }
+  ],
+  "earlierAttempt": {
+    "kind": "Controlled synthetic fixtures with live Nebius calls; not scientific accuracy validation",
+    "model": "nvidia/nemotron-3-super-120b-a12b",
+    "cases": [
+      {
+        "topic": "education",
+        "source": "This fictional controlled fixture compares peer-led seminars and lectures in adult students. Both groups used identical randomized assignment and the same validated belonging scale from 0 to 100, measured after eight weeks. Peer-led seminars reported a mean belonging score of 72 points. Lectures reported a mean belonging score of 65 points. Both groups attended the same institution.",
+        "protocol": {
+          "version": 3,
+          "task": "Compare the effect of peer-led seminars versus traditional lectures on belonging outcomes among adult students.",
+          "entities": [
+            {
+              "id": "e1",
+              "label": "Peer-led seminar",
+              "definition": "An instructional session where content is facilitated by fellow students acting as peers, with inclusion criteria: structured seminar format, peer facilitators, adult student participants; exclusion: faculty-led lectures, non-seminar formats."
+            },
+            {
+              "id": "e2",
+              "label": "Lecture",
+              "definition": "A traditional instructor-delivered presentation to students, with inclusion criteria: faculty or expert lecturer, one-way delivery, adult student participants; exclusion: interactive seminars, peer-led formats."
+            },
+            {
+              "id": "e3",
+              "label": "Adult student population",
+              "definition": "Learners aged 18+ enrolled in post\u2011secondary education (undergraduate or graduate), with inclusion criteria: adult age, current enrollment; exclusion: minors, non\u2011students, K\u201112 learners."
+            }
+          ],
+          "factors": [
+            {
+              "key": "factor_adult_population",
+              "label": "Adult student population",
+              "role": "eligibility",
+              "rule": "Participants must be aged 18+ and enrolled in post\u2011secondary education (undergraduate or graduate).",
+              "reason": "Ensures comparable developmental stage and educational context across groups."
+            },
+            {
+              "key": "factor_equivalent_contact_hours",
+              "label": "Equivalent total contact hours",
+              "role": "match",
+              "rule": "The seminar and lecture conditions must provide the same total number of instructional hours across the study period (e.g., same weeks and session length).",
+              "reason": "Prevents confounding belonging changes due to dosage differences."
+            },
+            {
+              "key": "factor_baseline_belonging_measure",
+              "label": "Baseline belonging assessment",
+              "role": "match",
+              "rule": "Belonging must be measured before intervention using the same validated scale for both groups.",
+              "reason": "Ensures comparable starting points for belonging outcomes."
+            },
+            {
+              "key": "factor_discipline_subject",
+              "label": "Academic discipline or subject area",
+              "role": "context",
+              "rule": "Record the field of study (e.g., psychology, engineering) in which the intervention is delivered.",
+              "reason": "Belonging may vary by discipline but does not disqualify the comparison."
+            },
+            {
+              "key": "factor_institution_type",
+              "label": "Type of educational institution",
+              "role": "context",
+              "rule": "Note whether the setting is a university, community college, or online program.",
+              "reason": "Institutional culture may affect belonging but is not a gating factor."
+            },
+            {
+              "key": "factor_facilitator_training",
+              "label": "Facilitator preparation for peer-led seminars",
+              "role": "context",
+              "rule": "Describe any training or guidelines provided to peer leaders; for lectures note instructor qualifications.",
+              "reason": "Variation in leader expertise may influence outcomes but is considered contextual."
+            }
+          ],
+          "review": "Ready for human review"
+        },
+        "papers": [
+          {
+            "id": "education",
+            "title": "Synthetic education fixture",
+            "protocol": {
+              "version": 3,
+              "task": "Compare the effect of peer-led seminars versus traditional lectures on belonging outcomes among adult students.",
+              "entities": [
+                {
+                  "id": "e1",
+                  "label": "Peer-led seminar",
+                  "definition": "An instructional session where content is facilitated by fellow students acting as peers, with inclusion criteria: structured seminar format, peer facilitators, adult student participants; exclusion: faculty-led lectures, non-seminar formats."
+                },
+                {
+                  "id": "e2",
+                  "label": "Lecture",
+                  "definition": "A traditional instructor-delivered presentation to students, with inclusion criteria: faculty or expert lecturer, one-way delivery, adult student participants; exclusion: interactive seminars, peer-led formats."
+                },
+                {
+                  "id": "e3",
+                  "label": "Adult student population",
+                  "definition": "Learners aged 18+ enrolled in post\u2011secondary education (undergraduate or graduate), with inclusion criteria: adult age, current enrollment; exclusion: minors, non\u2011students, K\u201112 learners."
+                }
+              ],
+              "factors": [
+                {
+                  "key": "factor_adult_population",
+                  "label": "Adult student population",
+                  "role": "eligibility",
+                  "rule": "Participants must be aged 18+ and enrolled in post\u2011secondary education (undergraduate or graduate).",
+                  "reason": "Ensures comparable developmental stage and educational context across groups."
+                },
+                {
+                  "key": "factor_equivalent_contact_hours",
+                  "label": "Equivalent total contact hours",
+                  "role": "match",
+                  "rule": "The seminar and lecture conditions must provide the same total number of instructional hours across the study period (e.g., same weeks and session length).",
+                  "reason": "Prevents confounding belonging changes due to dosage differences."
+                },
+                {
+                  "key": "factor_baseline_belonging_measure",
+                  "label": "Baseline belonging assessment",
+                  "role": "match",
+                  "rule": "Belonging must be measured before intervention using the same validated scale for both groups.",
+                  "reason": "Ensures comparable starting points for belonging outcomes."
+                },
+                {
+                  "key": "factor_discipline_subject",
+                  "label": "Academic discipline or subject area",
+                  "role": "context",
+                  "rule": "Record the field of study (e.g., psychology, engineering) in which the intervention is delivered.",
+                  "reason": "Belonging may vary by discipline but does not disqualify the comparison."
+                },
+                {
+                  "key": "factor_institution_type",
+                  "label": "Type of educational institution",
+                  "role": "context",
+                  "rule": "Note whether the setting is a university, community college, or online program.",
+                  "reason": "Institutional culture may affect belonging but is not a gating factor."
+                },
+                {
+                  "key": "factor_facilitator_training",
+                  "label": "Facilitator preparation for peer-led seminars",
+                  "role": "context",
+                  "rule": "Describe any training or guidelines provided to peer leaders; for lectures note instructor qualifications.",
+                  "reason": "Variation in leader expertise may influence outcomes but is considered contextual."
+                }
+              ],
+              "review": "Ready for human review"
+            },
+            "metrics": [
+              {
+                "name": "Mean belonging score",
+                "value": "72",
+                "unit": "points",
+                "direction": "higher",
+                "method": "peer-led seminar",
+                "dataset": "unknown",
+                "datasetVersion": "unknown",
+                "split": "unknown",
+                "horizon": "unknown",
+                "aggregation": "unknown",
+                "preprocessing": "unknown",
+                "metricDefinition": "unknown",
+                "provenance": "own",
+                "citedFrom": "unknown",
+                "locator": "text",
+                "entityId": "e1",
+                "entityQuote": "Peer-led seminars reported a mean belonging score of 72 points.",
+                "protocol": {
+                  "version": 3,
+                  "task": "Compare the effect of peer-led seminars versus traditional lectures on belonging outcomes among adult students.",
+                  "entities": [
+                    {
+                      "id": "e1",
+                      "label": "Peer-led seminar",
+                      "definition": "An instructional session where content is facilitated by fellow students acting as peers, with inclusion criteria: structured seminar format, peer facilitators, adult student participants; exclusion: faculty-led lectures, non-seminar formats."
+                    },
+                    {
+                      "id": "e2",
+                      "label": "Lecture",
+                      "definition": "A traditional instructor-delivered presentation to students, with inclusion criteria: faculty or expert lecturer, one-way delivery, adult student participants; exclusion: interactive seminars, peer-led formats."
+                    },
+                    {
+                      "id": "e3",
+                      "label": "Adult student population",
+                      "definition": "Learners aged 18+ enrolled in post\u2011secondary education (undergraduate or graduate), with inclusion criteria: adult age, current enrollment; exclusion: minors, non\u2011students, K\u201112 learners."
+                    }
+                  ],
+                  "factors": [
+                    {
+                      "key": "factor_adult_population",
+                      "label": "Adult student population",
+                      "role": "eligibility",
+                      "rule": "Participants must be aged 18+ and enrolled in post\u2011secondary education (undergraduate or graduate).",
+                      "reason": "Ensures comparable developmental stage and educational context across groups."
+                    },
+                    {
+                      "key": "factor_equivalent_contact_hours",
+                      "label": "Equivalent total contact hours",
+                      "role": "match",
+                      "rule": "The seminar and lecture conditions must provide the same total number of instructional hours across the study period (e.g., same weeks and session length).",
+                      "reason": "Prevents confounding belonging changes due to dosage differences."
+                    },
+                    {
+                      "key": "factor_baseline_belonging_measure",
+                      "label": "Baseline belonging assessment",
+                      "role": "match",
+                      "rule": "Belonging must be measured before intervention using the same validated scale for both groups.",
+                      "reason": "Ensures comparable starting points for belonging outcomes."
+                    },
+                    {
+                      "key": "factor_discipline_subject",
+                      "label": "Academic discipline or subject area",
+                      "role": "context",
+                      "rule": "Record the field of study (e.g., psychology, engineering) in which the intervention is delivered.",
+                      "reason": "Belonging may vary by discipline but does not disqualify the comparison."
+                    },
+                    {
+                      "key": "factor_institution_type",
+                      "label": "Type of educational institution",
+                      "role": "context",
+                      "rule": "Note whether the setting is a university, community college, or online program.",
+                      "reason": "Institutional culture may affect belonging but is not a gating factor."
+                    },
+                    {
+                      "key": "factor_facilitator_training",
+                      "label": "Facilitator preparation for peer-led seminars",
+                      "role": "context",
+                      "rule": "Describe any training or guidelines provided to peer leaders; for lectures note instructor qualifications.",
+                      "reason": "Variation in leader expertise may influence outcomes but is considered contextual."
+                    }
+                  ],
+                  "review": "Ready for human review"
+                },
+                "factor_adult_population": "unknown",
+                "factor_equivalent_contact_hours": "unknown",
+                "factor_baseline_belonging_measure": "unknown",
+                "factor_discipline_subject": "unknown",
+                "factor_institution_type": "unknown",
+                "factor_facilitator_training": "unknown",
+                "quote": "Peer-led seminars reported a mean belonging score of 72 points.",
+                "verified": false,
+                "quoteLocated": false,
+                "evidence": {
+                  "factor_adult_population": {
+                    "quote": "adult students",
+                    "origin": "paper"
+                  },
+                  "factor_equivalent_contact_hours": {
+                    "quote": "unknown",
+                    "origin": "paper"
+                  },
+                  "factor_baseline_belonging_measure": {
+                    "quote": "unknown",
+                    "origin": "paper"
+                  },
+                  "factor_discipline_subject": {
+                    "quote": "unknown",
+                    "origin": "paper"
+                  },
+                  "factor_institution_type": {
+                    "quote": "unknown",
+                    "origin": "paper"
+                  },
+                  "factor_facilitator_training": {
+                    "quote": "unknown",
+                    "origin": "paper"
+                  }
+                },
+                "missing": [
+                  "factor_adult_population",
+                  "factor_equivalent_contact_hours",
+                  "factor_baseline_belonging_measure"
+                ],
+                "checks": {
+                  "support": {
+                    "factor_adult_population": "missing",
+                    "factor_equivalent_contact_hours": "missing",
+                    "factor_baseline_belonging_measure": "missing",
+                    "factor_discipline_subject": "missing",
+                    "factor_institution_type": "missing",
+                    "factor_facilitator_training": "missing"
+                  },
+                  "cell": null
+                },
+                "rejected": {},
+                "id": "0da7026511ab",
+                "history": []
+              },
+              {
+                "name": "Mean belonging score",
+                "value": "65",
+                "unit": "points",
+                "direction": "lower",
+                "method": "lecture",
+                "dataset": "unknown",
+                "datasetVersion": "unknown",
+                "split": "unknown",
+                "horizon": "unknown",
+                "aggregation": "unknown",
+                "preprocessing": "unknown",
+                "metricDefinition": "unknown",
+                "provenance": "own",
+                "citedFrom": "unknown",
+                "locator": "text",
+                "entityId": "e2",
+                "entityQuote": "Lectures reported a mean belonging score of 65 points.",
+                "protocol": {
+                  "version": 3,
+                  "task": "Compare the effect of peer-led seminars versus traditional lectures on belonging outcomes among adult students.",
+                  "entities": [
+                    {
+                      "id": "e1",
+                      "label": "Peer-led seminar",
+                      "definition": "An instructional session where content is facilitated by fellow students acting as peers, with inclusion criteria: structured seminar format, peer facilitators, adult student participants; exclusion: faculty-led lectures, non-seminar formats."
+                    },
+                    {
+                      "id": "e2",
+                      "label": "Lecture",
+                      "definition": "A traditional instructor-delivered presentation to students, with inclusion criteria: faculty or expert lecturer, one-way delivery, adult student participants; exclusion: interactive seminars, peer-led formats."
+                    },
+                    {
+                      "id": "e3",
+                      "label": "Adult student population",
+                      "definition": "Learners aged 18+ enrolled in post\u2011secondary education (undergraduate or graduate), with inclusion criteria: adult age, current enrollment; exclusion: minors, non\u2011students, K\u201112 learners."
+                    }
+                  ],
+                  "factors": [
+                    {
+                      "key": "factor_adult_population",
+                      "label": "Adult student population",
+                      "role": "eligibility",
+                      "rule": "Participants must be aged 18+ and enrolled in post\u2011secondary education (undergraduate or graduate).",
+                      "reason": "Ensures comparable developmental stage and educational context across groups."
+                    },
+                    {
+                      "key": "factor_equivalent_contact_hours",
+                      "label": "Equivalent total contact hours",
+                      "role": "match",
+                      "rule": "The seminar and lecture conditions must provide the same total number of instructional hours across the study period (e.g., same weeks and session length).",
+                      "reason": "Prevents confounding belonging changes due to dosage differences."
+                    },
+                    {
+                      "key": "factor_baseline_belonging_measure",
+                      "label": "Baseline belonging assessment",
+                      "role": "match",
+                      "rule": "Belonging must be measured before intervention using the same validated scale for both groups.",
+                      "reason": "Ensures comparable starting points for belonging outcomes."
+                    },
+                    {
+                      "key": "factor_discipline_subject",
+                      "label": "Academic discipline or subject area",
+                      "role": "context",
+                      "rule": "Record the field of study (e.g., psychology, engineering) in which the intervention is delivered.",
+                      "reason": "Belonging may vary by discipline but does not disqualify the comparison."
+                    },
+                    {
+                      "key": "factor_institution_type",
+                      "label": "Type of educational institution",
+                      "role": "context",
+                      "rule": "Note whether the setting is a university, community college, or online program.",
+                      "reason": "Institutional culture may affect belonging but is not a gating factor."
+                    },
+                    {
+                      "key": "factor_facilitator_training",
+                      "label": "Facilitator preparation for peer-led seminars",
+                      "role": "context",
+                      "rule": "Describe any training or guidelines provided to peer leaders; for lectures note instructor qualifications.",
+                      "reason": "Variation in leader expertise may influence outcomes but is considered contextual."
+                    }
+                  ],
+                  "review": "Ready for human review"
+                },
+                "factor_adult_population": "unknown",
+                "factor_equivalent_contact_hours": "unknown",
+                "factor_baseline_belonging_measure": "unknown",
+                "factor_discipline_subject": "unknown",
+                "factor_institution_type": "unknown",
+                "factor_facilitator_training": "unknown",
+                "quote": "Lectures reported a mean belonging score of 65 points.",
+                "verified": false,
+                "quoteLocated": false,
+                "evidence": {
+                  "factor_adult_population": {
+                    "quote": "adult students",
+                    "origin": "paper"
+                  },
+                  "factor_equivalent_contact_hours": {
+                    "quote": "unknown",
+                    "origin": "paper"
+                  },
+                  "factor_baseline_belonging_measure": {
+                    "quote": "unknown",
+                    "origin": "paper"
+                  },
+                  "factor_discipline_subject": {
+                    "quote": "unknown",
+                    "origin": "paper"
+                  },
+                  "factor_institution_type": {
+                    "quote": "unknown",
+                    "origin": "paper"
+                  },
+                  "factor_facilitator_training": {
+                    "quote": "unknown",
+                    "origin": "paper"
+                  }
+                },
+                "missing": [
+                  "factor_adult_population",
+                  "factor_equivalent_contact_hours",
+                  "factor_baseline_belonging_measure"
+                ],
+                "checks": {
+                  "support": {
+                    "factor_adult_population": "missing",
+                    "factor_equivalent_contact_hours": "missing",
+                    "factor_baseline_belonging_measure": "missing",
+                    "factor_discipline_subject": "missing",
+                    "factor_institution_type": "missing",
+                    "factor_facilitator_training": "missing"
+                  },
+                  "cell": null
+                },
+                "rejected": {},
+                "id": "07d2c0266bf6",
+                "history": []
+              }
+            ],
+            "rejectedMetrics": 0
+          }
+        ],
+        "assessments": {
+          "2f461a25e483": {
+            "fingerprint": "d8e46fba55778536e9371fbf54e7f911e9e2372bcad09184a6c515e8b6f889cd",
+            "checks": [
+              {
+                "field": "entity",
+                "label": "Entity membership",
+                "role": "eligibility",
+                "status": "missing",
+                "detail": "No supported assessment was returned for this criterion.",
+                "refs": []
+              },
+              {
+                "field": "measurement",
+                "label": "Outcome comparability",
+                "role": "match",
+                "status": "missing",
+                "detail": "Both sources report a mean belonging score in points, but no information is provided about the belonging construct, measurement instrument, scale properties, or study design needed to determine if the outcomes are comparable.",
+                "refs": [
+                  {
+                    "quote": "Peer-led seminars reported a mean belonging score of 72 points.",
+                    "source": "education",
+                    "id": "a.result"
+                  },
+                  {
+                    "quote": "Lectures reported a mean belonging score of 65 points.",
+                    "source": "education",
+                    "id": "b.result"
+                  }
+                ]
+              },
+              {
+                "field": "factor_adult_population",
+                "label": "Adult student population",
+                "role": "eligibility",
+                "status": "missing",
+                "detail": "No supported assessment was returned for this criterion.",
+                "refs": []
+              },
+              {
+                "field": "factor_equivalent_contact_hours",
+                "label": "Equivalent total contact hours",
+                "role": "match",
+                "status": "missing",
+                "detail": "No supported assessment was returned for this criterion.",
+                "refs": []
+              },
+              {
+                "field": "factor_baseline_belonging_measure",
+                "label": "Baseline belonging assessment",
+                "role": "match",
+                "status": "missing",
+                "detail": "No supported assessment was returned for this criterion.",
+                "refs": []
+              },
+              {
+                "field": "factor_discipline_subject",
+                "label": "Academic discipline or subject area",
+                "role": "context",
+                "status": "missing",
+                "detail": "No supported assessment was returned for this criterion.",
+                "refs": []
+              },
+              {
+                "field": "factor_institution_type",
+                "label": "Type of educational institution",
+                "role": "context",
+                "status": "missing",
+                "detail": "No supported assessment was returned for this criterion.",
+                "refs": []
+              },
+              {
+                "field": "factor_facilitator_training",
+                "label": "Facilitator preparation for peer-led seminars",
+                "role": "context",
+                "status": "missing",
+                "detail": "No supported assessment was returned for this criterion.",
+                "refs": []
+              }
+            ],
+            "model": "nvidia/nemotron-3-super-120b-a12b",
+            "reviewed": false,
+            "reviewNote": ""
+          }
+        },
+        "summary": {
+          "comparable": 0,
+          "incompatible": 0,
+          "insufficient": 1,
+          "differentDataset": 0,
+          "differentHorizon": 0,
+          "outsideScope": 0,
+          "pending": 0,
+          "assessed": 1,
+          "total": 1
+        },
+        "calls": [
+          {
+            "at": "2026-10-29T12:12:42.396887+00:00",
+            "kind": "comparison-plan",
+            "provider": "nebius",
+            "model": "nvidia/nemotron-3-super-120b-a12b",
+            "attempts": 1,
+            "repaired": false,
+            "promptTokens": 315,
+            "completionTokens": 2281,
+            "totalTokens": 2596,
+            "ok": true,
+            "ms": 18134
+          },
+          {
+            "at": "2026-10-29T12:13:00.532790+00:00",
+            "kind": "extract",
+            "provider": "nebius",
+            "model": "nvidia/nemotron-3-super-120b-a12b",
+            "attempts": 1,
+            "repaired": false,
+            "promptTokens": 1185,
+            "completionTokens": 1257,
+            "totalTokens": 2442,
+            "ok": true,
+            "ms": 11195
+          },
+          {
+            "at": "2026-10-29T12:13:11.729592+00:00",
+            "kind": "semantic-comparison",
+            "provider": "nebius",
+            "model": "nvidia/nemotron-3-super-120b-a12b",
+            "attempts": 1,
+            "repaired": false,
+            "promptTokens": 2952,
+            "completionTokens": 1352,
+            "totalTokens": 4304,
+            "ok": true,
+            "ms": 10237
+          }
+        ]
+      },
+      {
+        "topic": "materials",
+        "source": "This fictional controlled fixture compares coating A and coating B on identical steel coupons. Both coatings were tested using the same salt spray exposure at 35 degrees Celsius for 100 hours. Corrosion mass loss was measured using the same gravimetric procedure in milligrams per square centimetre. Coating A reported a mass loss of 4 milligrams per square centimetre. Coating B reported a mass loss of 9 milligrams per square centimetre.",
+        "protocol": {
+          "version": 3,
+          "task": "Compare corrosion resistance of coating A versus coating B under identical exposure conditions.",
+          "entities": [
+            {
+              "id": "e1",
+              "label": "Coating A",
+              "definition": "Specific formulation identified as coating A in the study (e.g., epoxy\u2011based zinc\u2011rich coating); inclusion requires explicit identification of this formulation; exclusion applies to variants, mixtures, or unspecified coatings."
+            },
+            {
+              "id": "e2",
+              "label": "Coating B",
+              "definition": "Specific formulation identified as coating B in the study (e.g., polyurethane\u2011based coating); inclusion requires explicit identification of this formulation; exclusion applies to variants, mixtures, or unspecified coatings."
+            }
+          ],
+          "factors": [
+            {
+              "key": "factor_same_exposure",
+              "label": "Identical exposure protocol",
+              "role": "match",
+              "rule": "Both coatings must be evaluated using the exact same exposure conditions (temperature, humidity, salt concentration, UV intensity, duration, etc.) as reported; any deviation disqualifies a direct comparison.",
+              "reason": "Ensures that differences in corrosion resistance are attributable to the coating itself rather than exposure variability."
+            },
+            {
+              "key": "factor_coating_spec",
+              "label": "Defined coating specification",
+              "role": "eligibility",
+              "rule": "The study must clearly state the coating as either Coating A or Coating B according to its composition (binder, pigment, additives); studies where the coating is unspecified, a mixture, or a different variant are excluded.",
+              "reason": "Guarantees that the entities being compared correspond to the intended coatings."
+            },
+            {
+              "key": "factor_substrate_material",
+              "label": "Substrate material",
+              "role": "context",
+              "rule": "Record the substrate (e.g., carbon steel, aluminum alloy) on which each coating was applied; note differences but do not automatically exclude the pair unless the substrate is known to confound the corrosion mechanism.",
+              "reason": "Substrate can influence corrosion rate; capturing it aids interpretation without invalidating the comparison."
+            }
+          ],
+          "review": "Ready for human review"
+        },
+        "papers": [
+          {
+            "id": "materials",
+            "title": "Synthetic materials fixture",
+            "protocol": {
+              "version": 3,
+              "task": "Compare corrosion resistance of coating A versus coating B under identical exposure conditions.",
+              "entities": [
+                {
+                  "id": "e1",
+                  "label": "Coating A",
+                  "definition": "Specific formulation identified as coating A in the study (e.g., epoxy\u2011based zinc\u2011rich coating); inclusion requires explicit identification of this formulation; exclusion applies to variants, mixtures, or unspecified coatings."
+                },
+                {
+                  "id": "e2",
+                  "label": "Coating B",
+                  "definition": "Specific formulation identified as coating B in the study (e.g., polyurethane\u2011based coating); inclusion requires explicit identification of this formulation; exclusion applies to variants, mixtures, or unspecified coatings."
+                }
+              ],
+              "factors": [
+                {
+                  "key": "factor_same_exposure",
+                  "label": "Identical exposure protocol",
+                  "role": "match",
+                  "rule": "Both coatings must be evaluated using the exact same exposure conditions (temperature, humidity, salt concentration, UV intensity, duration, etc.) as reported; any deviation disqualifies a direct comparison.",
+                  "reason": "Ensures that differences in corrosion resistance are attributable to the coating itself rather than exposure variability."
+                },
+                {
+                  "key": "factor_coating_spec",
+                  "label": "Defined coating specification",
+                  "role": "eligibility",
+                  "rule": "The study must clearly state the coating as either Coating A or Coating B according to its composition (binder, pigment, additives); studies where the coating is unspecified, a mixture, or a different variant are excluded.",
+                  "reason": "Guarantees that the entities being compared correspond to the intended coatings."
+                },
+                {
+                  "key": "factor_substrate_material",
+                  "label": "Substrate material",
+                  "role": "context",
+                  "rule": "Record the substrate (e.g., carbon steel, aluminum alloy) on which each coating was applied; note differences but do not automatically exclude the pair unless the substrate is known to confound the corrosion mechanism.",
+                  "reason": "Substrate can influence corrosion rate; capturing it aids interpretation without invalidating the comparison."
+                }
+              ],
+              "review": "Ready for human review"
+            },
+            "metrics": [
+              {
+                "name": "Corrosion mass loss",
+                "value": "4",
+                "unit": "milligrams per square centimetre",
+                "direction": "lower",
+                "method": "same gravimetric procedure",
+                "dataset": "unknown",
+                "datasetVersion": "unknown",
+                "split": "unknown",
+                "horizon": "unknown",
+                "aggregation": "unknown",
+                "preprocessing": "unknown",
+                "metricDefinition": "unknown",
+                "provenance": "own",
+                "citedFrom": "unknown",
+                "locator": "sentence",
+                "entityId": "e1",
+                "entityQuote": "Coating A reported a mass loss of 4 milligrams per square centimetre.",
+                "protocol": {
+                  "version": 3,
+                  "task": "Compare corrosion resistance of coating A versus coating B under identical exposure conditions.",
+                  "entities": [
+                    {
+                      "id": "e1",
+                      "label": "Coating A",
+                      "definition": "Specific formulation identified as coating A in the study (e.g., epoxy\u2011based zinc\u2011rich coating); inclusion requires explicit identification of this formulation; exclusion applies to variants, mixtures, or unspecified coatings."
+                    },
+                    {
+                      "id": "e2",
+                      "label": "Coating B",
+                      "definition": "Specific formulation identified as coating B in the study (e.g., polyurethane\u2011based coating); inclusion requires explicit identification of this formulation; exclusion applies to variants, mixtures, or unspecified coatings."
+                    }
+                  ],
+                  "factors": [
+                    {
+                      "key": "factor_same_exposure",
+                      "label": "Identical exposure protocol",
+                      "role": "match",
+                      "rule": "Both coatings must be evaluated using the exact same exposure conditions (temperature, humidity, salt concentration, UV intensity, duration, etc.) as reported; any deviation disqualifies a direct comparison.",
+                      "reason": "Ensures that differences in corrosion resistance are attributable to the coating itself rather than exposure variability."
+                    },
+                    {
+                      "key": "factor_coating_spec",
+                      "label": "Defined coating specification",
+                      "role": "eligibility",
+                      "rule": "The study must clearly state the coating as either Coating A or Coating B according to its composition (binder, pigment, additives); studies where the coating is unspecified, a mixture, or a different variant are excluded.",
+                      "reason": "Guarantees that the entities being compared correspond to the intended coatings."
+                    },
+                    {
+                      "key": "factor_substrate_material",
+                      "label": "Substrate material",
+                      "role": "context",
+                      "rule": "Record the substrate (e.g., carbon steel, aluminum alloy) on which each coating was applied; note differences but do not automatically exclude the pair unless the substrate is known to confound the corrosion mechanism.",
+                      "reason": "Substrate can influence corrosion rate; capturing it aids interpretation without invalidating the comparison."
+                    }
+                  ],
+                  "review": "Ready for human review"
+                },
+                "factor_same_exposure": "Both coatings were tested using the same salt spray exposure at 35 degrees Celsius for 100 hours.",
+                "factor_coating_spec": "coating A",
+                "factor_substrate_material": "identical steel coupons",
+                "quote": "Coating A reported a mass loss of 4 milligrams per square centimetre.",
+                "verified": false,
+                "quoteLocated": false,
+                "evidence": {
+                  "factor_same_exposure": {
+                    "quote": "Both coatings were tested using the same salt spray exposure at 35 degrees Celsius for 100 hours.",
+                    "origin": "paper"
+                  },
+                  "factor_coating_spec": {
+                    "quote": "coating A",
+                    "origin": "paper"
+                  },
+                  "factor_substrate_material": {
+                    "quote": "identical steel coupons",
+                    "origin": "paper"
+                  }
+                },
+                "missing": [],
+                "checks": {
+                  "support": {
+                    "factor_same_exposure": "quoted",
+                    "factor_coating_spec": "quoted",
+                    "factor_substrate_material": "quoted"
+                  },
+                  "cell": null
+                },
+                "rejected": {},
+                "id": "1fc7ec5fabb8",
+                "history": []
+              },
+              {
+                "name": "Corrosion mass loss",
+                "value": "9",
+                "unit": "milligrams per square centimetre",
+                "direction": "higher",
+                "method": "same gravimetric procedure",
+                "dataset": "unknown",
+                "datasetVersion": "unknown",
+                "split": "unknown",
+                "horizon": "unknown",
+                "aggregation": "unknown",
+                "preprocessing": "unknown",
+                "metricDefinition": "unknown",
+                "provenance": "own",
+                "citedFrom": "unknown",
+                "locator": "sentence",
+                "entityId": "e2",
+                "entityQuote": "Coating B reported a mass loss of 9 milligrams per square centimetre.",
+                "protocol": {
+                  "version": 3,
+                  "task": "Compare corrosion resistance of coating A versus coating B under identical exposure conditions.",
+                  "entities": [
+                    {
+                      "id": "e1",
+                      "label": "Coating A",
+                      "definition": "Specific formulation identified as coating A in the study (e.g., epoxy\u2011based zinc\u2011rich coating); inclusion requires explicit identification of this formulation; exclusion applies to variants, mixtures, or unspecified coatings."
+                    },
+                    {
+                      "id": "e2",
+                      "label": "Coating B",
+                      "definition": "Specific formulation identified as coating B in the study (e.g., polyurethane\u2011based coating); inclusion requires explicit identification of this formulation; exclusion applies to variants, mixtures, or unspecified coatings."
+                    }
+                  ],
+                  "factors": [
+                    {
+                      "key": "factor_same_exposure",
+                      "label": "Identical exposure protocol",
+                      "role": "match",
+                      "rule": "Both coatings must be evaluated using the exact same exposure conditions (temperature, humidity, salt concentration, UV intensity, duration, etc.) as reported; any deviation disqualifies a direct comparison.",
+                      "reason": "Ensures that differences in corrosion resistance are attributable to the coating itself rather than exposure variability."
+                    },
+                    {
+                      "key": "factor_coating_spec",
+                      "label": "Defined coating specification",
+                      "role": "eligibility",
+                      "rule": "The study must clearly state the coating as either Coating A or Coating B according to its composition (binder, pigment, additives); studies where the coating is unspecified, a mixture, or a different variant are excluded.",
+                      "reason": "Guarantees that the entities being compared correspond to the intended coatings."
+                    },
+                    {
+                      "key": "factor_substrate_material",
+                      "label": "Substrate material",
+                      "role": "context",
+                      "rule": "Record the substrate (e.g., carbon steel, aluminum alloy) on which each coating was applied; note differences but do not automatically exclude the pair unless the substrate is known to confound the corrosion mechanism.",
+                      "reason": "Substrate can influence corrosion rate; capturing it aids interpretation without invalidating the comparison."
+                    }
+                  ],
+                  "review": "Ready for human review"
+                },
+                "factor_same_exposure": "Both coatings were tested using the same salt spray exposure at 35 degrees Celsius for 100 hours.",
+                "factor_coating_spec": "coating B",
+                "factor_substrate_material": "identical steel coupons",
+                "quote": "Coating B reported a mass loss of 9 milligrams per square centimetre.",
+                "verified": false,
+                "quoteLocated": false,
+                "evidence": {
+                  "factor_same_exposure": {
+                    "quote": "Both coatings were tested using the same salt spray exposure at 35 degrees Celsius for 100 hours.",
+                    "origin": "paper"
+                  },
+                  "factor_coating_spec": {
+                    "quote": "coating B",
+                    "origin": "paper"
+                  },
+                  "factor_substrate_material": {
+                    "quote": "identical steel coupons",
+                    "origin": "paper"
+                  }
+                },
+                "missing": [],
+                "checks": {
+                  "support": {
+                    "factor_same_exposure": "quoted",
+                    "factor_coating_spec": "quoted",
+                    "factor_substrate_material": "quoted"
+                  },
+                  "cell": null
+                },
+                "rejected": {},
+                "id": "a004d7285ede",
+                "history": []
+              }
+            ],
+            "rejectedMetrics": 0
+          }
+        ],
+        "assessments": {
+          "fc7755064d44": {
+            "fingerprint": "3d8720e37983eb8ebab96b91fc128bcb1ecc4d6b358e2cc01e150b553f8e6d1c",
+            "checks": [
+              {
+                "field": "entity",
+                "label": "Entity membership",
+                "role": "eligibility",
+                "status": "missing",
+                "detail": "No supported assessment was returned for this criterion.",
+                "refs": []
+              },
+              {
+                "field": "measurement",
+                "label": "Outcome comparability",
+                "role": "match",
+                "status": "match",
+                "detail": "Both results report corrosion mass loss using the same gravimetric procedure, same unit (milligrams per square centimetre), and same construct (mass loss). The measurement definition and scale are identical, allowing direct comparison.",
+                "refs": [
+                  {
+                    "quote": "Coating A reported a mass loss of 4 milligrams per square centimetre.",
+                    "source": "materials",
+                    "id": "a.result"
+                  },
+                  {
+                    "quote": "Coating B reported a mass loss of 9 milligrams per square centimetre.",
+                    "source": "materials",
+                    "id": "b.result"
+                  }
+                ]
+              },
+              {
+                "field": "factor_same_exposure",
+                "label": "Identical exposure protocol",
+                "role": "match",
+                "status": "match",
+                "detail": "Both coatings were tested using the same salt spray exposure at 35 degrees Celsius for 100 hours, fulfilling the identical exposure protocol requirement.",
+                "refs": [
+                  {
+                    "quote": "Both coatings were tested using the same salt spray exposure at 35 degrees Celsius for 100 hours.",
+                    "source": "materials",
+                    "origin": "paper",
+                    "id": "a.factor_same_exposure"
+                  },
+                  {
+                    "quote": "Both coatings were tested using the same salt spray exposure at 35 degrees Celsius for 100 hours.",
+                    "source": "materials",
+                    "origin": "paper",
+                    "id": "b.factor_same_exposure"
+                  }
+                ]
+              },
+              {
+                "field": "factor_coating_spec",
+                "label": "Defined coating specification",
+                "role": "eligibility",
+                "status": "match",
+                "detail": "The study clearly states the coating as 'coating A' for side A and 'coating B' for side B, meeting the defined coating specification eligibility criterion.",
+                "refs": [
+                  {
+                    "quote": "coating A",
+                    "source": "materials",
+                    "origin": "paper",
+                    "id": "a.factor_coating_spec"
+                  },
+                  {
+                    "quote": "coating B",
+                    "source": "materials",
+                    "origin": "paper",
+                    "id": "b.factor_coating_spec"
+                  }
+                ]
+              },
+              {
+                "field": "factor_substrate_material",
+                "label": "Substrate material",
+                "role": "context",
+                "status": "match",
+                "detail": "Both coatings were applied to identical steel coupons, indicating the same substrate material; any substrate differences are noted but do not invalidate the comparison.",
+                "refs": [
+                  {
+                    "quote": "identical steel coupons",
+                    "source": "materials",
+                    "origin": "paper",
+                    "id": "a.factor_substrate_material"
+                  },
+                  {
+                    "quote": "identical steel coupons",
+                    "source": "materials",
+                    "origin": "paper",
+                    "id": "b.factor_substrate_material"
+                  }
+                ]
+              }
+            ],
+            "model": "nvidia/nemotron-3-super-120b-a12b",
+            "reviewed": false,
+            "reviewNote": ""
+          }
+        },
+        "summary": {
+          "comparable": 0,
+          "incompatible": 0,
+          "insufficient": 1,
+          "differentDataset": 0,
+          "differentHorizon": 0,
+          "outsideScope": 0,
+          "pending": 0,
+          "assessed": 1,
+          "total": 1
+        },
+        "calls": [
+          {
+            "at": "2026-10-29T12:13:21.973124+00:00",
+            "kind": "comparison-plan",
+            "provider": "nebius",
+            "model": "nvidia/nemotron-3-super-120b-a12b",
+            "attempts": 1,
+            "repaired": false,
+            "promptTokens": 313,
+            "completionTokens": 1180,
+            "totalTokens": 1493,
+            "ok": true,
+            "ms": 9080
+          },
+          {
+            "at": "2026-10-29T12:13:31.053703+00:00",
+            "kind": "extract",
+            "provider": "nebius",
+            "model": "nvidia/nemotron-3-super-120b-a12b",
+            "attempts": 1,
+            "repaired": false,
+            "promptTokens": 944,
+            "completionTokens": 1736,
+            "totalTokens": 2680,
+            "ok": true,
+            "ms": 12093
+          },
+          {
+            "at": "2026-10-29T12:13:43.147908+00:00",
+            "kind": "semantic-comparison",
+            "provider": "nebius",
+            "model": "nvidia/nemotron-3-super-120b-a12b",
+            "attempts": 1,
+            "repaired": false,
+            "promptTokens": 2548,
+            "completionTokens": 1088,
+            "totalTokens": 3636,
+            "ok": true,
+            "ms": 7267
+          }
+        ]
+      }
+    ]
+  },
+  "limitations": [
+    "Controlled synthetic sources, not real-paper scientific accuracy validation.",
+    "Earlier attempt retained: missing measurement evidence and omitted or unsupported criteria prevented decisions.",
+    "Final education case remains insufficient; materials case provisionally comparable. Neither assessment is human-reviewed.",
+    "This exercises planning, extraction, and semantic audit calls, not browser acceptance or a complete hosted investigation."
+  ]
+}
