@@ -30,3 +30,14 @@ class SampleTests(unittest.TestCase):
 
 
 if __name__ == '__main__': unittest.main()
+
+
+class SampleDedupeTests(unittest.TestCase):
+    def test_two_copies_of_one_sample_study_are_listed_once(self):
+        import tempfile
+        with tempfile.TemporaryDirectory() as d:
+            r = Research(Path(d))
+            base = {'hypothesis': 'Which baselines hold under matched protocols?', 'provider': 'nebius', 'model': 'm', 'created': '2026-10-29T00:00:00Z',
+                    'status': 'review', 'revision': 1, 'tokens': 0, 'events': [], 'papers': [], 'suggestions': [], 'tex': '', 'bib': '', 'proposals': [], 'corrections': [], 'calls': []}
+            r.projects = [dict(base, id='a' * 16, studyKey='nebius-benchmark-audit-v1'), dict(base, id='b' * 16, studyKey='nebius-benchmark-audit-v1')]
+            self.assertEqual([p['id'] for p in r.samples()['projects']], ['a' * 16])

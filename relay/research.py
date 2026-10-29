@@ -478,9 +478,11 @@ class Research(ExecutionHistory):
     def samples(self):
         """Starter investigations installed from data/research/. Summaries only; no evidence text."""
         with self.lock:
-            out = []
+            out, seen = [], set()
             for p in self.projects:
-                if p.get('studyKey') in self.SAMPLE_KEYS and not p.get('parentProject'):
+                # One entry per sample study, even if the store holds more than one copy of it.
+                if p.get('studyKey') in self.SAMPLE_KEYS and not p.get('parentProject') and p['studyKey'] not in seen:
+                    seen.add(p['studyKey'])
                     last = (p.get('execution') or [None])[-1]
                     out.append({'id': p['id'], 'hypothesis': p['hypothesis'], 'branchName': p.get('branchName'), 'status': p['status'],
                                 'papers': len(p['papers']), 'studyKey': p['studyKey'], 'execution': [{'id': last['id']}] if last else []})

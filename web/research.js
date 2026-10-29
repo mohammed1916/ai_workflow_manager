@@ -199,7 +199,8 @@ async function dropSampleCopies(){
 function renderSamples(){
   const box=$('#samples');if(!box)return;
   const open=localStorage.getItem('relay-samples-open')==='1';
-  box.innerHTML=`<details class="sample-section" id="samples-details" ${open?'open':''}><summary><span>Sample investigations</span><small>starter examples · start your own copy to change them</small></summary>${samples.length?samples.map(s=>`<div class="sample-row"><button class="project-link" data-project="${s.id}">${esc((s.branchName||s.hypothesis).slice(0,90))}<small>${s.papers} papers · ${esc(s.status)} · sample</small></button><button class="sample-copy" data-copy-sample="${s.id}">Start my own copy</button></div>`).join(''):'<p class="side-note">Samples appear here after the Research desk loads them.</p>'}</details>`;
+  const shown=[...new Map(samples.map(s=>[s.studyKey||s.id,s])).values()];
+  box.innerHTML=`<details class="sample-section" id="samples-details" ${open?'open':''}><summary><span>Sample investigations</span><small>starter examples · start your own copy to change them</small></summary>${shown.length?shown.map(s=>`<div class="sample-row"><button class="project-link" data-project="${s.id}">${esc((s.branchName||s.hypothesis).slice(0,90))}<small>${s.papers} papers · ${esc(s.status)} · sample</small></button><button class="sample-copy" data-copy-sample="${s.id}">Start my own copy</button></div>`).join(''):'<p class="side-note">Samples appear here after the Research desk loads them.</p>'}</details>`;
   $('#samples-details').addEventListener('toggle',e=>localStorage.setItem('relay-samples-open',e.target.open?'1':'0'));
   box.querySelectorAll('[data-copy-sample]').forEach(b=>b.onclick=()=>startFromSample(b.dataset.copySample));
 }
