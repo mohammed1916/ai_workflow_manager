@@ -252,10 +252,8 @@ async function dropSampleCopies(){
 }
 function renderSamples(){
   const box=$('#samples');if(!box)return;
-  const open=localStorage.getItem('relay-samples-open')==='1';
   const shown=[...new Map(samples.map(s=>[s.studyKey||s.id,s])).values()];
-  box.innerHTML=`<details class="sample-section" id="samples-details" ${open?'open':''}><summary><span>Sample investigations</span><small>starter examples · start your own copy to change them</small></summary>${shown.length?shown.map(s=>`<div class="sample-row"><button class="project-link" data-project="${s.id}">${esc((s.branchName||s.hypothesis).slice(0,90))}<small>${s.papers} papers · ${esc(s.status)} · sample</small></button><button class="sample-copy" data-copy-sample="${s.id}">Start my own copy</button></div>`).join(''):'<p class="side-note">Samples appear here after the Research desk loads them.</p>'}</details>`;
-  $('#samples-details').addEventListener('toggle',e=>localStorage.setItem('relay-samples-open',e.target.open?'1':'0'));
+  box.innerHTML=`<section class="sample-section" aria-labelledby="saved-examples-label"><div class="examples-heading"><h3 id="saved-examples-label">Saved examples</h3><span>${shown.length}</span></div><p class="examples-help">Open results, or copy an example to explore your own question.</p><div class="example-cards">${shown.length?shown.map(s=>`<article class="example-card"><span class="example-type">RECORDED INVESTIGATION</span><h4 title="${esc(s.hypothesis)}">${esc(s.branchName||s.hypothesis)}</h4><p>${s.papers} papers · ${s.status==='review'?'Ready to review':esc(s.status)}</p><div class="example-actions"><button class="example-open" data-project="${s.id}" aria-label="Open example: ${esc(s.branchName||s.hypothesis)}">Open results <span aria-hidden="true">→</span></button><button class="example-copy" data-copy-sample="${s.id}" aria-label="Copy example: ${esc(s.branchName||s.hypothesis)}">Make a copy</button></div></article>`).join(''):'<p class="side-note">Open a recorded study from the Research desk to find it here.</p>'}</div></section>`;
   box.querySelectorAll('[data-copy-sample]').forEach(b=>b.onclick=()=>startFromSample(b.dataset.copySample));
 }
 async function startFromSample(id){
