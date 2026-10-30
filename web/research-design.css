@@ -176,3 +176,6 @@ details>summary{cursor:pointer;list-style:none;position:relative;padding-right:2
 /* Keep saved work reachable when the example library is expanded. */
 .sidebar{height:100dvh;overflow-y:auto;overscroll-behavior:contain}.sidebar>button,.sidebar>.brand,.sidebar>.eyebrow,#samples{flex-shrink:0}#projects{flex:1 0 120px;min-height:120px;max-height:45vh;overflow-y:auto}.aside-bottom{flex-shrink:0}.example-cards[hidden]{display:none}.examples-heading button{padding:6px 10px;min-height:36px;font-size:12px;color:#ead7ff;border-color:#79618c;background:#271d34}.close-investigation{float:right;margin:0 0 12px 18px;color:#e9d8fb;border-color:#79618c;font-size:12px}.copy-actions{display:flex;gap:8px;flex-wrap:wrap}.copy-actions .primary{min-height:42px}.copy-row{gap:16px}
 @media(max-width:650px){.close-investigation{float:none;margin:0 0 14px}#projects{max-height:35vh}.copy-row{flex-direction:column;align-items:stretch}}
+/* Sidebar: scrolls as one column on desktop, so the sample section stays reachable; footer stays at the bottom. */
+.sidebar{height:100vh;height:100dvh;overflow-y:auto;overscroll-behavior:contain;scrollbar-width:thin}
+.sidebar .aside-bottom{margin-top:auto;flex-shrink:0}
