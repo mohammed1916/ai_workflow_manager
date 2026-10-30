@@ -1,5 +1,6 @@
 // Contextual help stays separate from editor dialogs so unsaved inputs remain intact.
 const topics = {
+  "focused": ["Check one result", "Verify a retained result and your specified condition against retrieved source rows, headings, and relevant passages. This does not prove that two results satisfy every condition of the original hypothesis. Supported, conflicting, and unresolved findings retain source quotes and remain ready for human review."],
   "guided": ["Guided evidence selection", "Tables are detected from retrieved text without inference. Select rows and exact supporting context, then extract the requested outcomes. Inspect the proposed criteria and choose pairs before assessment. Comparability is a source-supported interpretation, not independent replication. Stop prevents subsequent requests; a request already sent may finish and be billed."],
   "source-coverage": ["Retrieved source coverage", "Shows how much retrieved text was supplied to the model, the observations returned, rejected source claims, and retained results. Reading every passage does not prove exhaustive extraction or scientific correctness. Partial coverage can be resumed without discarding accepted results."],
   "evaluations": [

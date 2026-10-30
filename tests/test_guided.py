@@ -84,3 +84,15 @@ class GuidedTests(unittest.TestCase):
         self.assertEqual(metric_id('paper',a),metric_id('paper',b))
         b['sourceAddress']={**b['sourceAddress'],'column':3}
         self.assertNotEqual(metric_id('paper',a),metric_id('paper',b))
+
+    def test_focused_check_rejects_unsupported_citations_and_keeps_comparisons(self):
+        self.p.update(model='test',status='investigating',comparisonAssessments={'saved':{'outcome':'incompatible'}})
+        paper=self.p['papers'][0];m={'id':'m','method':'A','name':'Accuracy','value':'82','quote':'| A | 82 |'};paper['metrics']=[m]
+        reply={'result':{'status':'supported','lines':['L4'],'reason':'row'},'condition':{'status':'supported','lines':['L999'],'reason':'invented'}}
+        with patch.object(self.r,'llm',return_value=reply):self.r.run_result_check(self.p,paper,m,'Condition A')
+        self.assertEqual(self.p['focusedChecks'][0]['status'],'insufficient')
+        self.assertEqual(self.p['comparisonAssessments'],{'saved':{'outcome':'incompatible'}})
+        self.assertFalse(self.p['focusedChecks'][0]['humanReviewed'])
+    def test_focused_check_requires_a_current_revision(self):
+        with self.assertRaises(RelayError):self.r.verify_result({'id':self.p['id'],'revision':0,'condition':'Check condition A'})
+        self.assertEqual(self.p['status'],'review')

@@ -8,6 +8,7 @@ from pathlib import Path
 from .core import RelayError, digest, now
 
 API = [
+    {'method':'POST','path':'/api/research/verify-result','purpose':'Check one retained result under a specified condition against retrieved source evidence; does not change broad comparison judgments.','example':{'id':'PROJECT','revision':1,'paper':'PAPER','metric':'METRIC','condition':'The evaluation condition to verify'}},
     {'method':'POST','path':'/api/research/stop','purpose':'Stop one investigation cooperatively; preserve saved results. An in-flight provider request may finish and be billed.','example':{'id':'PROJECT'}},
     {'method':'POST','path':'/api/research/scan-tables','purpose':'Inventory tables from retrieved text without inference; pause for source selection.','example':{'id':'PROJECT'}},
     {'method':'POST','path':'/api/research/extract-selected','purpose':'Extract selected source rows and pause for comparison selection.','example':{'id':'PROJECT','revision':1,'selections':[{'paper':'PAPER','table':'TABLE','rows':['L10','L11']}]}},

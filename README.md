@@ -41,6 +41,12 @@ Table scanning recognizes structured rows in retrieved text, not every table in 
 
 The comparison engine contains no built-in dataset list, metric catalog, model-name prefix rule, scientific conversion, or universal matching tolerance. That is an architectural property, **not evidence of validated accuracy across every research field**.
 
+## Check one result under one condition
+
+Open **Check one result**, search for the metric or method, choose a retained observation, and enter the condition to verify. Nemotron checks the reported result and the requested condition against source-addressed rows, headers, and relevant passages. The result is **Supported in retrieved source**, **Source conflict**, or **Insufficient evidence**, with quotations ready for review. This is a focused source check, not permission to ignore other required conditions in a broad comparison. Earlier comparison outcomes remain unchanged. Checks are evidence snapshots; rerun after changing evidence.
+
+Workload selectors explicitly offer **1**, **2**, and larger/custom counts. One result per paper can supply two observations; one comparison means one pair. To compare two specific observations, select exactly one pair in Select evidence.
+
 ## Recorded guided accuracy investigation
 
 Open **Research desk → Open guided results**. The saved [guided study](data/research/guided-study.json) records real Nemotron calls and two Tavily discovery queries. Two selected rows from DeiT Table 3 produce **8 top-1 accuracy observations**, **16 assessed pairs**, **3 comparable**, **12 incompatible**, and **1 insufficient-evidence** result. The three accepted, source-rechecked pairs report 72.2→74.5, 79.8→81.2, and 81.8→83.4 at matched 224-resolution variants. These are descriptive within-paper differences, not an independent experiment.
@@ -159,7 +165,7 @@ The first-pass model incorrectly accepted three pairs. Rechecking original table
 
 Token counts in this record are cumulative across development continuations and repairs, not the cost of a single fresh investigation. Earlier development attempts and failed logical calls are retained. This was seed-only validation: it does not demonstrate discovery or Tavily usage.
 
-The software checks currently pass **161 Python tests and 12 JavaScript tests**, including API loading of a recorded execution without inference. UI source syntax is checked; visual acceptance is left to the researcher, as requested. A successful provider call or completed source traversal does not prove complete extraction, correct interpretation, or an exhaustive literature review. Quote containment proves that text occurs in the source, not that the model understood it. Plans and semantic judgments can still be wrong and require expert review.
+The software checks currently pass **163 Python tests and 12 JavaScript tests**, including API loading of a recorded execution without inference. UI source syntax is checked; visual acceptance is left to the researcher, as requested. A successful provider call or completed source traversal does not prove complete extraction, correct interpretation, or an exhaustive literature review. Quote containment proves that text occurs in the source, not that the model understood it. Plans and semantic judgments can still be wrong and require expert review.
 
 The retired traffic comparator and its runner have been removed. Historical receipts remain in `eval/results/`; `python3 scripts/verify_evaluation.py` reconstructs their recorded metrics. Those agent-annotated cases share papers between development and held-out sets and were used during tuning. Their scores must not be presented as accuracy for the current generic workflow. Earlier live records in `data/research/` also predate this redesign unless explicitly identified otherwise.
 

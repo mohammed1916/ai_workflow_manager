@@ -127,6 +127,7 @@ def make_handler(store,port):
                 if self.path=='/api/desk/load':
                     from .desk import load_study, load_discovery, load_validation
                     result=load_validation(store.root,research,'guided-study.json') if data.get('study')=='guided' else load_validation(store.root,research) if data.get('study')=='workflow-validation' else load_discovery(store.root,research) if data.get('study')=='discovery' else load_study(store.root,research)
+                elif self.path=='/api/research/verify-result': result=research.verify_result(data)
                 elif self.path=='/api/research/stop': result=research.stop(data)
                 elif self.path=='/api/research/scan-tables': result=research.guided_scan(data)
                 elif self.path=='/api/research/extract-selected': result=research.guided_extract(data)
