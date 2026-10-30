@@ -14,7 +14,21 @@ Relay starts with a research question, collects source-addressed observations, a
 
 The application does not substitute an example answer when a live run fails. Failed calls, unread passages, rejected extractions, and unresolved criteria remain visible. Recorded executions are explicitly labeled and make no new inference calls when opened.
 
-## The workflow
+## Guided first: choose evidence before spending calls
+
+**Guided** is the default in New investigation. Enter a question with the outcome you need (for example, top-1 accuracy) and the conditions that must match. Nemotron plans the criteria; Tavily and OpenAlex discover papers; Relay scans retrieved text for table candidates without inference.
+
+1. Open **Select evidence**. Inspect table captions, headings, and source addresses. Select tables and individual rows. You can also paste an exact source excerpt and additional setup context.
+2. **Extract selected evidence** makes bounded model calls for those selections, preserving existing results. It pauses before comparison. Unselected tables are available but are not claimed as analyzed.
+3. Inspect the question coverage, choose candidate pairs, then **Assess selected comparisons**. Original-source rechecks still apply before a pair can be comparable. Results are labeled **Ready for human review**.
+
+**Autonomous** retains whole-source extraction. Both modes expose a model-call and elapsed-time budget per execution stage (defaults: 30 logical calls / 15 minutes). A logical call may include provider retries or one JSON repair; the budget is not a price quote. Budgets are checked between operations, so an in-flight request can exceed the time boundary.
+
+**Stop this run** cancels subsequent work for that investigation without restarting the website. The state becomes **Stopping** until the current operation returns, then **Stopped**. Completed evidence and checkpoints remain saved. A request already sent to the provider may finish and incur charges; its response is not applied after a stop request. Reopen Select evidence to scan saved sources and continue with a smaller selection.
+
+Table scanning recognizes structured rows in retrieved text, not every table in every PDF. Captions are candidates for inspection. Image-only tables need a usable text source; exact-excerpt selection is available when automatic table detection misses the desired evidence. Selection submits work; it does not silently mark evidence or criteria as human verified.
+
+## The full-source workflow
 
 1. **Question → comparison plan.** Nemotron proposes the alternatives, requested outcomes, analysis goals, and question-specific criteria. A separate model pass checks coverage against quoted requirements. Invalid structure receives a bounded repair; unresolved requirements stop the run before expensive paper extraction. The plan remains ready for human review.
 2. **Discovery → available sources.** OpenAlex supplies scholarly candidates; arXiv supplies available full text. Optional Tavily search adds web-discovered paper references. DOI and arXiv references can be supplied directly. Seed-only mode intentionally skips discovery.
@@ -26,6 +40,12 @@ The application does not substitute an example answer when a live run fails. Fai
 8. **Reviewed evidence → manuscript.** Draft a proposed-study abstract, cited related work, comparison discussion, and experimental controls. Corrections invalidate dependent claims. Review and regenerate them, then export LaTeX, BibTeX, and evidence for Overleaf.
 
 The comparison engine contains no built-in dataset list, metric catalog, model-name prefix rule, scientific conversion, or universal matching tolerance. That is an architectural property, **not evidence of validated accuracy across every research field**.
+
+## Recorded guided accuracy investigation
+
+Open **Research desk → Open guided results**. The saved [guided study](data/research/guided-study.json) records real Nemotron calls and two Tavily discovery queries. Two selected rows from DeiT Table 3 produce **8 top-1 accuracy observations**, **16 assessed pairs**, **3 comparable**, **12 incompatible**, and **1 insufficient-evidence** result. The three accepted, source-rechecked pairs report 72.2→74.5, 79.8→81.2, and 81.8→83.4 at matched 224-resolution variants. These are descriptive within-paper differences, not an independent experiment.
+
+The fourth matched-column pair remains withheld by the model's interpretation of the mathematical header. Its values are retained; the paper is not claimed to omit them. The run includes 10 calls for selected extraction, comparisons, source rechecks, and synthesis; its inherited discovery plan used two additional calls. Recorded checkpoints preserve the real execution. Criteria, observations, and conclusions are **Ready for human review**, not marked human verified.
 
 ## What to inspect in the app
 
@@ -95,6 +115,9 @@ Credentials are excluded from project exports, model-call records, and API respo
 | `GET /api/research/checkpoint?id=…&node=…` | Inspect an integrity-checked saved state |
 | `POST /api/research/start` | Start a question-specific investigation |
 | `POST /api/research/compare` | Render saved comparison assessments |
+| `POST /api/research/stop` | Stop one investigation; preserve completed evidence |
+| `POST /api/research/scan-tables` | Scan retrieved source tables without model calls |
+| `POST /api/research/extract-selected` | Extract chosen rows or exact excerpts, then pause |
 | `POST /api/research/assess-comparisons` | Run model assessments for selected pending pairs |
 | `POST /api/research/review-contract` | Record review of question coverage |
 | `POST /api/research/review-comparison` | Review a current semantic assessment |
@@ -136,7 +159,7 @@ The first-pass model incorrectly accepted three pairs. Rechecking original table
 
 Token counts in this record are cumulative across development continuations and repairs, not the cost of a single fresh investigation. Earlier development attempts and failed logical calls are retained. This was seed-only validation: it does not demonstrate discovery or Tavily usage.
 
-The software checks currently pass **146 Python tests and 12 JavaScript tests**, including API loading of a recorded execution without inference. UI source syntax is checked; visual acceptance is left to the researcher, as requested. A successful provider call or completed source traversal does not prove complete extraction, correct interpretation, or an exhaustive literature review. Quote containment proves that text occurs in the source, not that the model understood it. Plans and semantic judgments can still be wrong and require expert review.
+The software checks currently pass **161 Python tests and 12 JavaScript tests**, including API loading of a recorded execution without inference. UI source syntax is checked; visual acceptance is left to the researcher, as requested. A successful provider call or completed source traversal does not prove complete extraction, correct interpretation, or an exhaustive literature review. Quote containment proves that text occurs in the source, not that the model understood it. Plans and semantic judgments can still be wrong and require expert review.
 
 The retired traffic comparator and its runner have been removed. Historical receipts remain in `eval/results/`; `python3 scripts/verify_evaluation.py` reconstructs their recorded metrics. Those agent-annotated cases share papers between development and held-out sets and were used during tuning. Their scores must not be presented as accuracy for the current generic workflow. Earlier live records in `data/research/` also predate this redesign unless explicitly identified otherwise.
 

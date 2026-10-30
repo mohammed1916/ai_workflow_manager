@@ -1,11 +1,16 @@
 """Research desk, reproducible saved examples, and the application's API description."""
 import copy
+import base64
+import gzip
 import json
 import secrets
 from pathlib import Path
 from .core import RelayError, digest, now
 
 API = [
+    {'method':'POST','path':'/api/research/stop','purpose':'Stop one investigation cooperatively; preserve saved results. An in-flight provider request may finish and be billed.','example':{'id':'PROJECT'}},
+    {'method':'POST','path':'/api/research/scan-tables','purpose':'Inventory tables from retrieved text without inference; pause for source selection.','example':{'id':'PROJECT'}},
+    {'method':'POST','path':'/api/research/extract-selected','purpose':'Extract selected source rows and pause for comparison selection.','example':{'id':'PROJECT','revision':1,'selections':[{'paper':'PAPER','table':'TABLE','rows':['L10','L11']}]}},
     {'method':'GET','path':'/api/desk','purpose':'Recent research runs, source coverage, and explicitly recorded validation.'},
     {'method':'GET','path':'/api/submission/export','purpose':'Download the source test build with README, license, data, and tests. Excludes local credentials and private state.'},
     {'method':'GET','path':'/api/schema','purpose':'API catalog and request examples. Mutations use the session bearer token from /api/state.'},
@@ -58,7 +63,13 @@ def overview(root, research):
     if path.exists():
         receipt=json.loads(path.read_text(encoding='utf-8'));project=receipt['project']['project']
         validation={'title':project['hypothesis'],'description':receipt['kind'],'papers':len(project['papers']),'results':sum(len(x.get('metrics',[])) for x in project['papers']),'tokens':project.get('tokens',0)}
-    return {'featured':{'id':featured['id'],'status':featured['status'],'papers':len(featured['papers']),'tokens':featured.get('tokens',0),
+    guided_path=root/'data/research/guided-study.json'
+    guided=None
+    if guided_path.exists():
+        recorded=json.loads(guided_path.read_text(encoding='utf-8'))
+        project=recorded['project']['project']
+        guided={'title':project['hypothesis'],'id':project['id'],'results':sum(len(x['metrics']) for x in project['papers']),'summary':recorded.get('summary',{}),'calls':len(recorded.get('calls',[]))}
+    return {'guidedStudy':guided,'featured':{'id':featured['id'],'status':featured['status'],'papers':len(featured['papers']),'tokens':featured.get('tokens',0),
                         'calls':len(featured.get('calls',[])),'compiled':bool(featured.get('compile',{}).get('ok'))} if featured else None,
             'recent':[{'id':p['id'],'title':p.get('branchName') or p['hypothesis'],'status':p['status'],'papers':len(p['papers']),'results':sum(len(x.get('metrics',[])) for x in p['papers']),'tokens':p.get('tokens',0),'calls':len(p.get('calls',[])),'provider':p['provider'],'model':p['model']} for p in research.projects if p.get('provider')=='nebius' and p.get('studyKey') not in ('nebius-benchmark-audit-v1','nebius-discovery-v1') and not p.get('parentProject')][:4],
             'findings':[],'workflowValidation':validation,'evaluation':evaluation(root),
@@ -146,19 +157,30 @@ def load_discovery(root, research):
         return {'id':p['id'],'loaded':True}
 
 
-def load_validation(root,research):
-    path=root/'data/research/workflow-validation.json'
+def load_validation(root,research,filename='workflow-validation.json'):
+    path=root/'data/research'/filename
     if not path.exists():raise RelayError('NOT_FOUND','No recorded workflow validation is installed.',404)
     receipt=json.loads(path.read_text(encoding='utf-8'));document=copy.deepcopy(receipt['project'])
     for paper in document['project']['papers']:
         if paper.get('sourceRef') and digest(paper.get('evidence',''))!=paper['sourceRef']:
             raise RelayError('SOURCE_CHANGED','Recorded source hash does not match its evidence; import stopped.',409)
-    document['project']['archive']=True
-    document['project']['studyKey']='generic-workflow-validation-v1'
+    recorded_checkpoints=receipt.get('checkpoints',[])
+    for item in recorded_checkpoints:
+        if 'snapshotGzip' in item:item['snapshot']=json.loads(gzip.decompress(base64.b64decode(item['snapshotGzip'])))
+        blob=json.dumps(item['snapshot'],ensure_ascii=False,sort_keys=True)
+        if digest(blob)!=item['node']['sha256'] or item['snapshot']['id']!=document['project']['id']:
+            raise RelayError('CHECKPOINT_CHANGED','Recorded checkpoint integrity check failed.',409)
+    document['project']['archive']=document['project'].get('archive') or True
+    document['project']['studyKey']='guided-study-v1' if filename=='guided-study.json' else 'generic-workflow-validation-v1'
     result=research.import_project(document)
     result['id']=document['project']['id']
     p=research.get(result['id'])
     if not result.get('existing'):
         p['calls']=receipt.get('calls',[])
-        research.checkpoint(p,'validation-import','Recorded live validation imported without new inference',details={'receipt':'data/research/workflow-validation.json','humanReviewed':False})
+        if recorded_checkpoints:
+            folder=root/'.relay/checkpoints'/p['id'];folder.mkdir(parents=True,exist_ok=True)
+            for item in recorded_checkpoints:
+                (folder/(item['node']['id']+'.json')).write_text(json.dumps(item['snapshot'],ensure_ascii=False,sort_keys=True),encoding='utf-8')
+            p['execution']=[copy.deepcopy(item['node']) for item in recorded_checkpoints]
+        research.checkpoint(p,'validation-import','Recorded live validation imported without new inference',details={'receipt':'data/research/'+filename,'humanReviewed':False})
     return result

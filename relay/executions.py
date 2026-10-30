@@ -18,7 +18,7 @@ class ExecutionHistory:
             folder=self.root/'.relay/checkpoints'/p['id']; folder.mkdir(parents=True,exist_ok=True)
             (folder/(node['id']+'.json')).write_text(blob, encoding='utf-8')
             nodes.append(node); self.save()
-            if p.get('status') not in ('discovering', 'drafting', 'investigating') and hasattr(self, 'keys'): self.keys.pop(p['id'], None)
+            if p.get('status') not in ('discovering', 'drafting', 'investigating', 'stopping') and hasattr(self, 'keys'): self.keys.pop(p['id'], None)
         return node
 
     def cfg_for_id(self, pid):
@@ -63,7 +63,7 @@ class ExecutionHistory:
                      branchName=str(data.get('name') or 'Alternative path')[:100],
                      parentProject=data['id'],parentNode=node['id'],rootProject=snapshot.get('rootProject',data['id']),
                      inheritedTokens=snapshot.get('tokens',0),draftReviewed=False)
-            p.pop('error',None); p.pop('compile',None); p.pop('archive',None)
+            p.pop('stopRequested',None);p.pop('runBudget',None);p.pop('activeCall',None);p.pop('error',None); p.pop('compile',None); p.pop('archive',None)
             p['feedback']=str(data.get('feedback',''))[:3000]
             if changed or action in ('assess','extract','plan','search'):
                 p.update(tex='',bib='',suggestions=[],synthesis='',goalAssessments=[],synthesisStale=True,draftReviewed=False)
@@ -77,7 +77,7 @@ class ExecutionHistory:
             self.projects.insert(0,p)
             self.checkpoint(p,'branch','Branched from '+node['label'],details={'sourceProject':data['id'],'sourceNode':node['id'],'next':action,'inheritedRevision':node['revision']})
             self.event(p,'Created an independent branch. The parent checkpoint is unchanged.')
-        if action!='snapshot': threading.Thread(target=self.continue_branch,args=(p,action),daemon=True).start()
+        if action!='snapshot': self.launch(p,self.continue_branch,(p,action))
         return {'id':p['id'],'parentProject':p['parentProject'],'parentNode':p['parentNode']}
 
     def continue_branch(self,p,action):

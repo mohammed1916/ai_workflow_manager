@@ -41,6 +41,16 @@ class ResearchAPITests(unittest.TestCase):
         self.assertEqual(self.call('/api/state',headers={'Origin':'https://example.org'})[0],403)
         self.assertEqual(self.call('/api/state',headers={'Host':'evil.test'})[0],403)
         self.assertEqual(self.call('/api/schema',headers={'Sec-Fetch-Site':'cross-site'})[0],403)
+    def test_guided_routes_preserve_sources_and_validate_selections(self):
+        headers={'Authorization':'Bearer '+self.store.token}
+        project={'id':'c'*16,'hypothesis':'Compare the measured outcomes for A and B.','status':'review','papers':[{'id':'P','title':'Source','metrics':[],'evidence':'Table 1: Results\n| Group | Outcome |\n| A | 10 |\n| B | 11 |\n'}],'protocol':{'version':3}}
+        self.assertEqual(self.call('/api/research/import',{'format':'relay-research/1','project':project},headers)[0],200)
+        self.assertEqual(self.call('/api/research/scan-tables',{'id':project['id']},headers)[0],200)
+        code,body=self.call('/api/research?ids='+project['id']);saved=json.loads(body)['projects'][0]
+        self.assertEqual(saved['status'],'select_tables');self.assertEqual(len(saved['papers'][0]['tables']),1)
+        self.assertEqual(self.call('/api/research/extract-selected',{'id':project['id'],'revision':saved['revision'],'selections':[]},headers)[0],400)
+        self.assertEqual(self.call('/api/research/stop',{'id':project['id']},headers)[0],200)
+
     def test_removed_endpoints_cannot_run(self):
         for path in ['/api/runs','/api/approve','/api/clips','/api/reveal']:
             self.assertEqual(self.call(path,{},headers={'Authorization':'Bearer '+self.store.token})[0],404)

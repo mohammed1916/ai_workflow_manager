@@ -91,6 +91,19 @@ def ground_output(raw,lines,allowed=None):
             value=str(metric.get('value',''))
             candidates=[by_id[i] for i in ids if value and value in by_id[i]['text']]
             if len(candidates)==1:metric['quote']=candidates[0]['text']
+        # Context addresses resolve literal text only; semantic applicability is audited later.
+        locations=metric.get('fieldLocations',{})
+        if isinstance(locations,dict):
+            for key,address in locations.items():
+                if not key.startswith('factor_') or not isinstance(address,dict):continue
+                support_line=by_id.get(address.get('line'));quote=''
+                if support_line:
+                    column=address.get('column')
+                    if isinstance(column,str) and column.isdigit():column=int(column)
+                    if column is None:quote=support_line['text']
+                    else:quote=next((c['text'] for c in support_line.get('cells',[]) if c['column']==column),'')
+                    if quote:ids.append(support_line['id'])
+                metric.setdefault('evidence',{})[key]=quote
         metric['sourceEvidence']=[{'line':i,'quote':by_id[i]['text']} for i in dict.fromkeys(i for i in ids if isinstance(i,str) and i in by_id)]
     return out
 

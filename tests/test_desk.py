@@ -43,3 +43,20 @@ class SavedStudyTests(unittest.TestCase):
             r=Research(root)
             with self.assertRaises(RelayError) as e:load_study(root,r)
             self.assertEqual(e.exception.code,'SOURCE_CHANGED');self.assertEqual(r.projects,[])
+
+    def test_guided_recording_loads_without_inference_and_preserves_checkpoints(self):
+        from relay.desk import load_validation
+        from relay.research import compare
+        from unittest.mock import patch
+        with tempfile.TemporaryDirectory() as folder:
+            root=Path(folder);(root/'data/research').mkdir(parents=True)
+            shutil.copyfile(ROOT/'data/research/guided-study.json',root/'data/research/guided-study.json')
+            r=Research(root)
+            with patch.object(r,'llm',side_effect=AssertionError('Recorded opening must not call inference')):
+                result=load_validation(root,r,'guided-study.json')
+            p=r.get(result['id']);summary=compare(p['papers'],assessments=p['comparisonAssessments'])['summary']
+            self.assertEqual(summary,overview(root,r)['guidedStudy']['summary'])
+            self.assertGreaterEqual(summary['comparable'],2)
+            self.assertTrue(all(not m.get('verified') for paper in p['papers'] for m in paper['metrics']))
+            for node in p['execution']:r.get_checkpoint(p['id'],node['id'])
+            self.assertTrue(load_validation(root,r,'guided-study.json')['existing'])

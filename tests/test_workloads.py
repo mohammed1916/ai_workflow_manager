@@ -69,9 +69,9 @@ class WorkloadTests(unittest.TestCase):
             m=papers[0]['metrics'][0];m['protocol']=protocol
             p={'id':'x','papers':papers,'protocol':protocol,'revision':1,'status':'review'};r.projects=[p]
             fields=[f['key'] for f in protocol['factors']]
-            with patch('relay.research.threading.Thread') as thread,patch.object(r,'checkpoint'):
+            with patch.object(r,'launch') as thread,patch.object(r,'checkpoint'):
                 r.investigate({'id':'x','revision':1,'targets':[{'paper':papers[0]['id'],'metric':m['id'],'fields':fields}]})
-            targets=thread.call_args.kwargs['args'][1]
+            targets=thread.call_args.args[2][1]
             self.assertEqual([f for _,_,batch in targets for f in batch],fields)
             self.assertLessEqual(max(len(batch) for _,_,batch in targets),6)
     def test_custom_discovery_fetches_more_than_one_page(self):
