@@ -57,6 +57,22 @@ A paired live trial on the same selected DeiT and T2T-ViT rows retained **12 obs
 
 Browser copies remain in **IndexedDB**; the backend keeps content-addressed sources and checkpoints. A vector index is not needed to inspect selected tables or validate exact source addresses. Add semantic retrieval only if measured evidence coverage needs it; retrieval similarity is not evidence that two experiments are comparable. No FAISS or Milvus dependency was added.
 
+## Small cross-model diagnostic
+
+[Raw prompts, sources, expected labels, outputs, and usage](data/research/model-comparison.json) · Re-run with `python3 scripts/compare_research_models.py` using your Nebius key. Re-running spends credits and replaces the receipt; results can vary.
+
+On 2026-10-30, three available Token Factory models received the same six fixed tasks from DeiT and T2T-ViT source excerpts, with the same prompt, temperature 0.2, and 6,000-token output cap. One request per model; no repairs or retries. Expected answers were checked against the excerpts by the coding assistant, not an independent expert.
+
+| Model | Exact value sets | Expected status labels | Time | Total tokens |
+|---|---:|---:|---:|---:|
+| Nemotron 3 Super | 6/6 | 6/6 | 15.73 s | 4,114 |
+| Nemotron 3 Nano | 6/6 | 6/6 | 31.11 s | 5,868 |
+| GPT-OSS-120B | 6/6 | 6/6 | 3.68 s | 3,047 |
+
+**Correct labels were not always correct reasoning.** Nano attributed the Ti224/S224 incompatibility to input resolution, although both are 224 and the base variant differs. Super and GPT-OSS identified the variant conflict correctly. Every returned citation identifier exists, but citations were not consistently complete: Nano and GPT-OSS omitted headings, and Super did not consistently cite all metric/context headings. No unsupported acceptance appeared in the three deliberately conflicting/missing-condition cases.
+
+This is a small development diagnostic on already-used papers, not a held-out benchmark, independent evaluation, full-pipeline test, or statistical model ranking. GPT-OSS was faster in this run; that does not establish general latency or cost superiority. Production remains on Nemotron Super; Nano and GPT-OSS were tested as alternatives, not silently substituted into the recorded investigations.
+
 ## Recorded guided accuracy investigation
 
 Open **Research desk → Open guided results**. The saved [guided study](data/research/guided-study.json) records real Nemotron calls and two Tavily discovery queries. Two selected rows from DeiT Table 3 produce **8 top-1 accuracy observations**, **16 assessed pairs**, **3 comparable**, **12 incompatible**, and **1 insufficient-evidence** result. The three accepted, source-rechecked pairs report 72.2→74.5, 79.8→81.2, and 81.8→83.4 at matched 224-resolution variants. These are descriptive within-paper differences, not an independent experiment.
