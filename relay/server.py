@@ -68,7 +68,8 @@ def make_handler(store,port):
                         paper=research.paper(research.get(q.get('id',[''])[0]),q.get('paper',[''])[0])
                         text=research.source(paper)
                         self.respond({'text':text,'sha256':digest(text),'url':paper.get('evidenceUrl'),'kind':paper.get('evidenceKind')})
-                elif route=='/README.md': self.respond((ROOT/'README.md').read_bytes(),content_type='text/plain; charset=utf-8')
+                elif route=='/README.md':
+                    self.send_response(302);self.send_header('Location','https://github.com/mohammed1916/ai_workflow_manager/blob/main/README.md');self.send_header('Content-Length','0');self.send_header('Cache-Control','no-store');self.end_headers()
                 elif route=='/api/research/samples': self.respond(research.samples())
                 elif route=='/api/research':
                     # Only projects the browser names by id are returned; nothing is listed globally.
