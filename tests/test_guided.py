@@ -96,3 +96,52 @@ class GuidedTests(unittest.TestCase):
     def test_focused_check_requires_a_current_revision(self):
         with self.assertRaises(RelayError):self.r.verify_result({'id':self.p['id'],'revision':0,'condition':'Check condition A'})
         self.assertEqual(self.p['status'],'review')
+
+    def test_paper_workers_return_to_coordinator_and_group_same_paper(self):
+        self.p['status']='discovering';self.p['paperConcurrency']=2
+        other={'id':'Q','title':'Other paper','metrics':[]};self.p['papers'].append(other)
+        barrier=threading.Barrier(2);sizes=[]
+        def extract(p,jobs):
+            sizes.append(len(jobs));barrier.wait(timeout=2)
+            jobs[0][0]['metrics']=[{'id':'one'}]
+        jobs=[(self.p['papers'][0],[],{}),(self.p['papers'][0],[],{}),(other,[],{})]
+        with patch.object(self.r,'extract_selected_jobs',side_effect=extract):self.r.run_guided(self.p,jobs)
+        self.assertEqual(sorted(sizes),[1,2]);self.assertEqual(self.p['status'],'select_comparisons')
+        self.assertEqual([w['status'] for w in self.p['paperWorkers'].values()],['returned','returned'])
+        self.assertEqual(self.p['paperExecution']['concurrency'],2)
+    def test_parallel_calls_reserve_budget_before_provider_request(self):
+        entered=threading.Event();release=threading.Event();errors=[]
+        self.p['runBudget']={'deadline':time.time()+60,'startCalls':0,'maxCalls':1}
+        def model(*args,**kwargs):entered.set();release.wait(2);return {}
+        def first():
+            try:self.r.llm(self.p,'test',{})
+            except BaseException as e:errors.append(e)
+        with patch('relay.research.model_call',side_effect=model) as provider:
+            t=threading.Thread(target=first);t.start();self.assertTrue(entered.wait(1))
+            try:
+                with self.assertRaises(RunStopped):self.r.llm(self.p,'second',{})
+                self.assertEqual(len(self.p['activeCalls']),1)
+            finally:release.set();t.join(2)
+            self.assertEqual(provider.call_count,1);self.assertEqual(errors,[])
+        self.assertEqual(self.p['activeCalls'],{})
+    def test_worker_failure_preserves_other_paper(self):
+        self.p['status']='discovering';other={'id':'Q','title':'Other','metrics':[]};self.p['papers'].append(other)
+        def extract(p,jobs):
+            if jobs[0][0]['id']=='Q':raise ValueError('Source unavailable')
+            jobs[0][0]['metrics']=[{'id':'retained'}]
+        with patch.object(self.r,'extract_selected_jobs',side_effect=extract):self.r.run_guided(self.p,[(x,[],{}) for x in self.p['papers']])
+        self.assertEqual(self.p['paperWorkers']['Q']['status'],'failed')
+        self.assertEqual(self.p['papers'][0]['metrics'][0]['id'],'retained')
+    def test_stop_parallel_workers_prevents_queued_paper_from_calling(self):
+        second={'id':'Q','title':'Second','metrics':[]};third={'id':'R','title':'Third','metrics':[]}
+        self.p['papers'] += [second,third];self.p['paperConcurrency']=2
+        barrier=threading.Barrier(3);release=threading.Event()
+        def extract(p,jobs):
+            barrier.wait(3);release.wait(3);self.r.check_running(p)
+        with patch.object(self.r,'extract_selected_jobs',side_effect=extract) as extract_call:
+            t=self.r.launch(self.p,self.r.run_guided,(self.p,[(paper,[],{}) for paper in self.p['papers']]))
+            self.p['status']='discovering';barrier.wait(3)
+            self.r.stop({'id':self.p['id']});release.set();t.join(3)
+            self.assertFalse(t.is_alive());self.assertEqual(extract_call.call_count,2)
+            self.assertEqual(self.p['status'],'stopped')
+            self.assertTrue(all(w['status']=='stopped' for w in self.p['paperWorkers'].values()))

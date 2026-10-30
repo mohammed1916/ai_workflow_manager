@@ -60,3 +60,20 @@ class SavedStudyTests(unittest.TestCase):
             self.assertTrue(all(not m.get('verified') for paper in p['papers'] for m in paper['metrics']))
             for node in p['execution']:r.get_checkpoint(p['id'],node['id'])
             self.assertTrue(load_validation(root,r,'guided-study.json')['existing'])
+    def test_parallel_recording_preserves_receipts_and_uncertainty(self):
+        from relay.desk import load_validation
+        from relay.research import compare
+        from unittest.mock import patch
+        with tempfile.TemporaryDirectory() as folder:
+            root=Path(folder);(root/'data/research').mkdir(parents=True)
+            shutil.copyfile(ROOT/'data/research/parallel-study.json',root/'data/research/parallel-study.json')
+            r=Research(root)
+            with patch.object(r,'llm',side_effect=AssertionError('No inference on recorded open')):
+                result=load_validation(root,r,'parallel-study.json')
+            p=r.get(result['id'])
+            self.assertEqual(sum(len(x['metrics']) for x in p['papers']),12)
+            self.assertEqual(compare(p['papers'],assessments=p['comparisonAssessments'])['summary'],overview(root,r)['parallelStudy']['summary'])
+            self.assertEqual(len(p['paperWorkers']),2)
+            self.assertTrue(all(w['status']=='returned' for w in p['paperWorkers'].values()))
+            for node in p['execution']:r.get_checkpoint(p['id'],node['id'])
+            self.assertTrue(load_validation(root,r,'parallel-study.json')['existing'])

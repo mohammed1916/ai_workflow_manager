@@ -63,7 +63,7 @@ class ExecutionHistory:
                      branchName=str(data.get('name') or 'Alternative path')[:100],
                      parentProject=data['id'],parentNode=node['id'],rootProject=snapshot.get('rootProject',data['id']),
                      inheritedTokens=snapshot.get('tokens',0),draftReviewed=False)
-            p.pop('stopRequested',None);p.pop('runBudget',None);p.pop('activeCall',None);p.pop('error',None); p.pop('compile',None); p.pop('archive',None)
+            p.pop('stopRequested',None);p.pop('runBudget',None);p.pop('activeCall',None);p.pop('activeCalls',None);p.pop('paperWorkers',None);p.pop('paperExecution',None);p.pop('error',None); p.pop('compile',None); p.pop('archive',None)
             p['feedback']=str(data.get('feedback',''))[:3000]
             if changed or action in ('assess','extract','plan','search'):
                 p.update(tex='',bib='',suggestions=[],synthesis='',goalAssessments=[],synthesisStale=True,draftReviewed=False)

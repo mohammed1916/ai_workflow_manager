@@ -47,6 +47,16 @@ Open **Check one result**, search for the metric or method, choose a retained ob
 
 Workload selectors explicitly offer **1**, **2**, and larger/custom counts. One result per paper can supply two observations; one comparison means one pair. To compare two specific observations, select exactly one pair in Select evidence.
 
+## Bounded paper workers and opening slides
+
+[Open the four-slide introduction](https://relay-research.onrender.com/intro.html). Arrow keys advance; speaker notes, fullscreen, and print are available. Use the first two slides briefly, then demonstrate the real evidence. Keep the submission video under three minutes.
+
+Guided extraction groups selected rows by paper and runs up to **two independent Nebius/Nemotron paper workers**. Select sequential processing if preferred. Each worker returns source-addressed observations to a coordinator; comparison selection and source rechecks happen afterward. Worker failures retain other papers' evidence. Active calls reserve a shared call budget, Stop prevents further requests, and execution checkpoints remain branchable. These are bounded extraction workers, not independent autonomous research teams.
+
+A paired live trial on the same selected DeiT and T2T-ViT rows retained **12 observations using two model calls** in each mode: **40.05 seconds sequential**, **25.05 seconds with two workers**. Timing uses five-second completion polling and includes extraction only, excluding planning and later comparison checks. This single stochastic trial does not establish general speed, equivalent interpretations, or extraction accuracy. Inspect the recorded trial and model receipts from the research desk. Subsequent comparison work assessed six pairs: zero comparable, two labeled incompatible, and four unresolved; thirty other candidates were not assessed. These are unverified judgments, including questionable model-name interpretation, and remain available for human review. Parallel extraction does not fix semantic reasoning errors. The separate guided recording below remains the demonstration of accepted source-rechecked pairs.
+
+Browser copies remain in **IndexedDB**; the backend keeps content-addressed sources and checkpoints. A vector index is not needed to inspect selected tables or validate exact source addresses. Add semantic retrieval only if measured evidence coverage needs it; retrieval similarity is not evidence that two experiments are comparable. No FAISS or Milvus dependency was added.
+
 ## Recorded guided accuracy investigation
 
 Open **Research desk → Open guided results**. The saved [guided study](data/research/guided-study.json) records real Nemotron calls and two Tavily discovery queries. Two selected rows from DeiT Table 3 produce **8 top-1 accuracy observations**, **16 assessed pairs**, **3 comparable**, **12 incompatible**, and **1 insufficient-evidence** result. The three accepted, source-rechecked pairs report 72.2→74.5, 79.8→81.2, and 81.8→83.4 at matched 224-resolution variants. These are descriptive within-paper differences, not an independent experiment.
@@ -165,7 +175,7 @@ The first-pass model incorrectly accepted three pairs. Rechecking original table
 
 Token counts in this record are cumulative across development continuations and repairs, not the cost of a single fresh investigation. Earlier development attempts and failed logical calls are retained. This was seed-only validation: it does not demonstrate discovery or Tavily usage.
 
-The software checks currently pass **163 Python tests and 12 JavaScript tests**, including API loading of a recorded execution without inference. UI source syntax is checked; visual acceptance is left to the researcher, as requested. A successful provider call or completed source traversal does not prove complete extraction, correct interpretation, or an exhaustive literature review. Quote containment proves that text occurs in the source, not that the model understood it. Plans and semantic judgments can still be wrong and require expert review.
+The software checks currently pass **168 Python tests and 12 JavaScript tests**, including API loading of a recorded execution without inference. UI source syntax is checked; visual acceptance is left to the researcher, as requested. A successful provider call or completed source traversal does not prove complete extraction, correct interpretation, or an exhaustive literature review. Quote containment proves that text occurs in the source, not that the model understood it. Plans and semantic judgments can still be wrong and require expert review.
 
 The retired traffic comparator and its runner have been removed. Historical receipts remain in `eval/results/`; `python3 scripts/verify_evaluation.py` reconstructs their recorded metrics. Those agent-annotated cases share papers between development and held-out sets and were used during tuning. Their scores must not be presented as accuracy for the current generic workflow. Earlier live records in `data/research/` also predate this redesign unless explicitly identified otherwise.
 

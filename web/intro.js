@@ -1,0 +1,6 @@
+const slides=[...document.querySelectorAll('.slide')];let current=0;
+function show(index){current=Math.max(0,Math.min(slides.length-1,index));slides.forEach((s,i)=>s.hidden=i!==current);document.querySelector('#position').textContent=`${current+1} / ${slides.length}`;document.querySelector('#previous').disabled=current===0;document.querySelector('#next').disabled=current===slides.length-1;document.querySelector('#notes').textContent=slides[current].dataset.notes}
+document.querySelector('#previous').onclick=()=>show(current-1);document.querySelector('#next').onclick=()=>show(current+1);
+document.addEventListener('keydown',e=>{if(['ArrowRight','PageDown',' '].includes(e.key)){e.preventDefault();show(current+1)}if(['ArrowLeft','PageUp'].includes(e.key)){e.preventDefault();show(current-1)}});
+document.querySelector('#fullscreen').onclick=async()=>{try{if(document.fullscreenElement)await document.exitFullscreen();else await document.body.requestFullscreen()}catch{document.querySelector('#fullscreen').textContent='Use browser fullscreen'}};
+document.querySelector('#notes-toggle').onclick=()=>{const n=document.querySelector('#notes');n.hidden=!n.hidden;document.querySelector('#notes-toggle').setAttribute('aria-expanded',String(!n.hidden))};show(0);

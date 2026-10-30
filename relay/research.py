@@ -497,7 +497,11 @@ class Research(GuidedWorkflow, ExecutionHistory):
                 if 'topic' in paper and paper.get('protocol',{}).get('version')!=3: paper['topic'] = canonical_topic(paper['topic'])
                 for m in paper.get('metrics', []):
                     m.setdefault('id', metric_id(paper['id'], m)); m.setdefault('history', [])
-            if p['status'] in BUSY: p.update(status='interrupted', error='Companion restarted. Branch from a saved checkpoint to continue.')
+            if p['status'] in BUSY:
+                p.update(status='interrupted', error='Companion restarted. Branch from a saved checkpoint to continue.')
+                p.pop('activeCalls',None);p.pop('activeCall',None)
+                for worker in p.get('paperWorkers',{}).values():
+                    if worker.get('status') in ('running','queued'):worker['status']='interrupted'
             if not p.get('execution'):
                 p.setdefault('revision', 1)
                 self.checkpoint(p, 'import', 'Existing saved result', details={'note': 'Historical intermediate snapshots were not recorded; this is the saved state at migration.'})
@@ -561,7 +565,7 @@ class Research(GuidedWorkflow, ExecutionHistory):
             p = copy.deepcopy(self.get(pid))
             for paper in p['papers']:
                 paper['evidence'] = self.source(paper)
-            for k in ('execution', 'events', 'activeStep', 'activeCall', 'error', 'compile', 'calls'): p.pop(k, None)
+            for k in ('execution', 'events', 'activeStep', 'activeCall', 'activeCalls', 'error', 'compile', 'calls'): p.pop(k, None)
             return {'format': 'relay-research/1', 'project': p}
 
     def import_project(self, doc):
@@ -614,9 +618,15 @@ class Research(GuidedWorkflow, ExecutionHistory):
         def usage(tokens):
             with self.lock: p['tokens'] = p.get('tokens', 0) + tokens
         self.check_running(p)
-        record = {}
+        record = {};call_id=secrets.token_hex(8)
         with self.lock:
-            p['activeCall']={'kind':kind,'model':p['model'],'provider':p['provider'],'started':now()}
+            self.check_running(p)
+            budget=p.get('runBudget')
+            if budget and len(p.get('calls',[]))-budget['startCalls']+len(p.get('activeCalls',{}))>=budget['maxCalls']:
+                from .guided import RunStopped
+                raise RunStopped('Model-call budget reached. Saved evidence is ready to inspect.')
+            p['activeCall']={'id':call_id,'kind':kind,'model':p['model'],'provider':p['provider'],'started':now(),'paper':payload.get('paper') if isinstance(payload.get('paper'),str) else ''}
+            p.setdefault('activeCalls',{})[call_id]=p['activeCall']
             self.save()
         try:
             result = model_call(self.cfg_for_id(p['id']), p['provider'], p['model'], system, payload, kind, max_tokens, usage, record, lambda: self.check_running(p))
@@ -627,7 +637,11 @@ class Research(GuidedWorkflow, ExecutionHistory):
         finally:
             with self.lock:
                 p.setdefault('calls', []).append(record); p['calls'] = p['calls'][-500:]
-                p.pop('activeCall',None);self.save()
+                if isinstance(payload.get('paper'),str):record['paper']=payload['paper']
+                p.setdefault('activeCalls',{}).pop(call_id,None)
+                if p['activeCalls']:p['activeCall']=next(iter(p['activeCalls'].values()))
+                else:p.pop('activeCall',None)
+                self.save()
 
     # ------------------------------------------------------------ discovery
     def start(self, data):

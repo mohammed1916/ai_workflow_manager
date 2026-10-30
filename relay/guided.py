@@ -118,38 +118,68 @@ class GuidedWorkflow:
                     begin=source.index(context);end=begin+len(context)
                     chosen=list({l['id']:l for l in chosen+[l for l in lines if l['end']>begin and l['start']<end]}.values())
                 jobs.append((paper,chosen,selection))
+            concurrency=data.get('paperConcurrency',p.get('paperConcurrency',2))
+            if type(concurrency) is not int or concurrency not in (1,2):raise RelayError('INVALID_CONCURRENCY','Choose one or two concurrent paper workers.')
+            p['paperConcurrency']=concurrency
             p['guidedSelections']=copy.deepcopy(selections);p['guidedDirection']=str(data.get('direction',''))[:2000]
             p.update(status='discovering',guidedStage='extracting');p['revision']+=1
             self.checkpoint(p,'selection','Source selection submitted',details={'selections':selections,'humanReviewed':False})
         self.launch(p,self.run_guided,(p,jobs));return {'ok':True}
 
-    def run_guided(self,p,jobs):
+    def extract_selected_jobs(self,p,jobs):
         from .research import extraction_system,validate_analysis,check_metric
-        try:
-            for paper,lines,selection in jobs:
-                self.event(p,'Extracting selected table evidence: '+paper['title'][:80])
-                source=self.source(paper);paper['protocol']=copy.deepcopy(p['protocol'])
-                prompt=extraction_system(p['protocol'],'all')+' Include outcomeId and outcomeQuote matching the contract outcomes; outcomeQuote must explain the outcome (for example a heading), not merely repeat the number. Every factor_* value is a string directly on the metric object; evidence maps factor keys to verbatim quote strings, never nested objects. Extract only requested outcomes from the selected rows. Preserve separate results for each variant and condition.'
-                answer=self.llm(p,prompt,{'question':p['hypothesis'],'contract':p['protocol'],'direction':p.get('guidedDirection',''),'paper':paper['title'],'lines':lines,'selectedResultLines':selection.get('rows'),'instruction':'Extract numeric results only from selectedResultLines when provided. Other lines are headers or context.'},'selected-table-extraction',12000)
-                errors=schema_errors(answer,p['protocol'])
-                if errors:
-                    paper.setdefault('selectionSchemaRepairs',[]).append({'errors':errors,'response':copy.deepcopy(answer)})
-                    answer=self.llm(p,prompt,{'question':p['hypothesis'],'contract':p['protocol'],'lines':lines,'selectedResultLines':selection.get('rows'),'previousResponse':answer,'schemaErrors':errors,'instruction':'Repair the output schema once using the same selected evidence. Put all factor values directly on each metric, and quote strings in evidence. Preserve result row and cell addresses.'},'selected-table-schema-repair',14000)
-                grounded=extraction.ground_output(answer,extraction.indexed_lines(source),{l['id'] for l in lines})
-                if selection.get('rows'):
-                    grounded['metrics']=[m for m in grounded.get('metrics',[]) if (m.get('valueLocation') or {}).get('line') in selection['rows']]
-                probe=validate_analysis({'id':paper['id'],'protocol':paper['protocol']},grounded,source)
-                with self.lock:
-                    paper['metrics']=extraction.merge(paper.get('metrics',[]),probe['metrics'])
-                    for metric in paper['metrics']:check_metric(metric,source,paper['title'])
-                    paper.setdefault('extractionOutputs',[]).append({'selection':selection,'response':answer})
-                    paper.setdefault('rejectionDetails',[]).extend(probe.get('rejectionDetails',[]))
-                    paper['coverage']={'status':'selected','sourceChars':len(source),'coveredChars':extraction.covered_chars(lines),'readPassages':1,'totalPassages':1,'retained':len(paper['metrics']),'stopReason':'Selected rows and context only. Unselected tables have not been analyzed.'}
-                    p['revision']+=1;self.checkpoint(p,'selected-evidence','Selected results extracted',details={'paper':paper['id'],'retained':len(probe['metrics']),'rejected':probe.get('rejectedMetrics',0)})
-            self.check_running(p)
+        for paper,lines,selection in jobs:
+            self.event(p,'Extracting selected table evidence: '+paper['title'][:80])
+            source=self.source(paper)
+            with self.lock:paper['protocol']=copy.deepcopy(p['protocol'])
+            prompt=extraction_system(p['protocol'],'all')+' Include outcomeId and outcomeQuote matching the contract outcomes; outcomeQuote must explain the outcome (for example a heading), not merely repeat the number. Every factor_* value is a string directly on the metric object; evidence maps factor keys to verbatim quote strings, never nested objects. Extract only requested outcomes from the selected rows. Preserve separate results for each variant and condition.'
+            answer=self.llm(p,prompt,{'question':p['hypothesis'],'contract':p['protocol'],'direction':p.get('guidedDirection',''),'paper':paper['title'],'lines':lines,'selectedResultLines':selection.get('rows'),'instruction':'Extract numeric results only from selectedResultLines when provided. Other lines are headers or context.'},'selected-table-extraction',12000)
+            errors=schema_errors(answer,p['protocol'])
+            if errors:
+                with self.lock:paper.setdefault('selectionSchemaRepairs',[]).append({'errors':errors,'response':copy.deepcopy(answer)})
+                answer=self.llm(p,prompt,{'question':p['hypothesis'],'contract':p['protocol'],'lines':lines,'selectedResultLines':selection.get('rows'),'previousResponse':answer,'schemaErrors':errors,'instruction':'Repair the output schema once using the same selected evidence. Put all factor values directly on each metric, and quote strings in evidence. Preserve result row and cell addresses.'},'selected-table-schema-repair',14000)
+            grounded=extraction.ground_output(answer,extraction.indexed_lines(source),{l['id'] for l in lines})
+            if selection.get('rows'):
+                grounded['metrics']=[m for m in grounded.get('metrics',[]) if (m.get('valueLocation') or {}).get('line') in selection['rows']]
+            probe=validate_analysis({'id':paper['id'],'protocol':paper['protocol']},grounded,source)
             with self.lock:
+                paper['metrics']=extraction.merge(paper.get('metrics',[]),probe['metrics'])
+                for metric in paper['metrics']:check_metric(metric,source,paper['title'])
+                paper.setdefault('extractionOutputs',[]).append({'selection':selection,'response':answer})
+                paper.setdefault('rejectionDetails',[]).extend(probe.get('rejectionDetails',[]))
+                paper['coverage']={'status':'selected','sourceChars':len(source),'coveredChars':extraction.covered_chars(lines),'readPassages':1,'totalPassages':1,'retained':len(paper['metrics']),'stopReason':'Selected rows and context only. Unselected tables have not been analyzed.'}
+                p['revision']+=1;self.checkpoint(p,'selected-evidence','Selected results extracted',details={'paper':paper['id'],'retained':len(probe['metrics']),'rejected':probe.get('rejectedMetrics',0)})
+
+    def run_guided(self,p,jobs):
+        from concurrent.futures import ThreadPoolExecutor
+        groups={}
+        for job in jobs:groups.setdefault(job[0]['id'],[]).append(job)
+        workers=min(p.get('paperConcurrency',2),len(groups))
+        with self.lock:
+            p['paperWorkers']={pid:{'title':items[0][0]['title'],'status':'queued','selections':len(items)} for pid,items in groups.items()}
+            p['paperExecution']={'concurrency':workers,'started':now(),'papers':len(groups)};self.save()
+        def work(pid,items):
+            try:
+                self.check_running(p)
+                with self.lock:p['paperWorkers'][pid].update(status='running',started=now());self.save()
+                self.extract_selected_jobs(p,items)
+                with self.lock:p['paperWorkers'][pid].update(status='returned',finished=now(),results=len(items[0][0]['metrics']));self.save()
+            except RunStopped:
+                with self.lock:p['paperWorkers'][pid].update(status='stopped',finished=now());self.save()
+                raise
+            except Exception as error:
+                with self.lock:
+                    p['paperWorkers'][pid].update(status='failed',finished=now(),error=str(error)[:350]);self.save()
+        try:
+            with ThreadPoolExecutor(max_workers=max(1,workers)) as pool:
+                futures=[pool.submit(work,pid,items) for pid,items in groups.items()]
+                for future in futures:future.result()
+            if p.get('stopRequested'):raise RunStopped('Stopped at your request.')
+            with self.lock:
+                failed=sum(w['status']=='failed' for w in p['paperWorkers'].values())
+                p['paperExecution'].update(finished=now(),failed=failed)
                 p.update(status='select_comparisons',guidedStage='comparisons');p['revision']+=1
-                self.checkpoint(p,'comparison-selection','Choose pairs before comparison')
+                self.checkpoint(p,'comparison-selection','Paper evidence returned to coordinator',details={'papers':len(groups),'concurrency':workers,'failed':failed,'next':'Review evidence and choose comparison pairs'})
         except Exception as error:
             with self.lock:
                 p.update(status='error',error=str(error)[:350]);self.checkpoint(p,'failure','Guided extraction failed',status='failed')

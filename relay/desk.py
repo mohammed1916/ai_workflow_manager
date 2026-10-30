@@ -27,6 +27,7 @@ API = [
     {'method':'POST','path':'/api/research/update','purpose':'Review evidence, check a number, add a paper, accept/reject a proposal, apply a correction, amend-draft with structured source-reviewed prose, or save a manuscript. Requires the current revision.',
      'example':{'id':'PROJECT','revision':1,'action':'correct','actor':'agent','paper':'PAPER','metric':'METRIC','field':'metricDefinition','value':'non-standard evaluation','note':'Source-backed reason for this correction.'}},
     {'method':'POST','path':'/api/research/compare','purpose':'Compute comparisons from the current evidence. No model call.', 'example':{'id':'PROJECT','papers':[]}},
+    {'method':'POST','path':'/api/research/extract-selected','purpose':'Extract selected source rows with one or two bounded paper workers, then return evidence for comparison selection.','example':{'id':'PROJECT','revision':1,'paperConcurrency':2,'selections':[{'paper':'PAPER','table':'TABLE','rows':['L10']}]}},
     {'method':'POST','path':'/api/research/assess-comparisons','purpose':'Assess the selected total in small calls; limit accepts a positive count or all.', 'example':{'id':'PROJECT','revision':1,'entities':['e1','e2'],'limit':'all'}},
     {'method':'POST','path':'/api/research/review-contract','purpose':'Record human review of the question-to-criteria mapping; does not verify results.', 'example':{'id':'PROJECT','revision':1,'approved':True,'note':'Checked every question requirement.'}},
     {'method':'POST','path':'/api/research/review-comparison','purpose':'Record review of the current evidence assessment.', 'example':{'id':'PROJECT','revision':1,'pair':'PAIR','approved':True,'note':'Checked source applicability.'}},
@@ -70,7 +71,12 @@ def overview(root, research):
         recorded=json.loads(guided_path.read_text(encoding='utf-8'))
         project=recorded['project']['project']
         guided={'title':project['hypothesis'],'id':project['id'],'results':sum(len(x['metrics']) for x in project['papers']),'summary':recorded.get('summary',{}),'calls':len(recorded.get('calls',[]))}
-    return {'guidedStudy':guided,'featured':{'id':featured['id'],'status':featured['status'],'papers':len(featured['papers']),'tokens':featured.get('tokens',0),
+    trial_path=root/'data/research/parallel-study.json'
+    parallel=None
+    if trial_path.exists():
+        trial=json.loads(trial_path.read_text(encoding='utf-8'))
+        parallel={'id':trial['project']['project']['id'],'benchmark':trial['benchmark'],'summary':trial.get('summary',{})}
+    return {'parallelStudy':parallel,'guidedStudy':guided,'featured':{'id':featured['id'],'status':featured['status'],'papers':len(featured['papers']),'tokens':featured.get('tokens',0),
                         'calls':len(featured.get('calls',[])),'compiled':bool(featured.get('compile',{}).get('ok'))} if featured else None,
             'recent':[{'id':p['id'],'title':p.get('branchName') or p['hypothesis'],'status':p['status'],'papers':len(p['papers']),'results':sum(len(x.get('metrics',[])) for x in p['papers']),'tokens':p.get('tokens',0),'calls':len(p.get('calls',[])),'provider':p['provider'],'model':p['model']} for p in research.projects if p.get('provider')=='nebius' and p.get('studyKey') not in ('nebius-benchmark-audit-v1','nebius-discovery-v1') and not p.get('parentProject')][:4],
             'findings':[],'workflowValidation':validation,'evaluation':evaluation(root),
@@ -172,7 +178,7 @@ def load_validation(root,research,filename='workflow-validation.json'):
         if digest(blob)!=item['node']['sha256'] or item['snapshot']['id']!=document['project']['id']:
             raise RelayError('CHECKPOINT_CHANGED','Recorded checkpoint integrity check failed.',409)
     document['project']['archive']=document['project'].get('archive') or True
-    document['project']['studyKey']='guided-study-v1' if filename=='guided-study.json' else 'generic-workflow-validation-v1'
+    document['project']['studyKey']='guided-study-v1' if filename=='guided-study.json' else 'parallel-study-v1' if filename=='parallel-study.json' else 'generic-workflow-validation-v1'
     result=research.import_project(document)
     result['id']=document['project']['id']
     p=research.get(result['id'])
